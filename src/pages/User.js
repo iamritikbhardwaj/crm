@@ -1,7 +1,7 @@
 import React from 'react'
 import { CustomTable } from '../components/customTable/CustomTable';
 import BackToHome from '../components/BackToHome'
-import {ProfileDropdown} from '../components/dropDown/DropDown'
+import { userData } from '../sampleData/sampleData';
 function User() {
 
     const columns = [
@@ -34,73 +34,44 @@ function User() {
           accessor: "action",
         },
       ];
-    
-      const data = 
-      [
+
+    const inputData = [
         {
-          name: "John Doe",
-          phone: "1234567890",
-          profile: <ProfileDropdown />,
-          email: "jdoe@me.com",
-          status: "Active",
-          permissions: "View, Edit, Delete",
-          action: <button onClick={() => alert('Edit')}>Edit</button>,
+          value: "User Name",
+          dropDown: {}
         },
         {
-          name: "Jane Doe",
-          phone: "1234567890",
-          profile: <ProfileDropdown />,
-          email: "jdoe@me.com",
-          status: "Inactive",
-          permissions: "View, Edit, Delete",
-          action: <button onClick={() => alert('Edit')}>Edit</button>,
+          value: "Phone Number",
+          dropDown: {}
         },
         {
-          name: "John Doe",
-          phone: "1234567890",
-          profile: <ProfileDropdown />,
-          email: "jdoe@me.com",
-          status: "Active",
-          permissions: "View, Edit, Delete",
-          action: <button onClick={() => alert('Edit')}>Edit</button>,
+          value: "Profile",
+          dropDown: {
+            options: ["Admin", "Sales", "Operations", "Finance"]
+          }
         },
         {
-          name: "Jane Doe",
-          phone: "1234567890",
-          profile: <ProfileDropdown />,
-          email: "jdoe@me.com",
-          status: "Inactive",
-          permissions: "View, Edit, Delete",
-          action: <button onClick={() => alert('Edit')}>Edit</button>,
+          value: "Email",
+          dropDown: {}
         },
         {
-          name: "John Doe",
-          phone: "1234567890",
-          profile: <ProfileDropdown />,
-          email: "jdoe@me.com",
-          status: "Active",
-          permissions: "View, Edit, Delete",
-          action: <button onClick={() => alert('Edit')}>Edit</button>,
+          value: "Status",
+          dropDown: {
+            options: ["Active", "Inactive"]
+          }
         },
         {
-            id: 1,
-          name: "Jane Doe",
-          phone: "1234567890",
-          profile: <ProfileDropdown />,
-          email: "jdoe@me.com",
-          status: "Inactive",
-          permissions: "View, Edit, Delete",
-          action: <button onClick={() => alert('Edit')}>Edit</button>,
-        },
+          value: "Assigned Permissions",
+          dropDown: {}
+        }
       ];
 
   return (
     <div className='p-0 md:p-10'>
     <BackToHome />
-    <div className='container text-center'>
         
     {/* <!-- User Profiles Page --> */}
-    <CustomTable dataa={data} columnss={columns} button={'Add User'} path={'/userForm'}/></div>
+    <CustomTable dataa={userData} columnss={columns} button={'Add User'} path={'/userForm'} />
     </div>
   )
 }

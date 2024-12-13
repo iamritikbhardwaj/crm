@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import BackToHome from "../BackToHome";
 
-function UserForm() {
+function DestForm() {
   const [formData, setFormData] = useState({
     userName: "",
     phoneNumber: "",
@@ -25,12 +25,12 @@ function UserForm() {
   return (
     <div className="max-w-4xl mx-auto p-6 bg-slate-100 rounded-lg mt-10 shadow-lg">
         <BackToHome path={"/user"} />
-      <h2 className="text-2xl font-semibold text-center text-slate-800 mb-6">Add User</h2>
+      <h2 className="text-2xl font-semibold text-center text-slate-800 mb-6">Add Destination</h2>
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* User Name */}
+        {/* Destination */}
         <div className="flex flex-col">
           <label className="text-slate-700 text-sm font-semibold mb-2" htmlFor="userName">
-            User Name
+            Destination
           </label>
           <input
             type="text"
@@ -43,53 +43,48 @@ function UserForm() {
           />
         </div>
 
-        {/* Phone Number */}
+        {/* Currency */}
         <div className="flex flex-col">
-          <label className="text-slate-700 text-sm font-semibold mb-2" htmlFor="phoneNumber">
-            Phone Number
+          <label className="text-slate-700 text-sm font-semibold mb-2" htmlFor="userName">
+            Currency
           </label>
           <input
             type="text"
-            id="phoneNumber"
-            name="phoneNumber"
-            value={formData.phoneNumber}
+            id="userName"
+            name="userName"
+            value={formData.userName}
             onChange={handleChange}
             className="px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500"
             required
           />
         </div>
 
-        {/* Profile */}
+        {/* Agent */}
         <div className="flex flex-col">
-          <label className="text-slate-700 text-sm font-semibold mb-2" htmlFor="profile">
-            Profile
+          <label className="text-slate-700 text-sm font-semibold mb-2" htmlFor="userName">
+            Agent
           </label>
-          <select
-            id="profile"
-            name="profile"
-            value={formData.profile}
+          <input
+            type="text"
+            id="userName"
+            name="userName"
+            value={formData.userName}
             onChange={handleChange}
             className="px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500"
             required
-          >
-            <option value="">Select Profile</option>
-            <option value="Sales">Sales</option>
-            <option value="Operations">Operations</option>
-            <option value="Finance">Finance</option>
-            <option value="Admin">Admin</option>
-          </select>
+          />
         </div>
 
-        {/* Email */}
+        {/* Supplier */}
         <div className="flex flex-col">
-          <label className="text-slate-700 text-sm font-semibold mb-2" htmlFor="email">
-            Email
+          <label className="text-slate-700 text-sm font-semibold mb-2" htmlFor="userName">
+            Supplier
           </label>
           <input
-            type="email"
-            id="email"
-            name="email"
-            value={formData.email}
+            type="text"
+            id="userName"
+            name="userName"
+            value={formData.userName}
             onChange={handleChange}
             className="px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500"
             required
@@ -98,33 +93,14 @@ function UserForm() {
 
         {/* Status */}
         <div className="flex flex-col">
-          <label className="text-slate-700 text-sm font-semibold mb-2" htmlFor="status">
+          <label className="text-slate-700 text-sm font-semibold mb-2" htmlFor="userName">
             Status
-          </label>
-          <select
-            id="status"
-            name="status"
-            value={formData.status}
-            onChange={handleChange}
-            className="px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500"
-            required
-          >
-            <option value="">Select Status</option>
-            <option value="Active">Active</option>
-            <option value="Inactive">Inactive</option>
-          </select>
-        </div>
-
-        {/* Assigned Permissions */}
-        <div className="flex flex-col">
-          <label className="text-slate-700 text-sm font-semibold mb-2" htmlFor="permissions">
-            Assigned Permissions
           </label>
           <input
             type="text"
-            id="permissions"
-            name="permissions"
-            value={formData.permissions}
+            id="userName"
+            name="userName"
+            value={formData.userName}
             onChange={handleChange}
             className="px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500"
             required
@@ -145,4 +121,4 @@ function UserForm() {
   );
 }
 
-export default UserForm;
+export default DestForm;

@@ -8,7 +8,8 @@ const Booking = lazy(() => import("../pages/Booking"));
 const Schedule = lazy(() => import("../pages/Schedule"));
 const Profile = lazy(() => import("../pages/Profile"));
 const Login = lazy(() => import("../pages/Login"));
-const UserForm = lazy(() => import("../components/userForm/userForm"));
+const UserForm = lazy(() => import("../components/Form/userForm"));
+const DestForm = lazy(() => import("../components/Form/destForm"));
 
 const router = createBrowserRouter([
     {
@@ -42,7 +43,11 @@ const router = createBrowserRouter([
     {
         path: "/userForm",
         element: <UserForm />,
-    }
+    },
+    {
+        path: "/destForm",
+        element: <DestForm />,
+    },
 ]);
 
 export default router;
