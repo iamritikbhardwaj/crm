@@ -1,3 +1,5 @@
+import { Filter } from "@mui/icons-material";
+
 const bookingColumns = [
     {
       Header: 'Booking ID',
@@ -22,69 +24,51 @@ const bookingColumns = [
     {
       Header: 'Agent',
       accessor: 'agentDetails', // Column accessor for Agent Details
+      Filter: "text",
       Cell: ({ value }) => <span>{value}</span> // Custom rendering if necessary
     },
     {
       Header: 'Customer Name',
       accessor: 'customerName', // Column accessor for Customer Name
+      Filter: "text",
       Cell: ({ value }) => <span>{value}</span> // Custom rendering if necessary
     },
-    {
-      Header: 'Number of Pax',
-      accessor: 'numOfPax', // Column accessor for Number of Pax
-      Cell: ({ value }) => <span>{value}</span> // Custom rendering if necessary
-    },
+    
     {
       Header: 'Arrival Date',
       accessor: 'arrivalDate', // Column accessor for Arrival Date
+      Filter: "date",
       Cell: ({ value }) => <span>{new Date(value).toLocaleDateString()}</span> // Format date
     },
     {
       Header: 'Departure Date',
       accessor: 'departureDate', // Column accessor for Departure Date
+      Filter: "date",
       Cell: ({ value }) => <span>{new Date(value).toLocaleDateString()}</span> // Format date
     },
     {
       Header: 'Travel Month',
       accessor: 'travelMonth', // Column accessor for Travel Month
+      Filter: "text",
       Cell: ({ value }) => <span>{value}</span> // Custom rendering if necessary
     },
     {
       Header: 'Country Code',
       accessor: 'countryCode', // Column accessor for Country Code
+      Filter: "number",
       Cell: ({ value }) => <span>{value}</span> // Custom rendering if necessary
     },
     {
       Header: 'Order Value',
       accessor: 'orderValue', // Column accessor for Order Value
+      Filter: "number",
       Cell: ({ value }) => <span>{value}</span> // Custom rendering if necessary
     },
     {
       Header: 'Whatsapp Number',
       accessor: 'whatsappNumber', // Column accessor for Whatsapp Number
+      Filter: "number",
       Cell: ({ value }) => <span>{value}</span> // Custom rendering if necessary
-    },
-    {
-      Header: 'Booking Documents',
-      accessor: 'bookingDocuments', // Column accessor for Booking Documents
-      Cell: ({ value }) => (
-        <ul>
-          {value.map((doc, index) => (
-            <li key={index}>{doc}</li>
-          ))}
-        </ul>
-      ) // Render list of documents
-    },
-    {
-      Header: 'Booking Sheets',
-      accessor: 'bookingSheets', // Column accessor for Booking Sheets
-      Cell: ({ value }) => (
-        <ul>
-          {value.map((sheet, index) => (
-            <li key={index}>{sheet}</li>
-          ))}
-        </ul>
-      ) // Render list of booking sheets
     },
     {
       Header: 'Action',

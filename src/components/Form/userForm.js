@@ -1,7 +1,18 @@
 import React, { useState } from "react";
 import BackToHome from "../BackToHome";
+import { z } from "zod"
 
 function UserForm() {
+
+  const userShema = z.object({
+    userName: z.string(),
+    phoneNumber: z.string(),
+    profile: z.string(),
+    email: z.string(),
+    password: z.string(),
+    status: z.string(),
+    permissions: z.string(),
+  })
   const [formData, setFormData] = useState({
     userName: "",
     phoneNumber: "",

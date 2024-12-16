@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import BackToHome from "../BackToHome";
+import destinationForm from "./destinationForm";
 
 function DestForm() {
   const [formData, setFormData] = useState({

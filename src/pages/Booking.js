@@ -1,242 +1,170 @@
-import React, { useState, useEffect } from 'react';
-import BackToHome from '../components/BackToHome'
-function Booking() {
-  // Define states for all fields
-  const [destination, setDestination] = useState('');
-  const [bookingDate] = useState(new Date().toISOString().split('T')[0]); // Default to current date
-  const [salesSPOC] = useState('Sales SPOC Name'); // Replace with logic to get logged-in user
-  const [agent, setAgent] = useState('');
-  const [customerName, setCustomerName] = useState('');
-  const [numOfPax, setNumOfPax] = useState(1);
-  const [arrivalDate, setArrivalDate] = useState('');
-  const [departureDate, setDepartureDate] = useState('');
-  const [travelMonth, setTravelMonth] = useState('');
-  const [countryCode, setCountryCode] = useState('');
-  const [orderValue, setOrderValue] = useState('');
-  const [whatsappNumber, setWhatsappNumber] = useState('');
-  const [documents, setDocuments] = useState({});
-  const [freezeQuotation, setFreezeQuotation] = useState(null);
+import React, { useState } from "react";
 
-  const handleDocumentUpload = (event) => {
-    const { name, files } = event.target;
-    setDocuments({
-      ...documents,
-      [name]: files[0],
+const NewBooking = () => {
+  const sections = ["Booking Details", "Customer Details", "Travel Dates", "Order & Payment", "Documents Upload"];
+  const [currentSection, setCurrentSection] = useState(0);
+  const [formData, setFormData] = useState({
+    destination: "",
+    agent: "",
+    customerName: "",
+    pax: "",
+    arrivalDate: "",
+    departureDate: "",
+    orderValue: "",
+    whatsappNumber: "",
+    documents: {},
+  });
+
+  // Handle Input Changes
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
+
+  // Handle File Upload
+  const handleFileUpload = (e) => {
+    const { name, files } = e.target;
+    setFormData({
+      ...formData,
+      documents: { ...formData.documents, [name]: files[0] },
     });
   };
 
-  const handleFormSubmit = (e) => {
-    e.preventDefault();
-    // Submit logic to save the booking
-    const bookingData = {
-      destination,
-      bookingDate,
-      salesSPOC,
-      agent,
-      customerName,
-      numOfPax,
-      arrivalDate,
-      departureDate,
-      travelMonth,
-      countryCode,
-      orderValue,
-      whatsappNumber,
-      documents,
-      freezeQuotation,
-    };
-    // Call API to save the booking details
-    alert(bookingData);
+  // Remove Document
+  const removeDocument = (key) => {
+    const updatedDocs = { ...formData.documents };
+    delete updatedDocs[key];
+    setFormData({ ...formData, documents: updatedDocs });
   };
 
-  useEffect(() => {
-    if (arrivalDate) {
-      const month = new Date(arrivalDate).toLocaleString('default', { month: 'long' });
-      setTravelMonth(month);
-    }
-  }, [arrivalDate]);
+  // Navigate Sections
+  const goToNext = () => {
+    if (currentSection < sections.length - 1) setCurrentSection(currentSection + 1);
+  };
+  const goToPrevious = () => {
+    if (currentSection > 0) setCurrentSection(currentSection - 1);
+  };
 
   return (
-    <div className="max-w-4xl mx-auto my-10 p-4 bg-slate-100 rounded-lg shadow-md">
-      <BackToHome />
-      <h2 className="text-2xl font-bold text-center mb-6">Create New Booking</h2>
-      <form onSubmit={handleFormSubmit} className="space-y-4">
-        {/* Destination */}
-        <div className="flex flex-col">
-          <label className="text-sm font-medium text-gray-700">Destination</label>
-          <select
-            value={destination}
-            onChange={(e) => setDestination(e.target.value)}
-            className="border border-slate-400 p-2 rounded-md"
+    <div className="container mx-auto p-6 bg-gray-100">
+      <h1 className="text-3xl font-bold text-center mb-6">Create New Booking</h1>
+
+      <div className="bg-white shadow-md rounded p-6">
+        {/* Section Header */}
+        <h2 className="text-2xl font-semibold text-center mb-4">{sections[currentSection]}</h2>
+
+        {/* Section Content */}
+        {currentSection === 0 && (
+          <div>
+            <label className="block mb-2">Destination</label>
+            <select
+              name="destination"
+              value={formData.destination}
+              onChange={handleInputChange}
+              className="w-full border rounded px-3 py-2"
+            >
+              <option value="">Select Destination</option>
+              <option value="Paris">Paris</option>
+              <option value="New York">New York</option>
+              <option value="Tokyo">Tokyo</option>
+            </select>
+          </div>
+        )}
+
+        {currentSection === 1 && (
+          <div>
+            <label className="block mb-2">Customer Name</label>
+            <input
+              type="text"
+              name="customerName"
+              value={formData.customerName}
+              onChange={handleInputChange}
+              className="w-full border rounded px-3 py-2"
+            />
+          </div>
+        )}
+
+        {currentSection === 2 && (
+          <div>
+            <label className="block mb-2">Arrival Date</label>
+            <input
+              type="date"
+              name="arrivalDate"
+              value={formData.arrivalDate}
+              onChange={handleInputChange}
+              className="w-full border rounded px-3 py-2"
+            />
+          </div>
+        )}
+
+        {currentSection === 3 && (
+          <div>
+            <label className="block mb-2">Order Value (USD)</label>
+            <input
+              type="number"
+              name="orderValue"
+              value={formData.orderValue}
+              onChange={handleInputChange}
+              className="w-full border rounded px-3 py-2"
+            />
+          </div>
+        )}
+
+        {currentSection === 4 && (
+          <div>
+            <label className="block mb-2">Upload Documents</label>
+            <input
+              type="file"
+              name="document"
+              onChange={handleFileUpload}
+              className="w-full border rounded px-3 py-2"
+            />
+
+            {/* Document Previews */}
+            <div className="mt-4 space-y-2">
+              {Object.keys(formData.documents).map((key) => (
+                <div key={key} className="flex justify-between items-center border p-2 rounded">
+                  <span className="text-sm">{formData.documents[key]?.name}</span>
+                  <button
+                    type="button"
+                    className="text-red-500 hover:text-red-700"
+                    onClick={() => removeDocument(key)}
+                  >
+                    Remove
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Navigation Buttons */}
+        <div className="flex justify-between mt-6">
+          <button
+            type="button"
+            onClick={goToPrevious}
+            className={`px-4 py-2 bg-gray-400 text-white rounded ${currentSection === 0 ? "opacity-50 cursor-not-allowed" : ""}`}
+            disabled={currentSection === 0}
           >
-            <option value="">Select Destination</option>
-            {/* Populate destinations dynamically */}
-            <option value="Bali">Bali</option>
-            <option value="Paris">Paris</option>
-            <option value="Tokyo">Tokyo</option>
-          </select>
+            Previous
+          </button>
+          {currentSection < sections.length - 1 ? (
+            <button
+              type="button"
+              onClick={goToNext}
+              className="px-4 py-2 bg-blue-500 text-white rounded"
+            >
+              Next
+            </button>
+          ) : (
+            <button type="submit" className="px-4 py-2 bg-green-500 text-white rounded">
+              Submit
+            </button>
+          )}
         </div>
-
-        {/* Booking Date */}
-        <div className="flex flex-col">
-          <label className="text-sm font-medium text-gray-700">Booking Date</label>
-          <input
-            type="date"
-            value={bookingDate}
-            disabled
-            className="border border-slate-400 p-2 rounded-md"
-          />
-        </div>
-
-        {/* Sales SPOC */}
-        <div className="flex flex-col">
-          <label className="text-sm font-medium text-gray-700">Sales SPOC</label>
-          <input
-            type="text"
-            value={salesSPOC}
-            disabled
-            className="border border-slate-400 p-2 rounded-md"
-          />
-        </div>
-
-        {/* Agent */}
-        <div className="flex flex-col">
-          <label className="text-sm font-medium text-gray-700">Agent</label>
-          <select
-            value={agent}
-            onChange={(e) => setAgent(e.target.value)}
-            className="border border-slate-400 p-2 rounded-md"
-          >
-            <option value="">Select Agent</option>
-            <option value="Agent 1">Agent 1</option>
-            <option value="Agent 2">Agent 2</option>
-          </select>
-        </div>
-
-        {/* Customer Name */}
-        <div className="flex flex-col">
-          <label className="text-sm font-medium text-gray-700">Customer Name</label>
-          <input
-            type="text"
-            value={customerName}
-            onChange={(e) => setCustomerName(e.target.value)}
-            className="border border-slate-400 p-2 rounded-md"
-          />
-        </div>
-
-        {/* Number of Pax */}
-        <div className="flex flex-col">
-          <label className="text-sm font-medium text-gray-700">Number of Pax</label>
-          <select
-            value={numOfPax}
-            onChange={(e) => setNumOfPax(e.target.value)}
-            className="border border-slate-400 p-2 rounded-md"
-          >
-            <option value={1}>1</option>
-            <option value={2}>2</option>
-            <option value={3}>3</option>
-            <option value={4}>4</option>
-          </select>
-        </div>
-
-        {/* Arrival Date */}
-        <div className="flex flex-col">
-          <label className="text-sm font-medium text-gray-700">Arrival Date</label>
-          <input
-            type="date"
-            value={arrivalDate}
-            onChange={(e) => setArrivalDate(e.target.value)}
-            className="border border-slate-400 p-2 rounded-md"
-          />
-        </div>
-
-        {/* Departure Date */}
-        <div className="flex flex-col">
-          <label className="text-sm font-medium text-gray-700">Departure Date</label>
-          <input
-            type="date"
-            value={departureDate}
-            onChange={(e) => setDepartureDate(e.target.value)}
-            className="border border-slate-400 p-2 rounded-md"
-          />
-        </div>
-
-        {/* Travel Month */}
-        <div className="flex flex-col">
-          <label className="text-sm font-medium text-gray-700">Travel Month</label>
-          <input
-            type="text"
-            value={travelMonth}
-            disabled
-            className="border border-slate-400 p-2 rounded-md"
-          />
-        </div>
-
-        {/* Country Code */}
-        <div className="flex flex-col">
-          <label className="text-sm font-medium text-gray-700">Country Code</label>
-          <select
-            value={countryCode}
-            onChange={(e) => setCountryCode(e.target.value)}
-            className="border border-slate-400 p-2 rounded-md"
-          >
-            <option value="">Select Country Code</option>
-            <option value="+1">+1</option>
-            <option value="+44">+44</option>
-            <option value="+91">+91</option>
-          </select>
-        </div>
-
-        {/* Order Value */}
-        <div className="flex flex-col">
-          <label className="text-sm font-medium text-gray-700">Order Value (USD)</label>
-          <input
-            type="text"
-            value={orderValue}
-            onChange={(e) => setOrderValue(e.target.value)}
-            className="border border-slate-400 p-2 rounded-md"
-          />
-        </div>
-
-        {/* WhatsApp Number */}
-        <div className="flex flex-col">
-          <label className="text-sm font-medium text-gray-700">WhatsApp Number</label>
-          <input
-            type="text"
-            value={whatsappNumber}
-            onChange={(e) => setWhatsappNumber(e.target.value)}
-            className="border border-slate-400 p-2 rounded-md"
-          />
-        </div>
-
-        {/* Document Upload */}
-        <div className="flex flex-col">
-          <label className="text-sm font-medium text-gray-700">Documents Upload</label>
-          <input
-            type="file"
-            name="airticket"
-            onChange={handleDocumentUpload}
-            className="border border-slate-400 p-2 rounded-md"
-          />
-          {/* Add other file inputs similarly */}
-        </div>
-
-        {/* Freeze Quotation Upload */}
-        <div className="flex flex-col">
-          <label className="text-sm font-medium text-gray-700">Upload Freeze Quotation</label>
-          <input
-            type="file"
-            onChange={(e) => setFreezeQuotation(e.target.files[0])}
-            className="border border-slate-400 p-2 rounded-md"
-          />
-        </div>
-
-        {/* Submit Button */}
-        <button type="submit" className="bg-slate-800 text-white p-3 rounded-md w-full">
-          Submit Booking
-        </button>
-      </form>
+      </div>
     </div>
   );
-}
+};
 
-export default Booking;
+export default NewBooking;

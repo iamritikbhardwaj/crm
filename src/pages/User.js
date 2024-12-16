@@ -2,6 +2,7 @@ import React from 'react'
 import { CustomTable } from '../components/customTable/CustomTable';
 import BackToHome from '../components/BackToHome'
 import { userData } from '../sampleData/sampleData';
+import Header from "../header/Header.js"
 function User() {
 
     const columns = [
@@ -67,11 +68,14 @@ function User() {
       ];
 
   return (
-    <div className='p-0 md:p-10'>
+    <div className='flex justify-between'>
+      {/* <Header /> */}
+      <div className='relative w-full top-0 right-0'>
     <BackToHome />
         
     {/* <!-- User Profiles Page --> */}
     <CustomTable dataa={userData} columnss={columns} button={'Add User'} path={'/userForm'} />
+    </div>
     </div>
   )
 }

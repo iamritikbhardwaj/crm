@@ -6,12 +6,12 @@ import Login from './pages/Login';
 
 function App() {
 
-  const { user, setUser } = useState(true);
+  const { user, setUser } = useState(["true"]);
+  console.log(user,'user');
 
   return (
     <>
-    {/* {user ? <Header /> : <Login />} */}
-    <Header />
+    {user ? <Login /> : <Header />}
     <Outlet />
     </>
   );

@@ -10,6 +10,7 @@ const Profile = lazy(() => import("../pages/Profile"));
 const Login = lazy(() => import("../pages/Login"));
 const UserForm = lazy(() => import("../components/Form/userForm"));
 const DestForm = lazy(() => import("../components/Form/destForm"));
+const Dashboard = lazy(() => import("../pages/Dashboard"));
 
 const router = createBrowserRouter([
     {
@@ -48,6 +49,10 @@ const router = createBrowserRouter([
         path: "/destForm",
         element: <DestForm />,
     },
+    {
+        path: "/dashboard",
+        element: <Dashboard />,
+    }
 ]);
 
 export default router;
