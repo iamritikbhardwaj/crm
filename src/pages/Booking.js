@@ -1,8 +1,10 @@
 import React, { useState } from "react";
+import BackToHome from "../components/BackToHome";
 
 const NewBooking = () => {
-  const sections = ["Booking Details", "Customer Details", "Travel Dates", "Order & Payment", "Documents Upload"];
+  const sections = ["Booking Details", "Travel Details", "Order & Contact Details", "Documents Upload"];
   const [currentSection, setCurrentSection] = useState(0);
+
   const [formData, setFormData] = useState({
     destination: "",
     agent: "",
@@ -12,7 +14,7 @@ const NewBooking = () => {
     departureDate: "",
     orderValue: "",
     whatsappNumber: "",
-    documents: {},
+    documents: [],
   });
 
   // Handle Input Changes
@@ -21,23 +23,29 @@ const NewBooking = () => {
     setFormData({ ...formData, [name]: value });
   };
 
-  // Handle File Upload
-  const handleFileUpload = (e) => {
-    const { name, files } = e.target;
-    setFormData({
-      ...formData,
-      documents: { ...formData.documents, [name]: files[0] },
-    });
-  };
+  // Handle File Upload with Preview
+  const handleFileUpload = (e, index) => {
+    const file = e.target.files[0];
+    const filePreview = file ? URL.createObjectURL(file) : null;
 
-  // Remove Document
-  const removeDocument = (key) => {
-    const updatedDocs = { ...formData.documents };
-    delete updatedDocs[key];
+    const updatedDocs = [...formData.documents];
+    updatedDocs[index] = { file, preview: filePreview };
     setFormData({ ...formData, documents: updatedDocs });
   };
 
-  // Navigate Sections
+  // Add New Document
+  const addDocument = () => {
+    setFormData({ ...formData, documents: [...formData.documents, { file: null, preview: null }] });
+  };
+
+  // Remove Document
+  const removeDocument = (index) => {
+    const updatedDocs = [...formData.documents];
+    updatedDocs.splice(index, 1);
+    setFormData({ ...formData, documents: updatedDocs });
+  };
+
+  // Navigation Functions
   const goToNext = () => {
     if (currentSection < sections.length - 1) setCurrentSection(currentSection + 1);
   };
@@ -47,94 +55,159 @@ const NewBooking = () => {
 
   return (
     <div className="container mx-auto p-6 bg-gray-100">
+      <BackToHome />
       <h1 className="text-3xl font-bold text-center mb-6">Create New Booking</h1>
 
       <div className="bg-white shadow-md rounded p-6">
         {/* Section Header */}
         <h2 className="text-2xl font-semibold text-center mb-4">{sections[currentSection]}</h2>
 
-        {/* Section Content */}
+        {/* Booking Details */}
         {currentSection === 0 && (
-          <div>
-            <label className="block mb-2">Destination</label>
-            <select
-              name="destination"
-              value={formData.destination}
-              onChange={handleInputChange}
-              className="w-full border rounded px-3 py-2"
-            >
-              <option value="">Select Destination</option>
-              <option value="Paris">Paris</option>
-              <option value="New York">New York</option>
-              <option value="Tokyo">Tokyo</option>
-            </select>
+          <div className="space-y-4">
+            <div>
+              <label className="block mb-2">Destination</label>
+              <select
+                name="destination"
+                value={formData.destination}
+                onChange={handleInputChange}
+                className="w-full border rounded px-3 py-2"
+              >
+                <option value="">Select Destination</option>
+                <option value="Paris">Paris</option>
+                <option value="New York">New York</option>
+                <option value="Tokyo">Tokyo</option>
+              </select>
+            </div>
+            <div>
+              <label className="block mb-2">Agent</label>
+              <input
+                type="text"
+                name="agent"
+                value={formData.agent}
+                onChange={handleInputChange}
+                className="w-full border rounded px-3 py-2"
+              />
+            </div>
+            <div>
+              <label className="block mb-2">Customer Name</label>
+              <input
+                type="text"
+                name="customerName"
+                value={formData.customerName}
+                onChange={handleInputChange}
+                className="w-full border rounded px-3 py-2"
+              />
+            </div>
           </div>
         )}
 
+        {/* Travel Details */}
         {currentSection === 1 && (
-          <div>
-            <label className="block mb-2">Customer Name</label>
-            <input
-              type="text"
-              name="customerName"
-              value={formData.customerName}
-              onChange={handleInputChange}
-              className="w-full border rounded px-3 py-2"
-            />
+          <div className="space-y-4">
+            <div>
+              <label className="block mb-2">Arrival Date</label>
+              <input
+                type="date"
+                name="arrivalDate"
+                value={formData.arrivalDate}
+                onChange={handleInputChange}
+                className="w-full border rounded px-3 py-2"
+              />
+            </div>
+            <div>
+              <label className="block mb-2">Departure Date</label>
+              <input
+                type="date"
+                name="departureDate"
+                value={formData.departureDate}
+                onChange={handleInputChange}
+                className="w-full border rounded px-3 py-2"
+              />
+            </div>
+            <div>
+              <label className="block mb-2">Number of Passengers</label>
+              <input
+                type="number"
+                name="pax"
+                value={formData.pax}
+                onChange={handleInputChange}
+                className="w-full border rounded px-3 py-2"
+              />
+            </div>
           </div>
         )}
 
+        {/* Order & Contact Details */}
         {currentSection === 2 && (
-          <div>
-            <label className="block mb-2">Arrival Date</label>
-            <input
-              type="date"
-              name="arrivalDate"
-              value={formData.arrivalDate}
-              onChange={handleInputChange}
-              className="w-full border rounded px-3 py-2"
-            />
+          <div className="space-y-4">
+            <div>
+              <label className="block mb-2">Order Value (USD)</label>
+              <input
+                type="number"
+                name="orderValue"
+                value={formData.orderValue}
+                onChange={handleInputChange}
+                className="w-full border rounded px-3 py-2"
+              />
+            </div>
+            <div>
+              <label className="block mb-2">WhatsApp Number</label>
+              <input
+                type="text"
+                name="whatsappNumber"
+                value={formData.whatsappNumber}
+                onChange={handleInputChange}
+                className="w-full border rounded px-3 py-2"
+              />
+            </div>
           </div>
         )}
 
+        {/* Documents Upload */}
         {currentSection === 3 && (
-          <div>
-            <label className="block mb-2">Order Value (USD)</label>
-            <input
-              type="number"
-              name="orderValue"
-              value={formData.orderValue}
-              onChange={handleInputChange}
-              className="w-full border rounded px-3 py-2"
-            />
-          </div>
-        )}
+          <div className="space-y-4">
+            <button
+              type="button"
+              onClick={addDocument}
+              className="bg-blue-500 text-white px-4 py-2 rounded"
+            >
+              Add Document
+            </button>
 
-        {currentSection === 4 && (
-          <div>
-            <label className="block mb-2">Upload Documents</label>
-            <input
-              type="file"
-              name="document"
-              onChange={handleFileUpload}
-              className="w-full border rounded px-3 py-2"
-            />
-
-            {/* Document Previews */}
-            <div className="mt-4 space-y-2">
-              {Object.keys(formData.documents).map((key) => (
-                <div key={key} className="flex justify-between items-center border p-2 rounded">
-                  <span className="text-sm">{formData.documents[key]?.name}</span>
+            {/* Document Input Fields */}
+            {formData.documents.map((doc, index) => (
+              <div key={index} className="flex flex-col space-y-2 mt-4">
+                <div className="flex items-center space-x-4">
+                  <input
+                    type="file"
+                    onChange={(e) => handleFileUpload(e, index)}
+                    className="w-full border rounded px-3 py-2"
+                  />
                   <button
                     type="button"
+                    onClick={() => removeDocument(index)}
                     className="text-red-500 hover:text-red-700"
-                    onClick={() => removeDocument(key)}
                   >
                     Remove
                   </button>
                 </div>
-              ))}
-            </div>
+                {/* Display Preview */}
+                {doc.preview && (
+                  <div>
+                    <p className="text-sm font-semibold">Preview:</p>
+                    <a
+                      href={doc.preview}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 underline"
+                    >
+                      {doc.file.name}
+                    </a>
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
         )}
 
@@ -157,7 +230,10 @@ const NewBooking = () => {
               Next
             </button>
           ) : (
-            <button type="submit" className="px-4 py-2 bg-green-500 text-white rounded">
+            <button
+              type="submit"
+              className="px-4 py-2 bg-green-500 text-white rounded"
+            >
               Submit
             </button>
           )}

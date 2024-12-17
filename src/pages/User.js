@@ -69,7 +69,7 @@ function User() {
 
   return (
     <div className='flex justify-between'>
-      {/* <Header /> */}
+      <Header />
       <div className='relative w-full top-0 right-0'>
     <BackToHome />
         

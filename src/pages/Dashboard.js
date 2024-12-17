@@ -1,117 +1,191 @@
-import React, { useEffect, useRef } from 'react';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import Chart from 'chart.js/auto';
-import BackToHome from '../components/BackToHome';
+import React, { useState } from "react";
+import { Bar, Pie, Line } from "react-chartjs-2";
+import "chart.js/auto"; // Required for Chart.js v3+ compatibility
+import BackToHome from "../components/BackToHome";
+import UserActivityTable from "../components/charts/userVsActivity";
 
-function Dashboard() {
-  const chartRef = useRef(null); // Reference to keep track of the chart instance
+const Dashboard = () => {
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
 
-  useEffect(() => {
-    loadDashboardData();
-  }, []);
-
-  const dashboardData = {
-    totalBookings: 26000,
-    activeAgents: 6200,
-    totalGMV: 44,
-    conversionRate: 2.49,
-    organicSearch: [191235, 51223, 37564, 27319],
-    sources: ['Organic Search', 'Facebook', 'Twitter', 'LinkedIn'],
+  // Dummy Data
+  const data = {
+    noOfBookings: 120,
+    activeAgents: 25,
+    totalGMV: 500000,
+    totalGPV: 450000,
   };
 
-  const loadDashboardData = () => {
-    document.getElementById('totalBookings').innerText = '26K (-12.4%)';
-    document.getElementById('activeAgents').innerText = '$6,200 (40.9% ↑)';
-    document.getElementById('totalGMV').innerText = '44K (-23.6%)';
-    document.getElementById('conversionRate').innerText = '2.49% (84.7% ↑)';
-
-    // Initialize or update the chart
-    createChart('chartOrganicSearch', dashboardData.organicSearch, dashboardData.sources);
-  };
-
-  const createChart = (canvasId, data, labels) => {
-    const canvas = document.getElementById(canvasId);
-
-    // Destroy the previous chart instance if it exists
-    if (chartRef.current) {
-      chartRef.current.destroy();
-    }
-
-    // Create a new chart instance and store it in the reference
-    chartRef.current = new Chart(canvas, {
-      type: 'bar',
-      data: {
-        labels: labels,
-        datasets: [
-          {
-            label: 'Traffic Source',
-            data: data,
-            backgroundColor: ['#28a745', '#007bff', '#17a2b8', '#6c757d'],
-          },
-        ],
+  const statusChart = {
+    labels: ["Pending", "Confirmed", "Ongoing", "Completed"],
+    datasets: [
+      {
+        label: "Bookings Status",
+        data: [10, 50, 40, 20],
+        backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0"],
       },
-    });
+    ],
+  };
+
+  const opsStatusChart = {
+    labels: ["Red", "Orange", "Green"],
+    datasets: [
+      {
+        label: "Ops Status",
+        data: [30, 50, 40],
+        backgroundColor: ["#FF0000", "#FFA500", "#008000"],
+      },
+    ],
+  };
+
+  const bookingsComparison = {
+    labels: ["Sales SPOC 1", "Sales SPOC 2", "Sales SPOC 3"],
+    datasets: [
+      {
+        label: "Bookings vs Sales SPOC",
+        data: [15, 25, 30],
+        backgroundColor: "#36A2EB",
+      },
+      {
+        label: "Bookings vs Ops SPOC",
+        data: [20, 18, 25],
+        backgroundColor: "#FF6384",
+      },
+    ],
+  };
+
+  const bookingsVsSalesSPOC = {
+    labels: ["Sales SPOC 1", "Sales SPOC 2", "Sales SPOC 3"],
+    datasets: [
+      {
+        label: "Bookings",
+        data: [15, 25, 30],
+        backgroundColor: "#36A2EB",
+      },
+    ],
+  };
+
+  const bookingsVsOpsSPOC = {
+    labels: ["Ops SPOC 1", "Ops SPOC 2", "Ops SPOC 3"],
+    datasets: [
+      {
+        label: "Bookings",
+        data: [20, 18, 25],
+        backgroundColor: "#FF6384",
+      },
+    ],
+  };
+
+  const userVsActivity = {
+    labels: ["User 1", "User 2", "User 3", "User 4"],
+    datasets: [
+      {
+        label: "Activities Performed",
+        data: [5, 12, 8, 10],
+        backgroundColor: "#4BC0C0",
+      },
+    ],
+  };
+
+  const GMVComparison = {
+    labels: ["Sales SPOC 1", "Sales SPOC 2", "Sales SPOC 3"],
+    datasets: [
+      {
+        label: "GMV",
+        data: [100000, 150000, 250000],
+        backgroundColor: "#4BC0C0",
+      },
+      {
+        label: "GPV",
+        data: [95000, 130000, 220000],
+        backgroundColor: "#FFCE56",
+      },
+    ],
   };
 
   return (
-    <div className="container-fluid mt-4">
-      {/* Header */}
-      <div className="row">
-        <BackToHome />
-        {/* <div className="col-12 text-center text-white py-3" style={{ backgroundColor: '#343a40' }}>
-          <h1>Dashboard</h1>
-        </div> */}
-      </div>
+    <div className="container mx-auto p-6 bg-gray-100">
+      <BackToHome />
+      <h1 className="text-3xl font-bold mb-6 text-center">Dashboard</h1>
 
-      {/* Cards Section */}
-      <div className="row mt-4">
-        <div className="col-md-3">
-          <div className="card text-white bg-primary mb-3">
-            <div className="card-body">
-              <h5 className="card-title">Users</h5>
-              <p id="totalBookings" className="card-text">Loading...</p>
-            </div>
-          </div>
+      {/* Filters */}
+      <div className="flex justify-center gap-4 mb-6">
+        <div>
+          <label className="block mb-1">From Date</label>
+          <input
+            type="date"
+            value={fromDate}
+            onChange={(e) => setFromDate(e.target.value)}
+            className="border rounded px-3 py-2"
+          />
         </div>
-        <div className="col-md-3">
-          <div className="card text-white bg-info mb-3">
-            <div className="card-body">
-              <h5 className="card-title">Income</h5>
-              <p id="activeAgents" className="card-text">Loading...</p>
-            </div>
-          </div>
-        </div>
-        <div className="col-md-3">
-          <div className="card text-white bg-danger mb-3">
-            <div className="card-body">
-              <h5 className="card-title">Sessions</h5>
-              <p id="totalGMV" className="card-text">Loading...</p>
-            </div>
-          </div>
-        </div>
-        <div className="col-md-3">
-          <div className="card text-white bg-warning mb-3">
-            <div className="card-body">
-              <h5 className="card-title">Conversion Rate</h5>
-              <p id="conversionRate" className="card-text">Loading...</p>
-            </div>
-          </div>
+        <div>
+          <label className="block mb-1">To Date</label>
+          <input
+            type="date"
+            value={toDate}
+            onChange={(e) => setToDate(e.target.value)}
+            className="border rounded px-3 py-2"
+          />
         </div>
       </div>
 
-      {/* Chart Section */}
-      <div className="row mt-4">
-        <div className="col-md-12">
-          <div className="card">
-            <div className="card-body">
-              <h5 className="card-title">Traffic Sources</h5>
-              <canvas id="chartOrganicSearch" height="100"></canvas>
-            </div>
-          </div>
+      {/* Key Data */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+        <div className="p-4 bg-white shadow rounded text-center">
+          <h2 className="text-xl font-semibold">No of Bookings</h2>
+          <p className="text-3xl font-bold">{data.noOfBookings}</p>
         </div>
+        <div className="p-4 bg-white shadow rounded text-center">
+          <h2 className="text-xl font-semibold">Active Agents</h2>
+          <p className="text-3xl font-bold">{data.activeAgents}</p>
+        </div>
+        <div className="p-4 bg-white shadow rounded text-center">
+          <h2 className="text-xl font-semibold">Total GMV</h2>
+          <p className="text-3xl font-bold">${data.totalGMV}</p>
+        </div>
+        <div className="p-4 bg-white shadow rounded text-center">
+          <h2 className="text-xl font-semibold">Total GPV</h2>
+          <p className="text-3xl font-bold">${data.totalGPV}</p>
+        </div>
+      </div>
+
+      {/* Charts */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {/* Status Chart */}
+        <div className="bg-white p-4 rounded shadow">
+          <h3 className="text-lg font-semibold mb-4">Status Chart vs Number</h3>
+          <Pie data={statusChart} />
+        </div>
+
+        {/* Ops Status Bar Chart */}
+        <div className="bg-white p-4 rounded shadow">
+          <h3 className="text-lg font-semibold mb-4">Ops Status</h3>
+          <Bar data={opsStatusChart} />
+        </div>
+
+       {/* Bookings vs Sales SPOC */}
+       <div className="bg-white p-4 rounded shadow">
+          <h3 className="text-lg font-semibold mb-4">Bookings vs Sales SPOC</h3>
+          <Bar data={bookingsVsSalesSPOC} />
+        </div>
+
+        {/* Bookings vs Ops SPOC */}
+        <div className="bg-white p-4 rounded shadow">
+          <h3 className="text-lg font-semibold mb-4">Bookings vs Ops SPOC</h3>
+          <Bar data={bookingsVsOpsSPOC} />
+        </div>
+
+        {/* GMV vs GPV */}
+        <div className="bg-white p-4 rounded shadow">
+          <h3 className="text-lg font-semibold mb-4">GMV vs GPV (Sales SPOC)</h3>
+          <Bar data={GMVComparison} />
+        </div>
+
+        <UserActivityTable />
       </div>
     </div>
   );
-}
+};
 
 export default Dashboard;

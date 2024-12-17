@@ -15,9 +15,9 @@ function Header() {
     <div className='fixed w-1/6 flex flex-col text-center justify-between h-full  bg-slate-800 p-3'>
     <ul >
       <li>
-        <img src='https://activitybeds.com/static/media/activitybed.3a214645e1b5c84c0bdf.png' alt='logo' className='w-4/5 mx-auto text-red-500 my-2' />
+        <img src='https://activitybeds.com/static/media/activitybed.3a214645e1b5c84c0bdf.png' alt='logo' className='w-4/5 mx-0 text-red-500 my-2' />
       </li>
-      <li><button onClick={() => navigate('/dashboard')} className='w-fit flex items-center sm:w-4/5 text-xs font-bold bg-slate-100 p-2 rounded-lg text-center mx-0 md:mx-1 my-4 hover:bg-slate-300 focus:bg-slate-300'>
+      <li><button onClick={() => navigate('/dashboard')} className='w-4/5 flex items-center text-xs font-bold bg-slate-100 p-2 rounded-lg text-center mx-2 my-4 hover:bg-slate-300 focus:bg-slate-300'>
       <MdDashboard className='mx-1'/> Dashboard</button></li>
       
         <li><button onClick={() => navigate('/user')} className='w-4/5 flex items-center text-xs font-bold bg-slate-100 p-2 rounded-lg text-center mx-2 my-4 hover:bg-slate-300 focus:bg-slate-300'>
