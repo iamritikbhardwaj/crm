@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import BackToHome from "../components/BackToHome";
 import { CustomTable } from "../components/customTable/CustomTable";
 import { destData, agentData, supplierData } from "../sampleData/sampleData";
+import { MdModeEdit, MdDelete } from "react-icons/md";
 
 function Setting() {
   const [activeTab, setActiveTab] = useState(1);
@@ -15,9 +16,9 @@ function Setting() {
       Header: "Actions",
       accessor: "actions",
       Cell: () => (
-        <div className="flex gap-2">
-          <button className="text-blue-600 hover:underline">Edit</button>
-          <button className="text-red-600 hover:underline">Delete</button>
+        <div className="flex mx-4">
+          <button className="text-blue-600 text-right hover:underline"><MdModeEdit /></button>
+          <button className="text-red-600 hover:underline"><MdDelete /></button>
         </div>
       ),
     },
@@ -31,8 +32,8 @@ function Setting() {
       accessor: "actions",
       Cell: () => (
         <div className="flex gap-2">
-          <button className="text-blue-600 hover:underline">Edit</button>
-          <button className="text-red-600 hover:underline">Delete</button>
+          <button className="text-blue-600 hover:underline"><MdModeEdit /></button>
+          <button className="text-red-600 hover:underline"><MdDelete /></button>
         </div>
       ),
     },
@@ -45,9 +46,9 @@ function Setting() {
       Header: "Actions",
       accessor: "actions",
       Cell: () => (
-        <div className="flex gap-2">
-          <button className="text-blue-600 hover:underline">Edit</button>
-          <button className="text-red-600 hover:underline">Delete</button>
+        <div className="fulex gap-2 justify-center">
+          <button className="text-blue-600 hover:underline"><MdModeEdit /></button>
+          <button className="text-red-600 hover:underline"><MdDelete /></button>
         </div>
       ),
     },
@@ -67,7 +68,7 @@ function Setting() {
             {/* Tabs */}
             <ul className="flex justify-start">
               <li
-                className={`border-x-2 p-2 cursor-pointer ${
+                className={`border-x-[1px] p-2 cursor-pointer ${
                   activeTab === 1 && "bg-slate-700 text-white"
                 }`}
                 onClick={() => setActiveTab(1)}
@@ -75,7 +76,7 @@ function Setting() {
                 Destinations
               </li>
               <li
-                className={`border-x-2 p-2 cursor-pointer ${
+                className={`border-x-[1px] p-2 cursor-pointer ${
                   activeTab === 2 && "bg-slate-700 text-white"
                 }`}
                 onClick={() => setActiveTab(2)}
@@ -83,7 +84,7 @@ function Setting() {
                 Agents
               </li>
               <li
-                className={`border-x-2 p-2 cursor-pointer ${
+                className={`border-x-[1px] p-2 cursor-pointer ${
                   activeTab === 3 && "bg-slate-700 text-white"
                 }`}
                 onClick={() => setActiveTab(3)}
@@ -97,16 +98,16 @@ function Setting() {
           {activeTab === 1 && (
             <form>
               <input
-                className="w-full p-2 border-2 m-2 rounded"
+                className="w-full p-2 border-[1px] m-2 rounded"
                 type="text"
                 placeholder="Destination"
               />
               <input
-                className="w-full p-2 border-2 m-2 rounded"
+                className="w-full p-2 border-[1px] m-2 rounded"
                 type="text"
                 placeholder="Currency"
               />
-              <button className="w-1/2 p-2 border-2 m-2 bg-slate-700 text-white rounded hover:bg-slate-600">
+              <button className="w-1/2 p-2 border-[1px] m-2 bg-slate-700 text-white rounded hover:bg-slate-600">
                 Save
               </button>
             </form>
@@ -114,16 +115,16 @@ function Setting() {
           {activeTab === 2 && (
             <form>
               <input
-                className="w-full p-2 border-2 m-2 rounded"
+                className="w-full p-2 border-[1px] m-2 rounded"
                 type="text"
                 placeholder="Agent Name"
               />
               <input
-                className="w-full p-2 border-2 m-2 rounded"
+                className="w-full p-2 border-[1px] m-2 rounded"
                 type="text"
                 placeholder="Status"
               />
-              <button className="w-1/2 p-2 border-2 m-2 bg-slate-700 text-white rounded hover:bg-slate-600">
+              <button className="w-1/2 p-2 border-[1px] m-2 bg-slate-700 text-white rounded hover:bg-slate-600">
                 Save
               </button>
             </form>
@@ -131,16 +132,16 @@ function Setting() {
           {activeTab === 3 && (
             <form>
               <input
-                className="w-full p-2 border-2 m-2 rounded"
+                className="w-full p-2 border-[1px] m-2 rounded"
                 type="text"
                 placeholder="Supplier Name"
               />
               <input
-                className="w-full p-2 border-2 m-2 rounded"
+                className="w-full p-2 border-[1px] m-2 rounded"
                 type="text"
                 placeholder="Status"
               />
-              <button className="w-1/2 p-2 border-2 m-2 bg-slate-700 text-white rounded hover:bg-slate-600">
+              <button className="w-1/2 p-2 border-[1px] m-2 bg-slate-700 text-white rounded hover:bg-slate-600">
                 Save
               </button>
             </form>

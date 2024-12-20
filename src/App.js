@@ -3,7 +3,7 @@ import Header from './header/Header';
 import { Outlet } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import Login from './pages/Login';
-import axios from 'axios';
+// import axios from 'axios';
 
 function App() {
 
@@ -12,16 +12,16 @@ function App() {
 
   let serverMessage  = [];
 
-  useEffect(() => {
-    axios.get('localhost:5001/api')
-    .then((res) => {
-      console.log(res.data.message);
-      serverMessage = res.data.message;
-    })
-    .catch((err) => {
-      console.log(err);
-    })
-  },[]);
+  // useEffect(() => {
+  //   axios.get('localhost:5001/api')
+  //   .then((res) => {
+  //     console.log(res.data.message);
+  //     serverMessage = res.data.message;
+  //   })
+  //   .catch((err) => {
+  //     console.log(err);
+  //   })
+  // },[]);
 
   console.log(serverMessage,'serverMessage');
 

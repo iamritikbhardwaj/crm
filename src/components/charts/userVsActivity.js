@@ -84,6 +84,10 @@ const UserActivityTable = () => {
               ))}
             </tbody>
           </table>
+          <div className="flex justify-between p-4">
+          <button className="bg-slate-500 text-white px-2 py-1 rounded-lg">Prev</button>
+          <button className="bg-blue-500 text-white px-2 py-1 rounded-lg">Next</button>
+          </div>
         </div>
       </div>
     );

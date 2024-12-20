@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { FaUser } from "react-icons/fa";
 import { useNavigate } from 'react-router-dom';
 import { MdDashboard } from "react-icons/md";
@@ -10,6 +10,7 @@ import { GrSchedulePlay } from "react-icons/gr";
 function Header() {
 
   const navigate = useNavigate();
+  const [ active, setActive ] = useState('user')
 
   return (
     <div className='fixed w-1/6 flex flex-col text-center justify-between h-full  bg-slate-800 p-3'>
@@ -23,16 +24,14 @@ function Header() {
         <li><button onClick={() => navigate('/user')} className='w-4/5 flex items-center text-xs font-bold bg-slate-100 p-2 rounded-lg text-center mx-2 my-4 hover:bg-slate-300 focus:bg-slate-300'>
           <FaUser className='mx-1'/>User</button></li>
 <li><button onClick={() => navigate('/setting')} className='w-4/5 text-xs flex items-center font-bold bg-slate-100 p-2 rounded-lg text-center mx-2 my-4 hover:bg-slate-300 focus:bg-slate-300'><IoMdSettings className='mx-1'/>Setting</button></li>       
-<li><button onClick={() => navigate('/booking')} className='flex items-center w-4/5 text-xs font-bold bg-slate-100 p-2 rounded-lg text-center mx-2 my-4 hover:bg-slate-300 focus:bg-slate-300'><TbBrandBooking className='mx-1' />Booking</button></li>
-        <li><button onClick={() => navigate('/schedule')} className='flex items-centerw-fit sm:w-4/5 text-xs font-bold bg-slate-100 p-2 rounded-lg text-center mx-2 my-4 hover:bg-slate-300 focus:bg-slate-300'><GrSchedulePlay className='mx-1'/>Schedule</button></li>
+<li><button onClick={() => navigate('/booking')} className='flex items-center w-4/5 text-xs font-bold bg-slate-100 p-2 rounded-lg text-center mx-2 my-4 hover:bg-slate-300 focus:bg-slate-300'><TbBrandBooking className='mx-1' />New Booking</button></li>
+        <li><button onClick={() => navigate('/schedule')} className='flex items-centerw-fit sm:w-4/5 text-xs font-bold bg-slate-100 p-2 rounded-lg text-center mx-2 my-4 hover:bg-slate-300 focus:bg-slate-300'><GrSchedulePlay className='mx-1'/>All Bookings</button></li>
     </ul>
 
     <ul>
       <li><button onClick={() => navigate('/login')} className='w-4/5 flex items-center text-xs font-bold bg-slate-100 p-2 rounded-lg text-center mx-2 my-4 hover:bg-slate-300 focus:bg-slate-300'><IoLogOut className='mx-1'/>Logout</button></li>
       </ul>
-      
     </div>
-    
   )
 }
 

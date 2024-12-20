@@ -143,22 +143,6 @@ function UserForm() {
           </select>
         </div>
 
-        {/* Assigned Permissions */}
-        <div className="flex flex-col">
-          <label className="text-slate-700 text-sm font-semibold mb-2" htmlFor="permissions">
-            Assigned Permissions
-          </label>
-          <input
-            type="text"
-            id="permissions"
-            name="permissions"
-            value={formData.permissions}
-            onChange={handleChange}
-            className="px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500"
-            required
-          />
-        </div>
-
         {/* Action */}
         <div className="flex justify-center">
           <button

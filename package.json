@@ -26,6 +26,8 @@
     "react-scripts": "^5.0.1",
     "react-table": "^7.8.0",
     "react-tooltip": "^5.28.0",
+    "sheetjs": "^2.0.0",
+    "xlsx": "^0.18.5",
     "zod": "^3.24.1"
   },
   "scripts": {
@@ -34,7 +36,6 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
-  "proxy": "http://localhost:5000",
   "eslintConfig": {
     "extends": [
       "react-app",

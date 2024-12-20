@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTable, useSortBy, usePagination, useFilters } from 'react-table';
 
-function CustomTable({ dataa, columnss, button, path, size }) {
+function CustomTable({ dataa, columnss, button, path, size, hideFilter }) {
   // Use useMemo to ensure columns and data are memoized and don't cause unnecessary re-renders
   const data = useMemo(() => dataa, [dataa]);
   const columns = useMemo(() => columnss, [columnss]);
@@ -30,7 +30,7 @@ function CustomTable({ dataa, columnss, button, path, size }) {
   );
 
   return (
-    <div className="w-full flex-col justify-center text-center text-sm">
+    <div className={`w-fit flex-col mx-auto justify-center text-center ${size ? size : "text-sm"}`}>
       <div className="w-[1/4] flex flex-col items-end  mx-auto">
       <button
           onClick={() => { navigate(path) }
@@ -50,7 +50,7 @@ function CustomTable({ dataa, columnss, button, path, size }) {
             <tr {...headerGroup.getHeaderGroupProps()}>
               {headerGroup.headers.map((column) => (
                 <th
-                  className="p-2 border-2"
+                  className="p-2 border-2 whitespace-nowrap"
                   {...column.getHeaderProps(column.getSortByToggleProps())}
                 >
                   {column.render('Header')}
@@ -71,7 +71,7 @@ function CustomTable({ dataa, columnss, button, path, size }) {
                 {...row.getRowProps()}
               >
                 {row.cells.map((cell) => (
-                  <td className="hover:bg-slate-300 border-slate-300" {...cell.getCellProps()}>
+                  <td className="hover:bg-slate-300 border whitespace-nowrap border-slate-300" {...cell.getCellProps()}>
                     {cell.render('Cell')}
                   </td>
                 ))}
@@ -82,7 +82,7 @@ function CustomTable({ dataa, columnss, button, path, size }) {
       </table>
       </div>
       
-      <div className="flex justify-center my-0 md:my-4">
+     {!hideFilter && <div className="flex justify-center my-0 md:my-4">
         <button onClick={() => gotoPage(0)} disabled={!canPreviousPage} className="bg-slate-800 text-white p-2 rounded-lg mx-2 hover:bg-slate-300">{'<<'}</button>
         <button
           onClick={() => previousPage()}
@@ -117,7 +117,7 @@ function CustomTable({ dataa, columnss, button, path, size }) {
         </button>
         <button onClick={() => gotoPage(pageCount - 1)} disabled={!canNextPage} className="bg-slate-800 text-white p-2 rounded-lg mx-2 hover:bg-slate-300">{'>>'}</button>
         
-      </div>
+      </div>}
       
     </div>
   );

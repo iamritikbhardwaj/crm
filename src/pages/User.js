@@ -27,10 +27,6 @@ function User() {
           accessor: "status",
         },
         {
-          Header: "Assigned Permissions",
-          accessor: "permissions",
-        },
-        {
           Header: "Action",
           accessor: "action",
         },
@@ -58,26 +54,23 @@ function User() {
         {
           value: "Status",
           dropDown: {
-            options: ["Active", "Inactive"]
+            options: [<button className='p-2 bg-red-400'>Inactive</button>, 
+            <button className='p-2 bg-green-400'>Active</button>]
           }
-        },
-        {
-          value: "Assigned Permissions",
-          dropDown: {}
         }
       ];
 
   return (
-    <div className='flex justify-between'>
-      <Header />
+    <div className='flex w-full h-screen p-4 justify-between'>
+      {/* <Header /> */}
       <div className='relative w-full top-0 right-0'>
     <BackToHome />
         
     {/* <!-- User Profiles Page --> */}
-    <CustomTable dataa={userData} columnss={columns} button={'Add User'} path={'/userForm'} />
+    <CustomTable dataa={userData} columnss={columns} button={'Add User'} path={'/userForm'} size={"text-md"} />
     </div>
     </div>
   )
 }
 
-export default User
+export default User;
