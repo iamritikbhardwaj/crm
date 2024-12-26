@@ -1,44 +1,48 @@
-import React, { useState } from "react";
+import React, { useEffect } from "react";
 import BackToHome from "../BackToHome";
 import { z } from "zod"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useForm } from "react-hook-form";
+import axios from "axios";
 
 function UserForm() {
 
   const userShema = z.object({
-    userName: z.string(),
-    phoneNumber: z.string(),
-    profile: z.string(),
-    email: z.string(),
-    password: z.string(),
-    status: z.string(),
-    permissions: z.string(),
+    userName: z.string().nonempty(),
+    phoneNumber: z.string().min(10, {message: "Please enter a valid number"}).max(12, {message: "Please enter a valid number"}),
+    profile: z.string().nonempty(),
+    email: z.string().email(),
+    password: z.string().nonempty(),
+    status: z.string().nonempty(),
   })
-  const [formData, setFormData] = useState({
-    userName: "",
-    phoneNumber: "",
-    profile: "",
-    email: "",
-    password: "",
-    status: "",
-    permissions: "",
-  });
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
+  const { register, handleSubmit, formState: { errors } } = useForm({
+    resolver: zodResolver(userShema)
+  })
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  console.log('errors', errors);
+
+  
+
+  const onSubmitForm = async (data) => {
     // Handle form submission logic here
-    console.log("Form Data Submitted:", formData);
+    try {
+      const response = await axios.post("http://localhost:5001/api/users/createUser", data,
+      {
+        withCredentials: true
+      });
+      console.log(response.data, 'response');
+    } catch (error) {
+      console.log(error);
+    }
+    console.log("Form Data Submitted:", data);
   };
 
   return (
     <div className="max-w-4xl mx-auto p-6 bg-slate-100 rounded-lg mt-10 shadow-lg">
         <BackToHome path={"/user"} />
       <h2 className="text-2xl font-semibold text-center text-slate-800 mb-6">Add User</h2>
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit(onSubmitForm)} className="space-y-6">
         {/* User Name */}
         <div className="flex flex-col">
           <label className="text-slate-700 text-sm font-semibold mb-2" htmlFor="userName">
@@ -47,12 +51,11 @@ function UserForm() {
           <input
             type="text"
             id="userName"
-            name="userName"
-            value={formData.userName}
-            onChange={handleChange}
+            {...register("userName")}
             className="px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500"
             required
           />
+          {errors.userName && <p className="text-red-500 text-xs mt-1">{errors.userName.message}</p>}
         </div>
 
         {/* Phone Number */}
@@ -63,12 +66,11 @@ function UserForm() {
           <input
             type="text"
             id="phoneNumber"
-            name="phoneNumber"
-            value={formData.phoneNumber}
-            onChange={handleChange}
+            {...register("phoneNumber")}
             className="px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500"
             required
           />
+          {errors.phoneNumber && <p className="text-red-500 text-xs mt-1">{errors.phoneNumber.message}</p>}
         </div>
 
         {/* Profile */}
@@ -78,9 +80,7 @@ function UserForm() {
           </label>
           <select
             id="profile"
-            name="profile"
-            value={formData.profile}
-            onChange={handleChange}
+            {...register("profile")}
             className="px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500"
             required
           >
@@ -90,6 +90,7 @@ function UserForm() {
             <option value="Finance">Finance</option>
             <option value="Admin">Admin</option>
           </select>
+          {errors.profile && <p className="text-red-500 text-xs mt-1">{errors.profile.message}</p>}
         </div>
 
         {/* Email */}
@@ -100,12 +101,11 @@ function UserForm() {
           <input
             type="email"
             id="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
+            {...register("email")}
             className="px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500"
             required
           />
+          {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
         </div>
 
         {/* Password */}
@@ -116,12 +116,11 @@ function UserForm() {
           <input
             type="password"
             id="password"
-            name="password"
-            value={formData.password}
-            onChange={handleChange}
+            {...register("password")}
             className="px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500"
             required
           />
+          {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>}
         </div>
 
         {/* Status */}
@@ -131,9 +130,7 @@ function UserForm() {
           </label>
           <select
             id="status"
-            name="status"
-            value={formData.status}
-            onChange={handleChange}
+            {...register("status")}
             className="px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500"
             required
           >
@@ -141,6 +138,7 @@ function UserForm() {
             <option value="Active">Active</option>
             <option value="Inactive">Inactive</option>
           </select>
+          {errors.status && <p className="text-red-500 text-xs mt-1">{errors.status.message}</p>}
         </div>
 
         {/* Action */}
