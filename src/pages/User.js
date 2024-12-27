@@ -1,10 +1,11 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { CustomTable } from '../components/customTable/CustomTable';
 import BackToHome from '../components/BackToHome'
-import { userData } from '../sampleData/sampleData';
-import Header from "../header/Header.js"
+import { MdModeEdit, MdDelete } from "react-icons/md";
+import axios from 'axios';
 function User() {
 
+  const [data, setData] = useState([]);
     const columns = [
         {
           Header: "User Name",
@@ -32,33 +33,34 @@ function User() {
         },
       ];
 
-    const inputData = [
-        {
-          value: "User Name",
-          dropDown: {}
-        },
-        {
-          value: "Phone Number",
-          dropDown: {}
-        },
-        {
-          value: "Profile",
-          dropDown: {
-            options: ["Admin", "Sales", "Operations", "Finance"]
+      useEffect(() => {
+        (async () => {
+          try {
+            const res = await axios.get('http://localhost:5001/api/users/getAllUsers',
+            {
+              headers : {
+                'Content-Type': 'application/json',
+              }
+            });
+            console.log(res.data.OUTPUT);
+            setData(res.data.OUTPUT);
+          } catch (error) {
+            console.log(error);
           }
-        },
-        {
-          value: "Email",
-          dropDown: {}
-        },
-        {
-          value: "Status",
-          dropDown: {
-            options: [<button className='p-2 bg-red-400'>Inactive</button>, 
-            <button className='p-2 bg-green-400'>Active</button>]
-          }
+        })();
+      }, []);
+
+      const udata = data.map((item) => {
+        return {
+            name: item.name,
+            phone: item.phone,
+            profile: item.profile,
+            email: item.email,
+            status: <button className="m-1 px-1 py-2 rounded-lg bg-green-400">{item.status}</button>,
+            action: <><button className="p-2 rounded-lg bg-blue-400" onClick={() => alert("Edit")}><MdModeEdit />
+            </button> <button className="p-2 rounded-lg bg-red-400" onClick={() => alert("Delete")}><MdDelete /></button></>,
         }
-      ];
+    });
 
   return (
     <div className='flex w-full h-screen p-4 justify-between'>
@@ -67,7 +69,7 @@ function User() {
     <BackToHome />
         
     {/* <!-- User Profiles Page --> */}
-    <CustomTable dataa={userData} columnss={columns} button={'Add User'} path={'/userForm'} size={"text-md"} />
+    <CustomTable dataa={udata} columnss={columns} button={'Add User'} path={'/userForm'} size={"text-md"} />
     </div>
     </div>
   )

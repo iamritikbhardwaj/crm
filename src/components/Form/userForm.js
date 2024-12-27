@@ -27,10 +27,12 @@ function UserForm() {
   const onSubmitForm = async (data) => {
     // Handle form submission logic here
     try {
-      const response = await axios.post(API_URL + "createUser", data,
+      const response = await axios.post(API_URL + "users/createUser", data,
       {
-        withCredentials: true,
-      },
+        headers: {  
+          "content-type": "application/json" 
+        }
+      }
       );
       console.log(response.data, 'response');
     } catch (error) {
