@@ -1,10 +1,10 @@
-import React, { useEffect } from "react";
+import React from "react";
 import BackToHome from "../BackToHome";
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form";
 import axios from "axios";
-
+import { API_URL } from "../../AppConstant.js"
 function UserForm() {
 
   const userShema = z.object({
@@ -27,10 +27,11 @@ function UserForm() {
   const onSubmitForm = async (data) => {
     // Handle form submission logic here
     try {
-      const response = await axios.post("http://localhost:5001/api/users/createUser", data,
+      const response = await axios.post(API_URL + "createUser", data,
       {
-        withCredentials: true
-      });
+        withCredentials: true,
+      },
+      );
       console.log(response.data, 'response');
     } catch (error) {
       console.log(error);
