@@ -1,26 +1,70 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import BackToHome from "../components/BackToHome";
 import { CustomTable } from "../components/customTable/CustomTable";
-import { destData, agentData, supplierData } from "../sampleData/sampleData";
 import { MdModeEdit, MdDelete } from "react-icons/md";
+import DestForm from "../components/Form/destForm";
+import AgentForm from "../components/Form/agentForm";
+import SupForm from "../components/Form/supForm";
+import axios from "axios";
+import { API_URL } from "../AppConstant";
+import { set } from "mongoose";
 
 function Setting() {
   const [activeTab, setActiveTab] = useState(1);
+  const [dData, setDestData] = useState([]);
+  const [aData, setAgentData] = useState([]);
+  const [sData, setSupData] = useState([]);
+  const [editData, setEditData] = useState([]);
+
+ 
+
+  // destination data
+
+  const destData = dData.map((item) => ({
+    destination: item.destination,
+    currency: item.currency,
+    status: <button className="p-2 rounded-lg bg-green-400">{item.status}</button>,
+    actions: <><button className="align-center text-blue-400" onClick={() => {setEditData(item)
+    console.log(editData);
+    }}><MdModeEdit /></button>
+    <button className="align-center text-red-400" onClick={() => {(async () => {
+      try {
+        await axios.delete(`${API_URL}users/deleteDestination/${item.destination_id}`, {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        window.location.reload();
+      } catch (error) {
+        console.error("Error deleting destination:", error);
+      }
+    })();}}><MdDelete /></button></>,
+  }));
+
+  // agent data
+
+  const agentData = aData.map((item) => ({
+    agent: item.agentName,
+    status: <button className="p-2 rounded-lg bg-green-400">{item.status}</button>,
+    actions: <button onClick={() => alert("Edit")}><MdModeEdit /></button>,
+  }));
+
+  // supplier data
+
+  const supplierData = sData.map((item) => ({
+    supplier: item.supplierName,
+    status: <button className="p-2 rounded-lg bg-green-400">{item.status}</button>,
+    actions: <button onClick={() => alert("Edit")}><MdModeEdit /></button>,
+  }));
 
   // Columns for Destinations, Agents, and Suppliers tables
-  const destinationColumns = [
-    { Header: "Destination", accessor: "destination" },
-    { Header: "Currency", accessor: "currency" },
+  
+  const supplierColumns = [
+    { Header: "Supplier Name", accessor: "supplier" },
     { Header: "Status", accessor: "status" },
     {
       Header: "Actions",
       accessor: "actions",
-      Cell: () => (
-        <div className="flex mx-4">
-          <button className="text-blue-600 text-right hover:underline"><MdModeEdit /></button>
-          <button className="text-red-600 hover:underline"><MdDelete /></button>
-        </div>
-      ),
     },
   ];
 
@@ -30,29 +74,48 @@ function Setting() {
     {
       Header: "Actions",
       accessor: "actions",
-      Cell: () => (
-        <div className="flex gap-2">
-          <button className="text-blue-600 hover:underline"><MdModeEdit /></button>
-          <button className="text-red-600 hover:underline"><MdDelete /></button>
-        </div>
-      ),
     },
   ];
 
-  const supplierColumns = [
-    { Header: "Supplier Name", accessor: "supplier" },
+  const destinationColumns = [
+    { Header: "Destination", accessor: "destination" },
+    { Header: "Currency", accessor: "currency" },
     { Header: "Status", accessor: "status" },
     {
       Header: "Actions",
       accessor: "actions",
-      Cell: () => (
-        <div className="fulex gap-2 justify-center">
-          <button className="text-blue-600 hover:underline"><MdModeEdit /></button>
-          <button className="text-red-600 hover:underline"><MdDelete /></button>
-        </div>
-      ),
     },
   ];
+
+  useEffect(() => {
+    (async () => {
+    const response = axios.get(`${API_URL}users/getAllDestinations`, {
+      headers: {
+        "content-type": "application/json"
+      }
+    });
+    console.log((await response).data.OUTPUT, 'response');
+    setDestData((await response).data.OUTPUT);
+    })();
+    (async () => {
+      const response = axios.get(`${API_URL}users/getAllAgents`, {
+        headers: {
+          "content-type": "application/json"
+        }
+      });
+      console.log((await response).data.OUTPUT, 'response');
+      setAgentData((await response).data.OUTPUT);
+      })();
+      (async () => {
+        const response = axios.get(`${API_URL}users/getAllSuppliers`, {
+          headers: {
+            "content-type": "application/json"
+          }
+        });
+        console.log((await response).data.OUTPUT, 'response');
+        setSupData((await response).data.OUTPUT);
+        })();
+  }, []);
 
   return (
     <>
@@ -96,55 +159,13 @@ function Setting() {
 
           {/* Forms for each tab */}
           {activeTab === 1 && (
-            <form>
-              <input
-                className="w-full p-2 border-[1px] m-2 rounded"
-                type="text"
-                placeholder="Destination"
-              />
-              <input
-                className="w-full p-2 border-[1px] m-2 rounded"
-                type="text"
-                placeholder="Currency"
-              />
-              <button className="w-1/2 p-2 border-[1px] m-2 bg-slate-700 text-white rounded hover:bg-slate-600">
-                Save
-              </button>
-            </form>
+            <DestForm editData={editData} />
           )}
           {activeTab === 2 && (
-            <form>
-              <input
-                className="w-full p-2 border-[1px] m-2 rounded"
-                type="text"
-                placeholder="Agent Name"
-              />
-              <input
-                className="w-full p-2 border-[1px] m-2 rounded"
-                type="text"
-                placeholder="Status"
-              />
-              <button className="w-1/2 p-2 border-[1px] m-2 bg-slate-700 text-white rounded hover:bg-slate-600">
-                Save
-              </button>
-            </form>
+            <AgentForm />
           )}
           {activeTab === 3 && (
-            <form>
-              <input
-                className="w-full p-2 border-[1px] m-2 rounded"
-                type="text"
-                placeholder="Supplier Name"
-              />
-              <input
-                className="w-full p-2 border-[1px] m-2 rounded"
-                type="text"
-                placeholder="Status"
-              />
-              <button className="w-1/2 p-2 border-[1px] m-2 bg-slate-700 text-white rounded hover:bg-slate-600">
-                Save
-              </button>
-            </form>
+            <SupForm />
           )}
         </div>
 
@@ -154,7 +175,7 @@ function Setting() {
             <CustomTable
               dataa={destData}
               columnss={destinationColumns}
-              button={"Add Destination"}
+              button={false}
               path={"/destForm"}
             />
           )}
@@ -162,15 +183,15 @@ function Setting() {
             <CustomTable
               dataa={agentData}
               columnss={agentColumns}
-              button={"Add Agent"}
-              path={"/agentForm"}
+              button={false}
+              path={"/AgentForm"}
             />
           )}
           {activeTab === 3 && (
             <CustomTable
               dataa={supplierData}
               columnss={supplierColumns}
-              button={"Add Supplier"}
+              button={false}
               path={"/supForm"}
             />
           )}

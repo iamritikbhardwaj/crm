@@ -1,11 +1,19 @@
-import React from "react";
+import React, { useEffect } from "react";
 import BackToHome from "../BackToHome";
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form";
 import axios from "axios";
 import { API_URL } from "../../AppConstant.js"
+import { useLocation, useNavigate } from "react-router-dom";
 function UserForm() {
+
+  const data = useLocation().state;
+  console.log(data, 'data');
+
+  const [ id, setId ] = React.useState(data? data?.id : null);
+
+  const navigate = useNavigate();
 
   const userShema = z.object({
     userName: z.string().nonempty(),
@@ -16,18 +24,27 @@ function UserForm() {
     status: z.string().nonempty(),
   })
 
-  const { register, handleSubmit, formState: { errors } } = useForm({
+  const { register,setValue, handleSubmit, formState: { errors } } = useForm({
     resolver: zodResolver(userShema)
   })
 
-  console.log('errors', errors);
+  useEffect(() => {
+    if (data) {
+      setValue("userName", data.name);
+      setValue("phoneNumber", data.phone);
+      setValue("profile", data.profile);
+      setValue("email", data.email);
+      setValue("password", data.password);
+      setValue("status", data.status);
+    }
+  }, [data, setValue]);
 
-  
+  console.log('errors', errors);
 
   const onSubmitForm = async (data) => {
     // Handle form submission logic here
     try {
-      const response = await axios.post(API_URL + "users/createUser", data,
+      const response = await axios.post(`${API_URL}users/createUser${id ? `/?id=${id}` : ""}`, data,
       {
         headers: {  
           "content-type": "application/json" 
@@ -35,10 +52,12 @@ function UserForm() {
       }
       );
       console.log(response.data, 'response');
+      alert(`User ${id ? 'updated' : 'created'} successfully`);
     } catch (error) {
       console.log(error);
     }
     console.log("Form Data Submitted:", data);
+    navigate("/user");
   };
 
   return (

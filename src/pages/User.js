@@ -3,7 +3,10 @@ import { CustomTable } from '../components/customTable/CustomTable';
 import BackToHome from '../components/BackToHome'
 import { MdModeEdit, MdDelete } from "react-icons/md";
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 function User() {
+
+  const navigate = useNavigate();
 
   const [data, setData] = useState([]);
     const columns = [
@@ -56,9 +59,25 @@ function User() {
             phone: item.phone,
             profile: item.profile,
             email: item.email,
-            status: <button className="m-1 px-1 py-2 rounded-lg bg-green-400">{item.status}</button>,
-            action: <><button className="p-2 rounded-lg bg-blue-400" onClick={() => alert("Edit")}><MdModeEdit />
-            </button> <button className="p-2 rounded-lg bg-red-400" onClick={() => alert("Delete")}><MdDelete /></button></>,
+            status: <button className="m-1 p-1 rounded-lg bg-green-400">{item.status}</button>,
+            action: <><button className=" rounded-lg text-blue-400" onClick={() => {
+              navigate('/userForm', { state: item });
+            }}><MdModeEdit />
+            </button> <button className=" rounded-lg text-red-400" onClick={() => {
+              (async () => {
+                try {
+                  const res = await axios.delete(`http://localhost:5001/api/users/deleteUser/${item.id}`,
+                  {
+                    headers : {
+                      'Content-Type': 'application/json',
+                    }
+                  });
+                  console.log(res.data.OUTPUT);
+                  window.location.reload();
+                } catch (error) {
+                  console.log(error);
+              }})();
+            }}><MdDelete /></button></>,
         }
     });
 
