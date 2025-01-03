@@ -1,37 +1,50 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import axios from "axios";
 import { API_URL } from "../../AppConstant.js"
 import { useLocation } from 'react-router-dom';
 
-function SupForm() {
+function SupForm({editData, setEditData, refetch}) {
+
+  console.error("error");
 
     const supplierSchema = z.object({
         name: z.string().nonempty(),
         status: z.string().nonempty(),
     })
 
-    const id = useLocation.state.id;
-
-    const { handleSubmit, register, formState: { errors } } = useForm({
+    const { handleSubmit, register, setValue, formState: { errors } } = useForm({
         resolver: zodResolver(supplierSchema)
     });
 
     const supplierSubmit = (data) => {
-        console.log(data);
+        console.log(data, 'data');
         (async (data) => {
-        const res = await axios.post(`${API_URL}users/createSupplier${id ? `/?id=${id}` : ""}`, data,
+        const response = await axios.post(`${API_URL}users/createSupplier${editData.hasOwnProperty('name') ? `/?id=${editData?.supplier_id}` : ""}`, data,
         {
+            withCredentials: true,
             headers: {  
                 "content-type": "application/json" 
             }
+        })
+        if (response.status === 200) {
+            refetch();
         }
-        )
-        console.log(res);
-        })();
+        console.log(response, 'response');
+        })(data);
     }
+
+    useEffect(() => {
+      if (editData.hasOwnProperty('name')) {
+        setValue("name", editData?.name);
+        setValue("status", editData?.status);
+      } else {
+        setValue("name", "");
+        setValue("status", "");
+      }
+    }, [editData, setEditData]);
 
   return (
     <form onSubmit={handleSubmit(supplierSubmit)}>

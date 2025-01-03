@@ -46,6 +46,7 @@ function UserForm() {
     try {
       const response = await axios.post(`${API_URL}users/createUser${id ? `/?id=${id}` : ""}`, data,
       {
+        withCredentials: true,
         headers: {  
           "content-type": "application/json" 
         }

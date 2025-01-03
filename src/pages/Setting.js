@@ -10,31 +10,71 @@ import { API_URL } from "../AppConstant";
 import { set } from "mongoose";
 
 function Setting() {
+  const destfetch = async () => {
+    const response = axios.get(`${API_URL}users/getAllDestinations`, {
+      withCredentials: true,
+      headers: {
+        "content-type": "application/json"
+      }
+    });
+    console.log((await response), 'destination response');
+    setDestData((await response).data.OUTPUT);
+    }
+    const agentfetch = async () => {
+      const response = axios.get(`${API_URL}users/getAllAgents`, {
+        withCredentials: true,
+        headers: {
+          "content-type": "application/json"
+        }
+      });
+      console.log((await response), 'agent response');
+      setAgentData((await response).data.OUTPUT);
+      }
+  /**
+   * Fetches all suppliers and stores them in the component state
+   * via setSupData.
+   */
+      const supplierfetch = async () => {
+        const response = axios.get(`${API_URL}users/getAllSuppliers`, {
+          withCredentials: true,
+          headers: {
+            "content-type": "application/json"
+          }
+        });
+        console.log((await response).data.OUTPUT, 'response');
+        setSupData((await response).data.OUTPUT);
+        }
+
+  const refetch = async () => {
+    setEditData([]);
+    destfetch();
+    agentfetch();
+    supplierfetch();
+  }
+
   const [activeTab, setActiveTab] = useState(1);
   const [dData, setDestData] = useState([]);
   const [aData, setAgentData] = useState([]);
   const [sData, setSupData] = useState([]);
   const [editData, setEditData] = useState([]);
-
- 
-
   // destination data
 
   const destData = dData.map((item) => ({
     destination: item.destination,
     currency: item.currency,
-    status: <button className="p-2 rounded-lg bg-green-400">{item.status}</button>,
+    status: <button className={`p-2 rounded-lg ${item.status === ("active" || "Active") ? "bg-green-400" : "bg-red-400"}`}>{item.status}</button>,
     actions: <><button className="align-center text-blue-400" onClick={() => {setEditData(item)
     console.log(editData);
     }}><MdModeEdit /></button>
     <button className="align-center text-red-400" onClick={() => {(async () => {
       try {
         await axios.delete(`${API_URL}users/deleteDestination/${item.destination_id}`, {
+          withCredentials: true,
           headers: {
             "Content-Type": "application/json",
           },
         });
-        window.location.reload();
+        refetch();
       } catch (error) {
         console.error("Error deleting destination:", error);
       }
@@ -44,17 +84,42 @@ function Setting() {
   // agent data
 
   const agentData = aData.map((item) => ({
-    agent: item.agentName,
-    status: <button className="p-2 rounded-lg bg-green-400">{item.status}</button>,
-    actions: <button onClick={() => alert("Edit")}><MdModeEdit /></button>,
+    agent: item.name,
+    status: <button className={`p-2 rounded-lg ${item.status === "active" ? "bg-green-400" : "bg-red-400"}`}>{item.status}</button>,
+    actions: <><button onClick={() => {setEditData(item) 
+      console.log(editData);}}><MdModeEdit /></button><button className="align-center text-red-400" onClick={() => {(async () => {
+      try {
+        await axios.delete(`${API_URL}users/deleteAgent/${item.agent_id}`, {
+          withCredentials: true,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        refetch();
+      } catch (error) {
+        console.error("Error deleting destination:", error);
+      }
+    })();}}><MdDelete /></button></>,
   }));
 
   // supplier data
 
   const supplierData = sData.map((item) => ({
-    supplier: item.supplierName,
-    status: <button className="p-2 rounded-lg bg-green-400">{item.status}</button>,
-    actions: <button onClick={() => alert("Edit")}><MdModeEdit /></button>,
+    supplier: item.name,
+    status: <button className={`p-2 rounded-lg ${item.status === "active" ? "bg-green-400" : "bg-red-400"}`}>{item.status}</button>,
+    actions: <><button onClick={() => setEditData(item)}><MdModeEdit /></button><button className="align-center text-red-400" onClick={() => {(async () => {
+      try {
+        await axios.delete(`${API_URL}users/deleteSupplier/${item.supplier_id}`, {
+          withCredentials: true,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        refetch();
+      } catch (error) {
+        console.error("Error deleting destination:", error);
+      }
+    })();}}><MdDelete /></button></>,
   }));
 
   // Columns for Destinations, Agents, and Suppliers tables
@@ -88,33 +153,7 @@ function Setting() {
   ];
 
   useEffect(() => {
-    (async () => {
-    const response = axios.get(`${API_URL}users/getAllDestinations`, {
-      headers: {
-        "content-type": "application/json"
-      }
-    });
-    console.log((await response).data.OUTPUT, 'response');
-    setDestData((await response).data.OUTPUT);
-    })();
-    (async () => {
-      const response = axios.get(`${API_URL}users/getAllAgents`, {
-        headers: {
-          "content-type": "application/json"
-        }
-      });
-      console.log((await response).data.OUTPUT, 'response');
-      setAgentData((await response).data.OUTPUT);
-      })();
-      (async () => {
-        const response = axios.get(`${API_URL}users/getAllSuppliers`, {
-          headers: {
-            "content-type": "application/json"
-          }
-        });
-        console.log((await response).data.OUTPUT, 'response');
-        setSupData((await response).data.OUTPUT);
-        })();
+    refetch();
   }, []);
 
   return (
@@ -159,41 +198,54 @@ function Setting() {
 
           {/* Forms for each tab */}
           {activeTab === 1 && (
-            <DestForm editData={editData} />
+            <DestForm editData={editData} setEditData={setEditData} refetch={refetch} />
           )}
           {activeTab === 2 && (
-            <AgentForm />
+            <AgentForm editData={editData} setEditData={setEditData} refetch={refetch} />
           )}
           {activeTab === 3 && (
-            <SupForm />
+            <SupForm editData={editData} setEditData={setEditData} refetch={refetch} />
           )}
+          <button className="p-2 rounded-lg bg-slate-800 text-slate-50" onClick={() => {
+              refetch();
+              setEditData([])
+            }}>Refresh</button>
         </div>
 
         {/* Right Section for Tables */}
         <div className="flex-col w-[45%] h-[80vh] p-4 bg-slate-100 shadow rounded-lg overflow-y-auto">
           {activeTab === 1 && (
+            <>
+            
             <CustomTable
               dataa={destData}
               columnss={destinationColumns}
               button={false}
               path={"/destForm"}
             />
+            </>
           )}
           {activeTab === 2 && (
+            <>
+            
             <CustomTable
               dataa={agentData}
               columnss={agentColumns}
               button={false}
               path={"/AgentForm"}
             />
+            </>
           )}
           {activeTab === 3 && (
+            <>
+            
             <CustomTable
               dataa={supplierData}
               columnss={supplierColumns}
               button={false}
               path={"/supForm"}
             />
+            </>
           )}
         </div>
       </div>

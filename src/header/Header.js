@@ -7,7 +7,7 @@ import { TbBrandBooking } from "react-icons/tb";
 import { IoLogOut } from "react-icons/io5";
 import { GrSchedulePlay } from "react-icons/gr";
 
-function Header() {
+function Header({ setUser, setHasToken }) {
 
   const navigate = useNavigate();
   const [ active, setActive ] = useState('user')
@@ -29,7 +29,12 @@ function Header() {
     </ul>
 
     <ul>
-      <li><button onClick={() => navigate('/login')} className='w-4/5 flex items-center text-xs font-bold bg-slate-100 p-2 rounded-lg text-center mx-2 my-4 hover:bg-slate-300 focus:bg-slate-300'><IoLogOut className='mx-1'/>Logout</button></li>
+      <li><button onClick={() => {
+  // Remove token by setting past expiration date
+  document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=http://localhost:3000;";
+  console.log(document.cookie)
+  navigate('/login');
+}} className='w-4/5 flex items-center text-xs font-bold bg-slate-100 p-2 rounded-lg text-center mx-2 my-4 hover:bg-slate-300 focus:bg-slate-300'><IoLogOut className='mx-1'/>Logout</button></li>
       </ul>
     </div>
   )

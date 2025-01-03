@@ -40,7 +40,8 @@ function User() {
         (async () => {
           try {
             const res = await axios.get('http://localhost:5001/api/users/getAllUsers',
-            {
+            { 
+              withCredentials: true,
               headers : {
                 'Content-Type': 'application/json',
               }
@@ -68,8 +69,10 @@ function User() {
                 try {
                   const res = await axios.delete(`http://localhost:5001/api/users/deleteUser/${item.id}`,
                   {
+                    withCredentials: true,
                     headers : {
                       'Content-Type': 'application/json',
+                      'chars': 'utf-8',
                     }
                   });
                   console.log(res.data.OUTPUT);

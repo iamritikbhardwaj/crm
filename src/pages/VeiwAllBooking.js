@@ -123,7 +123,7 @@ function VeiwAllBooking() {
 
   return (
     <div className="p-4">
-    <BackToHome />
+    <BackToHome path={"/schedule"} />
       <div className="max-w-7xl 89 mx-auto p-4 md:p-6 bg-white shadow-lg rounded-lg mt-8">
         <h1 className="text-2xl font-bold text-center mb-6">View Confirmed Booking</h1>
 

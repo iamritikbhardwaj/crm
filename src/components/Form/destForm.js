@@ -4,8 +4,9 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import axios from "axios";
 import { API_URL } from "../../AppConstant.js";
+import { set } from "mongoose";
 
-function DestForm(editData, setEditData) {
+function DestForm({ editData, setEditData, refetch }) {
  
   const destSchema = z.object({
     destination: z.string(),
@@ -17,24 +18,27 @@ function DestForm(editData, setEditData) {
   });
 
   const destSubmit = (data) => {
-    console.log(editData);
+    console.log(editData, 'editData1');
     (async (data) => {
-      const response = await axios.post(`${API_URL}users/createDestination${editData ? `/?id=${editData?.editData?.destination_id}` : ""}`, data,
+      const response = await axios.post(`${API_URL}users/createDestination${editData.hasOwnProperty('destination_id') ? `/?id=${editData?.destination_id}` : ""}`, data,
       {
+        withCredentials: true,
         headers: {
           "content-type": "application/json"
         }
       })
       console.log(response, 'response');
-      window.location.reload();
+      if (response.status === 200) {
+        refetch();
+      }
     })(data);
   }
 
   
    useEffect(() => {if (editData) {
-      setValue("destination", editData.editData.destination);
-      setValue("currency", editData.editData.currency);
-      console.log(editData.editData.destination, 'editData');
+      setValue("destination", editData?.destination);
+      setValue("currency", editData?.currency);
+      console.log(editData?.destination, 'editData');
     }}, [editData, setEditData]);
   
 
