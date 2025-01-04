@@ -32,7 +32,7 @@ function Login() {
       console.log(response, 'response');
       if (response) {
         console.log((await response).data.OUTPUT, 'response');
-        navigate("/", state={user: (await response).data.OUTPUT});
+        navigate("/", {state: (await response).data.OUTPUT} );
       }
     })(data);
   }
