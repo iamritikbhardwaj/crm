@@ -4,6 +4,7 @@ import BackToHome from '../components/BackToHome'
 import { MdModeEdit, MdDelete } from "react-icons/md";
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { API_URL } from '../AppConstant';
 function User() {
 
   const navigate = useNavigate();
@@ -39,7 +40,7 @@ function User() {
       useEffect(() => {
         (async () => {
           try {
-            const res = await axios.get('http://localhost:5001/api/users/getAllUsers',
+            const res = await axios.get(`${API_URL}users/getAllUsers`,
             { 
               withCredentials: true,
               headers : {
