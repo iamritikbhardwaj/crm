@@ -10,6 +10,7 @@
 
 # production
 /build
+AppConstant
 
 # misc
 .DS_Store
