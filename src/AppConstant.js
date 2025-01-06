@@ -8,3 +8,7 @@ export const GoogleAutoCompleteKey = "AIzaSyCNe-x9Jn_2903j9PxhLPw6SPGXMwIlkCM";
 // LOCAL ENVIRONMENT
 export const FRONTEND_URL = "http://localhost:3000/";
 export const API_URL = "http://localhost:5001/api/";
+
+// PRODUCTION ENVIRONMENT
+// export const FRONTEND_URL = "http://91.205.105.35:63193/";
+// export const API_URL = "http://91.205.105.35:63193/api/";
