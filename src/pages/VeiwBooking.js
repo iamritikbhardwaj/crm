@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import { IoIosArrowDropdownCircle } from "react-icons/io";
 import BackToHome from "../components/BackToHome";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { getTravelMonthRange } from "./Booking";
+import axios from "axios";
+import { API_URL } from "../AppConstant";
 
 function VeiwBooking() {
   const [active, setActive] = useState(0); // Section toggle
@@ -17,6 +19,7 @@ function VeiwBooking() {
   const location = useLocation();
   const data = location.state;
   console.log(data, 'data');
+  const navigate = useNavigate();
 
 
   // Handle file upload
@@ -39,10 +42,19 @@ function VeiwBooking() {
   };
 
   // Reject Booking
-  const rejectBooking = () => {
+  const rejectBooking = async() => {
     // write your logic here delete ofc
+   try {
+    console.log(data.booking_id, 'booking id');
+     const response = await axios.delete(`${API_URL}users/deleteBooking/${data.booking_id}`)
+    if (response.status === "ok") {
+      alert("Booking has been deleted successfully");
+      navigate('/veiwBooking')
+    }
+   } catch (error) {
+    console.log(error);
+   }
     setDocPreviews({});
-    alert("Booking rejected!");
   };
 
   return (
