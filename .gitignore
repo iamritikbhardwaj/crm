@@ -10,7 +10,10 @@
 
 # production
 /build
-AppConstant
+
+# only dev related files
+/src/AppConstant.js
+
 
 # misc
 .DS_Store
