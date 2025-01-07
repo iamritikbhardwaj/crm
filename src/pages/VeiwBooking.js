@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { IoIosArrowDropdownCircle } from "react-icons/io";
 import BackToHome from "../components/BackToHome";
+import { useLocation } from "react-router-dom";
+import { getTravelMonthRange } from "./Booking";
 
 function VeiwBooking() {
   const [active, setActive] = useState(0); // Section toggle
@@ -12,23 +14,10 @@ function VeiwBooking() {
     "Email confirmation": null,
   });
 
-  // Predefined booking data
-  const [formData, setFormData] = useState({
-    destination: "Paris",
-    spoc: "Something",
-    agent: "John Doe",
-    customerName: "Jane Smith",
-    paxCount: 3,
-    travelMonth: "July",
-    arrivalDate: "11/12/2024",
-    departureDate: "20/12/2024",
-    countryCode: "+1",
-    whatsAppNumber: "1112202423",
-    opsSpoc: "John Doe",
-    orderValue: "5000",
-    quotationDetails: {},
-    documents: {},
-  });
+  const location = useLocation();
+  const data = location.state;
+  console.log(data, 'data');
+
 
   // Handle file upload
   const handleFileUpload = (e, docName) => {
@@ -36,37 +25,22 @@ function VeiwBooking() {
     if (file) {
       const fileURL = URL.createObjectURL(file);
       setDocPreviews((prev) => ({ ...prev, [docName]: fileURL }));
-      setFormData((prev) => ({
-        ...prev,
-        documents: { ...prev.documents, [docName]: file },
-      }));
+      // setdata((prev) => ({
+      //   ...prev,
+      //   documents: { ...prev.documents, [docName]: file },
+      // }));
     }
   };
 
   // Accept Booking
   const acceptBooking = () => {
-    localStorage.setItem("confirmedBooking", JSON.stringify(formData));
+    localStorage.setItem("confirmedBooking", data);
     alert("Booking accepted and saved!");
   };
 
   // Reject Booking
   const rejectBooking = () => {
-    setFormData({
-      destination: "",
-      spoc: "",
-      agent: "",
-      customerName: "",
-      paxCount: 0,
-      travelMonth: "",
-      arrivalDate: "",
-      departureDate: "",
-      countryCode: "",
-      whatsAppNumber: "",
-      opsSpoc: "",
-      orderValue: "",
-      quotationDetails: "",
-      documents: {},
-    });
+    // write your logic here delete ofc
     setDocPreviews({});
     alert("Booking rejected!");
   };
@@ -87,18 +61,17 @@ function VeiwBooking() {
           </h2>
           <div className={`${active === 0 ? "block" : "hidden"} grid grid-cols-2 gap-4 p-4`}>
             {[
-              ["Destination", formData.destination],
-              ["Sales Spoc", formData.spoc],
-              ["Agent", formData.agent],
-              ["Customer Name", formData.customerName],
-              ["Number of Pax", formData.paxCount],
-              ["Travel Month", formData.travelMonth],
-              ["Arrival Date", formData.arrivalDate],
-              ["Departure Date", formData.departureDate],
-              ["Country Code", formData.countryCode],
-              ["Booking Date", formData.bookingDate],
-              ["WhatsApp Number", formData.whatsAppNumber],
-              ["Ops Spoc", formData.opsSpoc],
+              ["Destination", data.destination],
+              ["Sales Spoc", data.salesSpoc],
+              ["Agent", data.agent],
+              ["Customer Name", data.customerName],
+              ["Number of Pax", data.pax.A + data.pax.C],
+              ["Travel Month", getTravelMonthRange(data.arrivalDate, data.departureDate)],
+              ["Arrival Date", data.arrivalDate],
+              ["Departure Date", data.departureDate],
+              ["Booking Date", data.bookingDate],
+              ["WhatsApp Number",data.countryCode + " " + data.whatsappNumber],
+              ["Ops Spoc", "some One"], // ask client where will this come from
             ].map(([label, value], index) => (
               <div key={index} className="flex space-x-3">
                 <label className="font-semibold">{label}:</label>
@@ -169,8 +142,8 @@ function VeiwBooking() {
             <label className="font-semibold">Order Value (USD):</label>
             <input
               type="text"
-              value={formData.orderValue}
-              onChange={(e) => setFormData({ ...formData, orderValue: e.target.value })}
+              value={data.orderValue}
+              // onChange={(e) => setdata({ ...data, orderValue: e.target.value })}
               className="w-full p-2 border rounded mt-2"
             />
           </div>

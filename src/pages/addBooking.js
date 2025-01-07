@@ -12,6 +12,7 @@ const AddBooking = () => {
   const [currentSection, setCurrentSection] = useState(0);
   const [bookingid, setBookingId] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [documents, setDocuments] = useState([]);
   const navigate = useNavigate();
 
   const bookingSchema = z.object({
@@ -29,18 +30,6 @@ const AddBooking = () => {
     orderValue: z.string().min(1, { message: "Order Value is required" }),
     countryCode: z.string().min(1, { message: "Country Code is required" }),
     whatsappNumber: z.string().min(1, { message: "WhatsApp Number is required" }),
-    documents: z.array(
-      z.object({
-        file: z
-          .instanceof(File, { message: "Must be a valid file" })
-          .refine(file => file.size <= 5 * 1024 * 1024, { // Max size 5MB
-            message: 'File size must be less than 5MB'
-          })
-          .refine(file => ['application/pdf', 'image/jpeg', 'image/png'].includes(file.type), {
-            message: 'File must be PDF, JPEG, or PNG'
-          })
-      })
-    ),
   });
 
   const { register, handleSubmit, setValue, watch, control, getValues, formState: { errors } } = useForm({
@@ -58,106 +47,78 @@ const AddBooking = () => {
     updatedDocs[index] = { file };
     setValue("documents", updatedDocs);
 
-    if (bookingid) {
-        const fileData = new FormData();
-        fileData.append('file', file);
+    // if (bookingid) {
+    //     const fileData = new FormData();
+    //     fileData.append('file', file);
         
-        try {
-            const response = await axios.post(
-                `${API_URL}users/uploadFile?id=${bookingid}`, 
-                fileData, 
-                {
-                    headers: {
-                        'Content-Type': 'multipart/form-data',
-                    },
-                }
-            );
+    //     try {
+    //         const response = await axios.post(
+    //             `${API_URL}users/uploadFile?id=${bookingid}`, 
+    //             fileData, 
+    //             {
+    //                 headers: {
+    //                     'Content-Type': 'multipart/form-data',
+    //                 },
+    //             }
+    //         );
             
-            console.log("File upload response:", response);
-        } catch (error) {
-            console.error("Error uploading file:", error);
-        }
-    }
+    //         console.log("File upload response:", response);
+    //     } catch (error) {
+    //         console.error("Error uploading file:", error);
+    //     }
+    // }
 };
  
-  const addDocument = () => {
-    // Add an empty document object to the documents array
-    const currentDocs = getValues("documents") || [];
-    currentDocs.push({ file: null, preview: null, url: null });
-    setValue("documents", currentDocs);
-  };
+const addDocument = () => {
+  setDocuments([...documents, { file: null }]);
+};
 
-  const removeDocument = (index) => {
-    const currentDocs = getValues("documents") || [];
-    if (index >= 0 && index < currentDocs.length) {
-      currentDocs.splice(index, 1); // Remove the document at the specified index
-      setValue("documents", currentDocs); // Update the documents array
-    }
-  };
+const removeDocument = (index) => {
+  const updatedDocs = documents.filter((_, i) => i !== index);
+  setDocuments(updatedDocs);
+};
 
   console.dir(errors, "errors");
 
 
-const bookingSubmit = async (data) => {
-  console.log("Current section:", currentSection);
-  console.log("Form data before submission:", data);
+  const bookingSubmit = async (data) => {
+    console.log("Form data before submission:", data);
 
-  if (currentSection < sections.length - 1) {
-    // If not on the last section, just move to next section
-    setCurrentSection(currentSection + 1);
-    return;
-  }
-
-  // Only proceed with API submission on the last section
-  setIsSubmitting(true);
-  try {
-    const formattedData = {
-      destination: data.destination,
-      salesSpoc: data.salesSpoc,
-      agent: data.agent,
-      customerName: data.customerName,
-      pax: {
-        A: parseInt(data.pax.A),
-        C: parseInt(data.pax.C || 0),
-        Ca: data.pax.Ca || []
-      },
-      arrivalDate: data.arrivalDate,
-      departureDate: data.departureDate,
-      orderValue: parseFloat(data.orderValue),
-      countryCode: data.countryCode,
-      whatsappNumber: data.whatsappNumber,
-      documents: data.documents || []
-    };
-
-    console.log("Formatted data for submission:", formattedData);
-
-    console.log(data, "data");
-
-    const response = await axios.post(
-      `${API_URL}users/createBooking`, 
-      formattedData,
-      {
-        withCredentials: true,
-        headers: {
-          "content-type": "application/json"
-        }
-      }
-    );
-
-    console.log("API Response:", response);
+    const formData = new FormData();
+    // Append other form data here
     
-    if (response.status === 200) {
-      setBookingId(response.data?.OUTPUT?.booking_id);
-      // Handle successful submission (e.g., show success message, redirect)
+    // Append files
+    formData.append("destination", data.destination);
+    documents.forEach((doc, index) => {
+      if (doc.file) {
+        formData.append(`documents[${index}].file`, doc.file);
+      }
+    });
+    console.log(formData, documents, 'formData');
+
+    // Submit the form data
+
+    try {
+      setIsSubmitting(true);
+      const response = await axios.post(
+        `${API_URL}users/createBooking`, 
+        data, 
+        { 
+          withCredentials: true,
+          headers: { "Content-Type": "application/json" } }
+      );
+      console.log("Response", response);
+
+      // Handle response
+      setBookingId(response.data.bookingId);
+      // Navigate or show success message
+    } catch (error) {
+      console.error("Error submitting the booking:", error);
+    } finally {
+      setIsSubmitting(false);
+      navigate("/booking");
     }
-  } catch (error) {
-    console.error("Submission error:", error);
-    // Handle error (e.g., show error message)
-  } finally {
-    setIsSubmitting(false);
-    // navigate("/booking");
-  }
-};
+  };
 
   
 
@@ -367,26 +328,18 @@ const bookingSubmit = async (data) => {
             </button>
 
              {/* Document Input Fields */}
-  {(watch("documents") || []).map((doc, index) => (
+  {documents.map((doc, index) => (
     <div key={index} className="flex flex-col space-y-2 mt-4">
       <div className="flex items-center space-x-4">
-     
+    
     <div className="flex items-center space-x-4">
-      <Controller
-        name={`documents.${index}.file`}
-        control={control}
-        render={({ field }) => (
-          <input
-            type="file"
-            {...field}
-            className="w-1/2 border rounded px-3 py-2"
-          />
-        )}  
-        defaultValue={""}
-        />     
+    <input 
+                type="file"
+                onChange={(e) => handleFileUpload(e, index)}
+              />  
       <button
         type="button"
-        onClick={() => removeDocument(index)}
+        onClick={async () => await removeDocument(index)}
         className="text-red-500 hover:text-red-700"
       >
         Remove
