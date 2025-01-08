@@ -5,13 +5,21 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { getTravelMonthRange } from "./Booking";
 import axios from "axios";
 import { API_URL } from "../AppConstant";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { set } from "mongoose";
+import Swal from "sweetalert2";
 
 function VeiwBooking() {
+
   const [active, setActive] = useState(0); // Section toggle
-  const [docPreviews, setDocPreviews] = useState({
+  const [docPreviews, setDocPreviews] = useState({});
+
+  const [doc, setDoc] = useState({
     "Air Ticket": null,
-    Passport: null,
-    PAN: null,
+    "Passport": null,
+    "PAN": null,
     "Sales Sheet": null,
     "Email confirmation": null,
   });
@@ -19,25 +27,30 @@ function VeiwBooking() {
   const location = useLocation();
   const data = location.state;
   console.log(data, 'data');
+
   const navigate = useNavigate();
+
+  const isFileStored = doc !== null;
 
 
   // Handle file upload
-  const handleFileUpload = (e, docName) => {
+  const handleFileUpload = async(e, docName) => {
     const file = e.target.files[0];
     if (file) {
       const fileURL = URL.createObjectURL(file);
-      setDocPreviews((prev) => ({ ...prev, [docName]: fileURL }));
-      // setdata((prev) => ({
-      //   ...prev,
-      //   documents: { ...prev.documents, [docName]: file },
-      // }));
+      setDocPreviews((prev) => ({[docName]: fileURL }));
+      await setDoc((prev) => ({
+        ...prev,
+        [docName]: { ...prev.documents, [docName]: file },
+      }));
+      console.log(isFileStored, 'doc');
+      console.log(doc, 'doc');
     }
   };
 
   // Accept Booking
-  const acceptBooking = () => {
-    localStorage.setItem("confirmedBooking", data);
+  const acceptBooking = async() => {
+    await submit();
     alert("Booking accepted and saved!");
   };
 
@@ -64,6 +77,18 @@ function VeiwBooking() {
    }
     setDocPreviews({});
   };
+
+  const submit = async () => {
+    Swal.fire("submit data")
+    // const axios.post(`${API_URL}users/uploadDocuments`, doc,
+    // {
+    //   withCredentials: true,
+    //   headers: {
+    //     "Content-Type": "application/json",
+    //   },
+    // })
+    }
+    // write your logic here
 
   return (
     <div className="p-4">
@@ -114,7 +139,7 @@ function VeiwBooking() {
               {/* Document Upload List */}
               <div className="w-1/2 border-r-2 pr-4">
                 <ul>
-                  {Object.keys(docPreviews).map((docName, index) => (
+                  {Object.keys(doc).map((docName, index) => (
                     <li key={index} className="flex justify-between mb-2">
                       <span>{docName}:</span>
                       <input
@@ -184,7 +209,7 @@ function VeiwBooking() {
                         accept="application/pdf,image/*"
                         className="hidden"
                         id={`file-quatation`}
-                        // onChange={(e) => handleFileUpload(e, docName)}
+                        onChange={(e) => handleFileUpload(e, {docName: "quatation"})}
                       />
                       <label
                         htmlFor={`file-quatation`}

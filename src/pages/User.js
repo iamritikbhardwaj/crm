@@ -5,6 +5,7 @@ import { MdModeEdit, MdDelete } from "react-icons/md";
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { API_URL } from '../AppConstant';
+import Swal from 'sweetalert2';
 function User() {
 
   const navigate = useNavigate();
@@ -66,21 +67,36 @@ function User() {
               navigate('/userForm', { state: item });
             }}><MdModeEdit />
             </button> <button className=" rounded-lg text-red-400" onClick={() => {
-              (async () => {
-                try {
-                  const res = await axios.delete(`http://localhost:5001/api/users/deleteUser/${item.id}`,
-                  {
-                    withCredentials: true,
-                    headers : {
-                      'Content-Type': 'application/json',
-                      'chars': 'utf-8',
-                    }
-                  });
-                  console.log(res.data.OUTPUT);
-                  window.location.reload();
-                } catch (error) {
-                  console.log(error);
-              }})();
+              Swal.fire({
+                title: "Do you want to delete?",
+                showDenyButton: true,
+                confirmButtonText: "Delete",
+                denyButtonText: `Don't Delete`
+              }).then((result) => {
+                /* Read more about isConfirmed, isDenied below */
+                if (result.isConfirmed) {
+                  (async () => {
+                    try {
+                      const res = await axios.delete(`http://localhost:5001/api/users/deleteUser/${item.id}`,
+                      {
+                        withCredentials: true,
+                        headers : {
+                          'Content-Type': 'application/json',
+                          'chars': 'utf-8',
+                        }
+                      });
+                      console.log(res.data.OUTPUT);
+                      await Swal.fire("Deleted!", "", "success");
+                      window.location.reload();
+                    } catch (error) {
+                      console.log(error);
+                  }})();
+                 
+                } else if (result.isDenied) {
+                  Swal.fire("Changes are not deleted", "", "info");
+                }
+              });
+              
             }}><MdDelete /></button></>,
         }
     });

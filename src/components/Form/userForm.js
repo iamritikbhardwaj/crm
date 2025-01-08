@@ -170,7 +170,7 @@ function UserForm() {
             type="submit"
             className="bg-slate-800 text-white px-6 py-2 rounded-lg text-lg font-semibold hover:bg-slate-600 focus:outline-none focus:ring-2 focus:ring-slate-500"
           >
-            Add User
+            Save
           </button>
         </div>
       </form>

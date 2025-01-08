@@ -8,6 +8,7 @@ import SupForm from "../components/Form/supForm";
 import axios from "axios";
 import { API_URL } from "../AppConstant";
 import { set } from "mongoose";
+import Swal from "sweetalert2";
 
 function Setting() {
   const destfetch = async () => {
@@ -66,19 +67,34 @@ function Setting() {
     actions: <><button className="align-center text-blue-400" onClick={() => {setEditData(item)
     console.log(editData);
     }}><MdModeEdit /></button>
-    <button className="align-center text-red-400" onClick={() => {(async () => {
-      try {
-        await axios.delete(`${API_URL}users/deleteDestination/${item.destination_id}`, {
-          withCredentials: true,
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-        refetch();
-      } catch (error) {
-        console.error("Error deleting destination:", error);
-      }
-    })();}}><MdDelete /></button></>,
+    <button className="align-center text-red-400" onClick={() => {
+      Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        confirmButtonColor: '#3085d6',
+        confirmButtonText: 'Yes, delete it!',
+        denyButtonText: 'No, cancel',
+      }).then((result) => {
+        if (result.isConfirmed) {
+          (async () => {
+            try {
+              await axios.delete(`${API_URL}users/deleteDestination/${item.destination_id}`, {
+                withCredentials: true,
+                headers: {
+                  "Content-Type": "application/json",
+                },
+              });
+              refetch();
+            } catch (error) {
+              console.error("Error deleting destination:", error);
+            }
+          })();
+        } else if (result.isDenied) {
+          Swal.fire('Changes are not deleted', '', 'info')
+        }
+      })
+  }}><MdDelete /></button></>,
   }));
 
   // agent data
@@ -87,19 +103,35 @@ function Setting() {
     agent: item.name,
     status: <button className={`p-2 rounded-lg ${item.status === "active" ? "bg-green-400" : "bg-red-400"}`}>{item.status}</button>,
     actions: <><button onClick={() => {setEditData(item) 
-      console.log(editData);}}><MdModeEdit /></button><button className="align-center text-red-400" onClick={() => {(async () => {
-      try {
-        await axios.delete(`${API_URL}users/deleteAgent/${item.agent_id}`, {
-          withCredentials: true,
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-        refetch();
-      } catch (error) {
-        console.error("Error deleting destination:", error);
-      }
-    })();}}><MdDelete /></button></>,
+      console.log(editData);}}><MdModeEdit /></button><button className="align-center text-red-400" onClick={() => {
+        Swal.fire({
+          title: 'Are you sure?',
+          text: "You won't be able to revert this!",
+          icon: 'warning',
+          confirmButtonColor: '#3085d6',
+          confirmButtonText: 'Yes, delete it!',
+          denyButtonText: 'No, cancel',
+        }).then((result) => {
+          if (result.isConfirmed) {
+            (async () => {
+              try {
+                await axios.delete(`${API_URL}users/deleteAgent/${item.agent_id}`, {
+                  withCredentials: true,
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                });
+                refetch();
+              } catch (error) {
+                console.error("Error deleting destination:", error);
+              }
+            })();
+          } else if (result.isDenied) {
+            Swal.fire('Changes are not deleted', '', 'info')
+          }
+        
+        })
+  }}><MdDelete /></button></>,
   }));
 
   // supplier data
@@ -107,19 +139,37 @@ function Setting() {
   const supplierData = sData.map((item) => ({
     supplier: item.name,
     status: <button className={`p-2 rounded-lg ${item.status === "active" ? "bg-green-400" : "bg-red-400"}`}>{item.status}</button>,
-    actions: <><button onClick={() => setEditData(item)}><MdModeEdit /></button><button className="align-center text-red-400" onClick={() => {(async () => {
-      try {
-        await axios.delete(`${API_URL}users/deleteSupplier/${item.supplier_id}`, {
-          withCredentials: true,
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-        refetch();
-      } catch (error) {
-        console.error("Error deleting destination:", error);
-      }
-    })();}}><MdDelete /></button></>,
+    actions: <><button onClick={() => setEditData(item)}><MdModeEdit /></button><button 
+    className="align-center text-red-400" 
+    onClick={() => {
+      Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        confirmButtonColor: '#3085d6',
+        confirmButtonText: 'Yes, delete it!',
+        denyButtonText: 'No, cancel',
+      }).then((result) => {
+        if (result.isConfirmed) {
+          (async () => {
+            try {
+              await axios.delete(`${API_URL}users/deleteSupplier/${item.supplier_id}`, {
+                withCredentials: true,
+                headers: {
+                  "Content-Type": "application/json",
+                },
+              });
+              refetch();
+            } catch (error) {
+              console.error("Error deleting destination:", error);
+            }
+          })();
+        } else if (result.isDenied) {
+          Swal.fire('Changes are not deleted', '', 'info')
+        }
+      })
+    }}
+  ><MdDelete /></button></>,
   }));
 
   // Columns for Destinations, Agents, and Suppliers tables
