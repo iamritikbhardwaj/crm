@@ -46,10 +46,18 @@ function VeiwBooking() {
     // write your logic here delete ofc
    try {
     console.log(data.booking_id, 'booking id');
-     const response = await axios.delete(`${API_URL}users/deleteBooking/${data.booking_id}`)
+     const response = await axios.delete(`${API_URL}users/deleteBooking/${data.booking_id}`,{
+      withCredentials: true,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
     if (response.status === "ok") {
       alert("Booking has been deleted successfully");
-      navigate('/veiwBooking')
+      navigate('/booking')
+    } else {
+      alert("Error deleting booking. Please try again later.");
+      navigate('/booking')
     }
    } catch (error) {
     console.log(error);
