@@ -13,6 +13,7 @@ import FormControl from '@mui/material/FormControl';
 import TextField from '@mui/material/TextField';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import Swal from 'sweetalert2';
 function Login() {
 
   const navigate = useNavigate();
@@ -50,8 +51,25 @@ function Login() {
       })
       console.log(response, 'response');
       if (response) {
-        console.log((await response).data.OUTPUT, 'response');
-        navigate("/", {state: (await response).data.OUTPUT} );
+        console.log((await response).data.STATUS, 'response');
+        if ((await response).data.STATUS === 'SUCCESS') {
+          Swal.fire({
+            icon: 'success',
+            title: 'Login Successfull',
+            showConfirmButton: false,
+            timer: 1500
+          }).then(async() => {
+            navigate("/", {state: (await response).data.OUTPUT} );
+          })
+        } else if ((await response).data.STATUS === 'FAIL') {
+          Swal.fire({
+            icon: 'error',
+            title: 'Login Failed',
+            text: (await response).data.MESSAGE,
+            showConfirmButton: false,
+            timer: 1500
+          })
+        }
       }
     })(data);
   }
