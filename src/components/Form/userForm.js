@@ -11,13 +11,19 @@ function UserForm() {
   const data = useLocation().state;
   console.log(data, 'data');
 
-  const [ id, setId ] = React.useState(data? data?.id : null);
+  const [ id, setId ] = React.useState(null);
+
+  useEffect(() => {
+    if (data) {
+      setId(data.id);
+    }
+  }, [data]);
 
   const navigate = useNavigate();
 
   const userShema = z.object({
     userName: z.string().nonempty(),
-    phoneNumber: z.string().min(10, {message: "Please enter a valid number"}).max(12, {message: "Please enter a valid number"}),
+    phoneNumber: z.string().min(10, {message: "Please enter a valid number"}).max(10, {message: "Please enter a valid number"}),
     profile: z.string().nonempty(),
     email: z.string().email(),
     password: z.string().nonempty(),
@@ -87,7 +93,9 @@ function UserForm() {
             Phone Number
           </label>
           <input
-            type="text"
+            type="number"
+            maxLength={10}
+            minLength={10}
             id="phoneNumber"
             {...register("phoneNumber")}
             className="px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500"

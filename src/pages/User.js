@@ -82,7 +82,6 @@ function User() {
                         withCredentials: true,
                         headers : {
                           'Content-Type': 'application/json',
-                          'chars': 'utf-8',
                         }
                       });
                       console.log(res.data.OUTPUT);

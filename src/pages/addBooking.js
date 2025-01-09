@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import BackToHome from "../components/BackToHome";
 import { z } from "zod";
-import { Controller, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 import { API_URL } from "../AppConstant";
@@ -10,7 +10,6 @@ import { useNavigate } from "react-router-dom";
 const AddBooking = () => {
   const sections = ["Booking Details", "Travel Details", "Order & Contact Details", "Documents Upload"];
   const [currentSection, setCurrentSection] = useState(0);
-  const [bookingid, setBookingId] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [documents, setDocuments] = useState([]);
   const navigate = useNavigate();
@@ -37,40 +36,19 @@ const AddBooking = () => {
   });
 
   // Add New Document
-  const handleFileUpload = async (e, index) => {
+  const handleFileUpload = (e, id) => {
     const file = e.target.files[0];
-    if (!file) return;
-
-    // Update the form data immediately with the file
-    const currentDocs = getValues("documents") || [];
-    const updatedDocs = [...currentDocs];
-    updatedDocs[index] = { file };
-    setValue("documents", updatedDocs);
-
-    // if (bookingid) {
-    //     const fileData = new FormData();
-    //     fileData.append('file', file);
-        
-    //     try {
-    //         const response = await axios.post(
-    //             `${API_URL}users/uploadFile?id=${bookingid}`, 
-    //             fileData, 
-    //             {
-    //                 headers: {
-    //                     'Content-Type': 'multipart/form-data',
-    //                 },
-    //             }
-    //         );
-            
-    //         console.log("File upload response:", response);
-    //     } catch (error) {
-    //         console.error("Error uploading file:", error);
-    //     }
-    // }
-};
+    if (file) {
+      const fileURL = URL.createObjectURL(file);
+      const updatedDocuments = documents.filter((doc) => doc.id !== id);
+      setDocuments([
+        ...updatedDocuments, { id: id, file: file, preview: fileURL },
+      ]);
+    }
+  };
  
 const addDocument = () => {
-  setDocuments([...documents, { file: null }]);
+  setDocuments([...documents, {id: Date.now(), file: null, preview: null}]);
 };
 
 const removeDocument = (index) => {
@@ -83,42 +61,37 @@ const removeDocument = (index) => {
 
   const bookingSubmit = async (data) => {
     console.log("Form data before submission:", data);
-
-    const formData = new FormData();
-    // Append other form data here
+  
+    const formData = {
+      ...data,
+      documents
+    };
     
-    // Append files
-    formData.append("destination", data.destination);
-    documents.forEach((doc, index) => {
-      if (doc.file) {
-        formData.append(`documents[${index}].file`, doc.file);
-      }
-    });
-    console.log(formData, documents, 'formData');
-
+    console.log(formData, 'formData');
+  
     // Submit the form data
-
     try {
       setIsSubmitting(true);
       const response = await axios.post(
         `${API_URL}users/createBooking`, 
-        data, 
+        formData, 
         { 
           withCredentials: true,
-          headers: { "Content-Type": "application/json" } }
+          headers: { "Content-Type": "Application/json" } // Use multipart/form-data for file uploads
+        }
       );
       console.log("Response", response);
-
-      // Handle response
-      setBookingId(response.data.bookingId);
-      // Navigate or show success message
+  
+      // Handle response (e.g., navigate or show success message)
+      navigate("/booking");
     } catch (error) {
       console.error("Error submitting the booking:", error);
+      // Optionally, handle error (e.g., show error message to the user)
     } finally {
       setIsSubmitting(false);
-      navigate("/booking");
     }
   };
+  
 
   
 
@@ -335,7 +308,7 @@ const removeDocument = (index) => {
     <div className="flex items-center space-x-4">
     <input 
                 type="file"
-                onChange={(e) => handleFileUpload(e, index)}
+                onChange={(e) => handleFileUpload(e, doc.id)}
               />  
       <button
         type="button"
@@ -352,7 +325,7 @@ const removeDocument = (index) => {
   <div>
     <p className="text-sm font-semibold">Preview:</p>
     <a
-      href={URL.createObjectURL(doc.file)}
+      href={doc.preview}
       target="_blank"
       rel="noopener noreferrer"
       className="text-blue-600 underline"
