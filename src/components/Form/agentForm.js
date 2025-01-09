@@ -9,7 +9,7 @@ function AgentForm({editData, setEditData, refetch}) {
 
     const agentSchema = z.object({
         name: z.string().nonempty(),
-        status: z.string().nonempty(),
+        status: z.string().nonempty().toLowerCase(),
     })
     const { handleSubmit, register, setValue, formState: { errors } } = useForm({
         resolver: zodResolver(agentSchema)

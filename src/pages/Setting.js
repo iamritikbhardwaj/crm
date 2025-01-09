@@ -63,45 +63,18 @@ function Setting() {
   const destData = dData.map((item) => ({
     destination: item.destination,
     currency: item.currency,
-    status: <button className={`p-2 rounded-lg ${item.status === ("active" || "Active") ? "bg-green-400" : "bg-red-400"}`}>{item.status}</button>,
+    status: <button className={`p-2 rounded-lg ${item.status === ("ACTIVE") ? "bg-green-400" : "bg-red-400"}`}>{item.status}</button>,
     actions: <><button className="align-center text-blue-400" onClick={() => {setEditData(item)
     console.log(editData);
     }}><MdModeEdit /></button>
-    <button className="align-center text-red-400" onClick={() => {
-      Swal.fire({
-        title: 'Are you sure?',
-        text: "You won't be able to revert this!",
-        icon: 'warning',
-        confirmButtonColor: '#3085d6',
-        confirmButtonText: 'Yes, delete it!',
-        denyButtonText: 'No, cancel',
-      }).then((result) => {
-        if (result.isConfirmed) {
-          (async () => {
-            try {
-              await axios.delete(`${API_URL}users/deleteDestination/${item.destination_id}`, {
-                withCredentials: true,
-                headers: {
-                  "Content-Type": "application/json",
-                },
-              });
-              refetch();
-            } catch (error) {
-              console.error("Error deleting destination:", error);
-            }
-          })();
-        } else if (result.isDenied) {
-          Swal.fire('Changes are not deleted', '', 'info')
-        }
-      })
-  }}><MdDelete /></button></>,
+    </>,
   }));
 
   // agent data
 
   const agentData = aData.map((item) => ({
     agent: item.name,
-    status: <button className={`p-2 rounded-lg ${item.status === "active" ? "bg-green-400" : "bg-red-400"}`}>{item.status}</button>,
+    status: <button className={`p-2 rounded-lg ${item.status === "ACTIVE" ? "bg-green-400" : "bg-red-400"}`}>{item.status}</button>,
     actions: <><button onClick={() => {setEditData(item) 
       console.log(editData);}}><MdModeEdit /></button><button className="align-center text-red-400" onClick={() => {
         Swal.fire({
@@ -138,7 +111,7 @@ function Setting() {
 
   const supplierData = sData.map((item) => ({
     supplier: item.name,
-    status: <button className={`p-2 rounded-lg ${item.status === "active" ? "bg-green-400" : "bg-red-400"}`}>{item.status}</button>,
+    status: <button className={`p-2 rounded-lg ${item.status === "ACTIVE" ? "bg-green-400" : "bg-red-400"}`}>{item.status}</button>,
     actions: <><button onClick={() => setEditData(item)}><MdModeEdit /></button><button 
     className="align-center text-red-400" 
     onClick={() => {
