@@ -47,10 +47,10 @@ function UserForm() {
 
   console.log('errors', errors);
 
-  const onSubmitForm = async (data) => {
+  const onSubmitForm = async (Formdata) => {
     // Handle form submission logic here
     try {
-      const response = await axios.post(`${API_URL}users/createUser${id ? `/?id=${id}` : ""}`, data,
+      const response = await axios.post(`${API_URL}users/createUser${id ? `/?id=${id}` : ""}`, Formdata,
       {
         withCredentials: true,
         headers: {  
@@ -70,7 +70,7 @@ function UserForm() {
   return (
     <div className="max-w-4xl mx-auto p-6 bg-slate-100 rounded-lg mt-10 shadow-lg">
         <BackToHome path={"/user"} />
-      <h2 className="text-2xl font-semibold text-center text-slate-800 mb-6">Add User</h2>
+      <h2 className="text-2xl font-semibold text-center text-slate-800 mb-6">{id ? "Update User" : "Add User"}</h2>
       <form onSubmit={handleSubmit(onSubmitForm)} className="space-y-6">
         {/* User Name */}
         <div className="flex flex-col">

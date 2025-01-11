@@ -81,7 +81,9 @@ function Setting() {
           title: 'Are you sure?',
           text: "You won't be able to revert this!",
           icon: 'warning',
+          showDenyButton: true,
           confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#d33',
           confirmButtonText: 'Yes, delete it!',
           denyButtonText: 'No, cancel',
         }).then((result) => {
@@ -119,7 +121,9 @@ function Setting() {
         title: 'Are you sure?',
         text: "You won't be able to revert this!",
         icon: 'warning',
+        showDenyButton: true,
         confirmButtonColor: '#3085d6',
+        denyButtonColor: '#d33',
         confirmButtonText: 'Yes, delete it!',
         denyButtonText: 'No, cancel',
       }).then((result) => {
@@ -229,11 +233,7 @@ function Setting() {
           {activeTab === 3 && (
             <SupForm editData={editData} setEditData={setEditData} refetch={refetch} />
           )}
-          <button className="p-2 rounded-lg bg-slate-800 text-slate-50" onClick={() => {
-              refetch();
-              setEditData([])
-            }}>Refresh</button>
-        </div>
+        </div >
 
         {/* Right Section for Tables */}
         <div className="flex-col w-[45%] h-[80vh] p-4 bg-slate-100 shadow rounded-lg overflow-y-auto">

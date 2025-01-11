@@ -9,7 +9,7 @@ function AgentForm({editData, setEditData, refetch}) {
 
     const agentSchema = z.object({
         name: z.string().nonempty(),
-        status: z.string().nonempty().toLowerCase(),
+        status: z.string().nonempty().toUpperCase(),
     })
     const { handleSubmit, register, setValue, formState: { errors } } = useForm({
         resolver: zodResolver(agentSchema)
@@ -26,7 +26,7 @@ function AgentForm({editData, setEditData, refetch}) {
             }
           })
           console.log(response, 'response');
-          if (response) {
+          if ((await response).status === 200) {
             refetch();
           }
         })(data);     

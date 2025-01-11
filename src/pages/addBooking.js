@@ -1,11 +1,12 @@
-import React, { useState } from "react";
-import BackToHome from "../components/BackToHome";
-import { z } from "zod";
-import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
-import { API_URL } from "../AppConstant";
+import React, { useState } from "react";
+import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
+import { z } from "zod";
+import { API_URL } from "../AppConstant";
+import BackToHome from "../components/BackToHome";
 
 const AddBooking = () => {
   const sections = ["Booking Details", "Travel Details", "Order & Contact Details", "Documents Upload"];
@@ -19,12 +20,25 @@ const AddBooking = () => {
     salesSpoc: z.string().min(1, { message: "Sales SPOC is required" }),
     agent: z.string().min(1, { message: "Agent is required" }),
     customerName: z.string().min(1, { message: "Customer Name is required" }),
-    arrivalDate: z.string().min(1, { message: "Arrival Date is required" }),
-    departureDate: z.string().min(1, { message: "Departure Date is required" }),
+    arrivalDate: z.string().min(1, { message: "Arrival Date is required" }).refine(
+      (value) => 
+      new Date(value) > new Date()
+    ,
+    {
+      message: "Arrival Date must be in the future",
+    }),
+    departureDate: z.string().min(1, { message: "Departure Date is required" }).refine(
+      (value) => 
+        new Date(value) > new Date(watch("arrivalDate"))
+      ,
+      {
+        message: "Departure Date must be after Arrival Date",
+      }
+    ),
     pax: z.object({
       A: z.string().min(1, { message: "Adults is required" }),
       C: z.string().optional(),
-      Ca: z.array(z.string()).optional(),
+      Ca: z.array(z.string().max(11)).optional(),
     }),
     orderValue: z.string().min(1, { message: "Order Value is required" }),
     countryCode: z.string().min(1, { message: "Country Code is required" }),
@@ -81,6 +95,12 @@ const removeDocument = (index) => {
         }
       );
       console.log("Response", response);
+
+      if (response.status !== 200) {
+        Swal.fire("Failed to submit the booking");
+      }else{
+        Swal.fire("Booking submitted successfully");
+      }
   
       // Handle response (e.g., navigate or show success message)
       navigate("/booking");
@@ -132,7 +152,7 @@ const removeDocument = (index) => {
                 <option value="New York">New York</option>
                 <option value="Tokyo">Tokyo</option>
               </select>
-              {errors.destination && <p className="text-red-500">{errors.destination.message}</p>}
+              {errors.destination && <p className="text-red-500">{errors.destination.message}</p> && Swal.fire(errors.destination.message)}
             </div>
 
             <div>

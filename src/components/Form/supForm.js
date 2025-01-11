@@ -12,7 +12,7 @@ function SupForm({editData, setEditData, refetch}) {
 
     const supplierSchema = z.object({
         name: z.string().nonempty(),
-        status: z.string().nonempty().toLowerCase(),
+        status: z.string().nonempty().toUpperCase(),
     })
 
     const { handleSubmit, register, setValue, formState: { errors } } = useForm({
