@@ -5,24 +5,77 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { getTravelMonthRange } from "./Booking";
 import axios from "axios";
 import { API_URL } from "../AppConstant";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { set } from "mongoose";
 import Swal from "sweetalert2";
 
 function VeiwBooking() {
 
   const [active, setActive] = useState(0); // Section toggle
-  const [docPreviews, setDocPreviews] = useState({});
 
-  const [doc, setDoc] = useState({
-    "Air Ticket": null,
-    "Passport": null,
-    "PAN": null,
-    "Sales Sheet": null,
-    "Email confirmation": null,
-  });
+  const [airTicket, setAirTicket] = useState([])
+  const [passport, setPassport] = useState([])
+  const [pan, setPan] = useState([])
+  const [misc, setMisc] = useState([])
+  const [emailConf, setEmailConf] = useState([])
+
+  const addAirTicker = (e) => {
+    const file = e.target.files[0];
+    const fileURL = URL.createObjectURL(file)
+    setAirTicket(...airTicket, {file: file, url: fileURL})
+    console.log(airTicket, 'airTicket');
+  }
+  
+  const addPassport = (e) => {
+    const file = e.target.files[0];
+    const fileURL = URL.createObjectURL(file)
+    setPassport(...passport, {file: file, url: fileURL})
+    console.log(passport, 'airTicket');
+  }
+
+  const addPan = (e) => {
+    const file = e.target.files[0];
+    const fileURL = URL.createObjectURL(file)
+    setPan(...pan, {file: file, url: fileURL})
+    console.log(pan, 'airTicket');
+  }
+
+  const addMisc = (e) => {
+    const file = e.target.files[0];
+    const fileURL = URL.createObjectURL(file)
+    setMisc(...misc, {file: file, url: fileURL})
+    console.log(misc, 'airTicket');
+  } 
+
+  const addEmailConf = (e) => {
+    const file = e.target.files[0];
+    const fileURL = URL.createObjectURL(file)
+    setEmailConf(...emailConf, {file: file, url: fileURL})
+    console.log(emailConf, 'airTicket');
+  }
+
+  const removeAirTicket = (index) => {
+    const updatedDoc = airTicket.filter((_, i) => i !== index);
+    setAirTicket(updatedDoc)
+  }
+
+  const removePassport = (index) => {
+    const updatedDoc = passport.filter((_, i) => i !== index);
+    setPassport(updatedDoc)
+  }
+
+  const removePan = (index) => {
+    const updatedDoc = pan.filter((_, i) => i !== index);
+    setPan(updatedDoc)
+  }
+
+  const removeMisc = (index) => {
+    const updatedDoc = misc.filter((_, i) => i !== index);
+    setMisc(updatedDoc)
+  }
+
+  const removeEmailConf = (index) => {
+    const updatedDoc = emailConf.filter((_, i) => i !== index);
+    setEmailConf(updatedDoc)
+  }
 
   const location = useLocation();
   const data = location.state;
@@ -30,33 +83,14 @@ function VeiwBooking() {
 
   const navigate = useNavigate();
 
-  const isFileStored = doc !== null;
-
-
-  // Handle file upload
-  const handleFileUpload = async(e, docName) => {
-    const file = e.target.files[0];
-    if (file) {
-      const fileURL = URL.createObjectURL(file);
-      setDocPreviews((prev) => ({[docName]: fileURL }));
-      await setDoc((prev) => ({
-        ...prev,
-        [docName]: { ...prev.documents, [docName]: file },
-      }));
-      console.log(isFileStored, 'doc');
-      console.log(doc, 'doc');
-    }
-  };
-
-  // Accept Booking
+  // Accept Booking is to set booking status to confirmed also add salesSpoc
   const acceptBooking = async() => {
     await submit();
     alert("Booking accepted and saved!");
   };
 
-  // Reject Booking
+  // Reject Booking is to delete the booking
   const rejectBooking = async() => {
-    // write your logic here delete ofc
    try {
     console.log(data.booking_id, 'booking id');
      const response = await axios.delete(`${API_URL}users/deleteBooking/${data.booking_id}`,{
@@ -75,7 +109,6 @@ function VeiwBooking() {
    } catch (error) {
     console.log(error);
    }
-    setDocPreviews({});
   };
 
   const submit = async () => {
@@ -139,37 +172,130 @@ function VeiwBooking() {
               {/* Document Upload List */}
               <div className="w-1/2 border-r-2 pr-4">
                 <ul>
-                  {Object.keys(doc).map((docName, index) => (
-                    <li key={index} className="flex justify-between mb-2">
-                      <span>{docName}:</span>
+                    <li className="flex justify-between mb-2">
+                      <span>Air Ticket:</span>
                       <input
                         type="file"
                         accept="application/pdf,image/*"
                         className="hidden"
-                        id={`file-${index}`}
-                        onChange={(e) => handleFileUpload(e, docName)}
+                        id="airTicket"
+                        onChange={addAirTicker}
                       />
                       <label
-                        htmlFor={`file-${index}`}
+                        htmlFor="airTicket"
                         className="bg-blue-600 text-white px-2 py-1 rounded-lg cursor-pointer hover:bg-blue-700"
                       >
                         Upload
                       </label>
                     </li>
-                  ))}
+                    <li className="flex justify-between mb-2">
+                      <span>Passport:</span>
+                      <input
+                        type="file"
+                        accept="application/pdf,image/*"
+                        className="hidden"
+                        id={`passport`}
+                        onChange={(e) => addPassport(e)}
+                      />
+                      <label
+                        htmlFor={`passport`}
+                        className="bg-blue-600 text-white px-2 py-1 rounded-lg cursor-pointer hover:bg-blue-700"
+                      >
+                        Upload
+                      </label>
+                    </li>
+                    <li className="flex justify-between mb-2">
+                      <span>PAN:</span>
+                      <input
+                        type="file"
+                        accept="application/pdf,image/*"
+                        className="hidden"
+                        id={`pan`}
+                        onChange={(e) => addPan(e)}
+                      />
+                      <label
+                        htmlFor={`pan`}
+                        className="bg-blue-600 text-white px-2 py-1 rounded-lg cursor-pointer hover:bg-blue-700"
+                      >
+                        Upload
+                      </label>
+                    </li>
+                    <li className="flex justify-between mb-2">
+                      <span>Miscleanious:</span>
+                      <input
+                        type="file"
+                        accept="application/pdf,image/*"
+                        className="hidden"
+                        id={`misc`}
+                        onChange={(e) => addMisc(e)}
+                      />
+                      <label
+                        htmlFor={`misc`}
+                        className="bg-blue-600 text-white px-2 py-1 rounded-lg cursor-pointer hover:bg-blue-700"
+                      >
+                        Upload
+                      </label>
+                    </li>
+                    <li className="flex justify-between mb-2">
+                      <span>Email Confirmation:</span>
+                      <input
+                        type="file"
+                        accept="application/pdf,image/*"
+                        className="hidden"
+                        id={`emailConf`}
+                        onChange={(e) => addEmailConf(e)}
+                      />
+                      <label
+                        htmlFor={`emailConf`}
+                        className="bg-blue-600 text-white px-2 py-1 rounded-lg cursor-pointer hover:bg-blue-700"
+                      >
+                        Upload
+                      </label>
+                    </li>
                 </ul>
               </div>
               {/* Document Preview */}
               <div className="w-1/2 pl-4">
-                {Object.values(docPreviews).some((url) => url) ? (
-                  <iframe
-                    src={Object.values(docPreviews).find((url) => url)}
-                    className="w-full h-48 border"
-                    title="Document Preview"
-                  ></iframe>
-                ) : (
-                  <p>No document uploaded</p>
-                )}
+                <h3 className="text-lg font-semibold mb-2">Air Tickets:</h3>
+                {airTicket.map((doc, index) => (
+                  <>
+                  <a key={index} href={doc.url} target="_blank" rel="noopener noreferrer">
+                    </a>
+                    <button className="text-red-400" onClick={removeAirTicket(index)}></button>
+                  </>
+                ))}
+                <h3 className="text-lg font-semibold mb-2">Passport:</h3>
+                {passport.map((doc, index) => (
+                  <>
+                  <a key={index} href={doc.url} target="_blank" rel="noopener noreferrer">
+                    </a>
+                    <button className="text-red-400" onClick={removePassport(index)}></button>
+                  </>
+                ))}
+                <h3 className="text-lg font-semibold mb-2">PAN:</h3>
+                {pan.map((doc, index) => (
+                  <>
+                  <a key={index} href={doc.url} target="_blank" rel="noopener noreferrer">
+                    </a>
+                    <button className="text-red-400" onClick={removePan(index)}></button>
+                  </>
+                ))}
+                <h3 className="text-lg font-semibold mb-2">Miscleanious:</h3>
+                {misc.map((doc, index) => (
+                  <>
+                  <a key={index} href={doc.url} target="_blank" rel="noopener noreferrer">
+                    </a>
+                    <button className="text-red-400" onClick={removeMisc(index)}></button>
+                  </>
+                ))}
+                <h3 className="text-lg font-semibold mb-2">Email Confirmation:</h3>
+                {emailConf.map((doc, index) => (
+                  <>
+                  <a key={index} href={doc.url} target="_blank" rel="noopener noreferrer">
+                    </a>
+                    <button className="text-red-400" onClick={removeEmailConf(index)}></button>
+                  </>
+                ))}
               </div>
             </div>
           </div>
@@ -209,7 +335,7 @@ function VeiwBooking() {
                         accept="application/pdf,image/*"
                         className="hidden"
                         id={`file-quatation`}
-                        onChange={(e) => handleFileUpload(e, {docName: "quatation"})}
+                        // onChange={(e) => handleFileUpload(e, {docName: "quatation"})}
                       />
                       <label
                         htmlFor={`file-quatation`}
