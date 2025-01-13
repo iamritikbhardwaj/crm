@@ -7,6 +7,7 @@ import Swal from "sweetalert2";
 import { z } from "zod";
 import { API_URL } from "../AppConstant";
 import BackToHome from "../components/BackToHome";
+import FileUpload from "../components/Input/FileUpload";
 
 const AddBooking = () => {
   const sections = ["Booking Details", "Travel Details", "Order & Contact Details", "Documents Upload"];
@@ -50,19 +51,15 @@ const AddBooking = () => {
   });
 
   // Add New Document
-  const handleFileUpload = (e, id) => {
-    const file = e.target.files[0];
-    if (file) {
-      const fileURL = URL.createObjectURL(file);
-      const updatedDocuments = documents.filter((doc) => doc.id !== id);
-      setDocuments([
-        ...updatedDocuments, { id: id, file: file, preview: fileURL },
-      ]);
-    }
-  };
  
-const addDocument = () => {
-  setDocuments([...documents, {id: Date.now(), file: null, preview: null}]);
+const addDocument = (e, catagory) => {
+  const files = e.target.files;
+  if(files.length > 0){
+    files.forEach((file) => {
+      const fileURL = URL.createObjectURL(file);
+      setDocuments((prevDocs) => [...prevDocs, { file, url: fileURL, catagory: catagory }]);
+    })
+  };
 };
 
 const removeDocument = (index) => {
@@ -311,54 +308,34 @@ const removeDocument = (index) => {
 
         {/* Documents Upload */}
         {currentSection === 3 && (
-          <div className="space-y-4">
-            <button
-              type="button"
-              onClick={addDocument}
-              className="bg-blue-500 text-white px-4 py-2 rounded"
-            >
-              Add Document
-            </button>
+          <>
+          <h3 className="text-2xl font-bold mb-4">Documents Upload</h3>
+          <div className={`p-4 `}>
+          <div className="flex">
+            {/* Document Upload List */}
+            <div className="w-1/2 border-r border-gray-300 px-2 space-y-2">
+              <FileUpload label={"Air Ticket"} id={"airTicket"} onChange={addDocument} onRemove={removeDocument} files={documents} catagory={"airTicket"} />
+              <FileUpload label={"Passport"} id={"passport"} onChange={addDocument} onRemove={removeDocument} files={documents} catagory={"passport"} />
+              <FileUpload label={"PAN"} id={"pan"} onChange={addDocument} onRemove={removeDocument} files={documents} catagory={"pan"} />
+              <FileUpload label={"Misceleanious"} id={"misc"} onChange={addDocument} onRemove={removeDocument} files={documents} catagory={"misc"} />
+              <FileUpload label={"Email Confirmation"} id={"emailConf"} onChange={addDocument} onRemove={removeDocument} files={documents} catagory={"emailConf"} />
+            </div>
 
-             {/* Document Input Fields */}
-  {documents.map((doc, index) => (
-    <div key={index} className="flex flex-col space-y-2 mt-4">
-      <div className="flex items-center space-x-4">
-    
-    <div className="flex items-center space-x-4">
-    <input 
-                type="file"
-                onChange={(e) => handleFileUpload(e, doc.id)}
-              />  
-      <button
-        type="button"
-        onClick={async () => await removeDocument(index)}
-        className="text-red-500 hover:text-red-700"
-      >
-        Remove
-      </button>
-    </div>
-      </div>
-
-      {/* Preview */}
-      {doc.file && doc.file instanceof Blob && (
-  <div>
-    <p className="text-sm font-semibold">Preview:</p>
-    <a
-      href={doc.preview}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="text-blue-600 underline"
-    >
-      {doc.file.name}
-    </a>
-  </div>
-)}
-
-    </div>
-  ))
-}
+            {/* Document Preview */}
+            <div className="w-1/2 pl-4">
+              <ul>
+                {documents.length > 0 ? documents.map((doc, index) => (
+                  <li key={index}>
+                    <a href={doc.url} target="_blank" rel="noopener noreferrer">
+                      {doc.file.name}
+                    </a>
+                  </li>
+                )): "No documents uploaded"}
+              </ul>
+            </div>
           </div>
+        </div>
+          </>
         )}
 
         {/* Navigation Buttons */}

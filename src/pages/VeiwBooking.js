@@ -6,75 +6,27 @@ import { getTravelMonthRange } from "./Booking";
 import axios from "axios";
 import { API_URL } from "../AppConstant";
 import Swal from "sweetalert2";
+import FileUpload from "../components/Input/FileUpload";
 
 function VeiwBooking() {
 
   const [active, setActive] = useState(0); // Section toggle
 
-  const [airTicket, setAirTicket] = useState([])
-  const [passport, setPassport] = useState([])
-  const [pan, setPan] = useState([])
-  const [misc, setMisc] = useState([])
-  const [emailConf, setEmailConf] = useState([])
+  const [doc, setDoc] = useState([]);
 
-  const addAirTicker = (e) => {
-    const file = e.target.files[0];
-    const fileURL = URL.createObjectURL(file)
-    setAirTicket(...airTicket, {file: file, url: fileURL})
-    console.log(airTicket, 'airTicket');
-  }
+  const addDoc = (e, catagory) => {
+    const files = e.target.files;
+    if(files.length > 0){
+      files.forEach((file) => {
+        const fileURL = URL.createObjectURL(file);
+        setDoc((prevDoc) => [...prevDoc, { file, url: fileURL, catagory: catagory }]);
+      })
+    };
+  };  
   
-  const addPassport = (e) => {
-    const file = e.target.files[0];
-    const fileURL = URL.createObjectURL(file)
-    setPassport(...passport, {file: file, url: fileURL})
-    console.log(passport, 'airTicket');
-  }
-
-  const addPan = (e) => {
-    const file = e.target.files[0];
-    const fileURL = URL.createObjectURL(file)
-    setPan(...pan, {file: file, url: fileURL})
-    console.log(pan, 'airTicket');
-  }
-
-  const addMisc = (e) => {
-    const file = e.target.files[0];
-    const fileURL = URL.createObjectURL(file)
-    setMisc(...misc, {file: file, url: fileURL})
-    console.log(misc, 'airTicket');
-  } 
-
-  const addEmailConf = (e) => {
-    const file = e.target.files[0];
-    const fileURL = URL.createObjectURL(file)
-    setEmailConf(...emailConf, {file: file, url: fileURL})
-    console.log(emailConf, 'airTicket');
-  }
-
-  const removeAirTicket = (index) => {
-    const updatedDoc = airTicket.filter((_, i) => i !== index);
-    setAirTicket(updatedDoc)
-  }
-
-  const removePassport = (index) => {
-    const updatedDoc = passport.filter((_, i) => i !== index);
-    setPassport(updatedDoc)
-  }
-
-  const removePan = (index) => {
-    const updatedDoc = pan.filter((_, i) => i !== index);
-    setPan(updatedDoc)
-  }
-
-  const removeMisc = (index) => {
-    const updatedDoc = misc.filter((_, i) => i !== index);
-    setMisc(updatedDoc)
-  }
-
-  const removeEmailConf = (index) => {
-    const updatedDoc = emailConf.filter((_, i) => i !== index);
-    setEmailConf(updatedDoc)
+  const removeDoc = (index) => {
+    const updatedDoc = doc.filter((_, i) => i !== index);
+    setDoc(updatedDoc)
   }
 
   const location = useLocation();
@@ -170,8 +122,8 @@ function VeiwBooking() {
           <div className={`p-4 ${active === 1 ? "block" : "hidden"}`}>
             <div className="flex">
               {/* Document Upload List */}
-              <div className="w-1/2 border-r-2 pr-4">
-                <ul>
+              <div className="w-1/2 border-r border-gray-300 px-2 space-y-2">
+                {/* <ul>
                     <li className="flex justify-between mb-2">
                       <span>Air Ticket:</span>
                       <input
@@ -179,7 +131,7 @@ function VeiwBooking() {
                         accept="application/pdf,image/*"
                         className="hidden"
                         id="airTicket"
-                        onChange={addAirTicker}
+                        onChange={addAirTicket}
                       />
                       <label
                         htmlFor="airTicket"
@@ -252,50 +204,25 @@ function VeiwBooking() {
                         Upload
                       </label>
                     </li>
-                </ul>
+                </ul> */}
+                <FileUpload label={"Air Ticket"} id={"airTicket"} onChange={addDoc} onRemove={removeDoc} files={doc} catagory={"airTicket"} />
+                <FileUpload label={"Passport"} id={"passport"} onChange={addDoc} onRemove={removeDoc} files={doc} catagory={"passport"} />
+                <FileUpload label={"PAN"} id={"pan"} onChange={addDoc} onRemove={removeDoc} files={doc} catagory={"pan"} />
+                <FileUpload label={"Misceleanious"} id={"misc"} onChange={addDoc} onRemove={removeDoc} files={doc} catagory={"misc"} />
+                <FileUpload label={"Email Confirmation"} id={"emailConf"} onChange={addDoc} onRemove={removeDoc} files={doc} catagory={"emailConf"} />
               </div>
+
               {/* Document Preview */}
               <div className="w-1/2 pl-4">
-                <h3 className="text-lg font-semibold mb-2">Air Tickets:</h3>
-                {airTicket.map((doc, index) => (
-                  <>
-                  <a key={index} href={doc.url} target="_blank" rel="noopener noreferrer">
-                    </a>
-                    <button className="text-red-400" onClick={removeAirTicket(index)}></button>
-                  </>
-                ))}
-                <h3 className="text-lg font-semibold mb-2">Passport:</h3>
-                {passport.map((doc, index) => (
-                  <>
-                  <a key={index} href={doc.url} target="_blank" rel="noopener noreferrer">
-                    </a>
-                    <button className="text-red-400" onClick={removePassport(index)}></button>
-                  </>
-                ))}
-                <h3 className="text-lg font-semibold mb-2">PAN:</h3>
-                {pan.map((doc, index) => (
-                  <>
-                  <a key={index} href={doc.url} target="_blank" rel="noopener noreferrer">
-                    </a>
-                    <button className="text-red-400" onClick={removePan(index)}></button>
-                  </>
-                ))}
-                <h3 className="text-lg font-semibold mb-2">Miscleanious:</h3>
-                {misc.map((doc, index) => (
-                  <>
-                  <a key={index} href={doc.url} target="_blank" rel="noopener noreferrer">
-                    </a>
-                    <button className="text-red-400" onClick={removeMisc(index)}></button>
-                  </>
-                ))}
-                <h3 className="text-lg font-semibold mb-2">Email Confirmation:</h3>
-                {emailConf.map((doc, index) => (
-                  <>
-                  <a key={index} href={doc.url} target="_blank" rel="noopener noreferrer">
-                    </a>
-                    <button className="text-red-400" onClick={removeEmailConf(index)}></button>
-                  </>
-                ))}
+                <ul>
+                  {doc.length > 0 ? doc.map((file, index) => (
+                    <li key={index}>
+                      <a href={file.url} target="_blank" rel="noopener noreferrer">
+                        {file.file.name}
+                      </a>
+                    </li>
+                  )): "No documents uploaded"}
+                </ul>
               </div>
             </div>
           </div>
