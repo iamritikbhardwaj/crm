@@ -16,8 +16,10 @@ function VeiwBooking() {
 
   const addDoc = (e, catagory) => {
     const files = e.target.files;
+    console.log(files, 'files');
+    
     if(files.length > 0){
-      files.forEach((file) => {
+      Array.from(files).forEach((file) => {
         const fileURL = URL.createObjectURL(file);
         setDoc((prevDoc) => [...prevDoc, { file, url: fileURL, catagory: catagory }]);
       })
@@ -65,15 +67,19 @@ function VeiwBooking() {
 
   const submit = async () => {
     Swal.fire("submit data")
-    // const axios.post(`${API_URL}users/uploadDocuments`, doc,
-    // {
-    //   withCredentials: true,
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //   },
-    // })
+    const formData = {
+      opsSpoc: "Some One",
+      documents: doc
     }
-    // write your logic here
+    const response = await axios.post(`${API_URL}users/createBooking/?id=${data.booking_id}`, formData,
+    {
+       withCredentials: true,
+        headers: {
+         "Content-Type": "application/json",
+       },
+     });
+     navigate('/booking')
+    }
 
   return (
     <div className="p-4">
@@ -216,11 +222,13 @@ function VeiwBooking() {
               <div className="w-1/2 pl-4">
                 <ul>
                   {doc.length > 0 ? doc.map((file, index) => (
-                    <li key={index}>
+                    (file.catagory !== "freezeQuotation" && (
+                    <li className="space-x-2" key={index}>
                       <a href={file.url} target="_blank" rel="noopener noreferrer">
                         {file.file.name}
                       </a>
-                    </li>
+                      <button className="text-red-400 rounded-lg cursor-pointer hover:text-red-700" onClick={() => removeDoc(index)}>Remove</button>
+                    </li>))
                   )): "No documents uploaded"}
                 </ul>
               </div>
@@ -241,7 +249,7 @@ function VeiwBooking() {
             <input
               type="text"
               value={data.orderValue}
-              // onChange={(e) => setdata({ ...data, orderValue: e.target.value })}
+              onChange={(e) => console.log(e.target.value)}
               className="w-full p-2 border rounded mt-2"
             />
           </div>
@@ -255,22 +263,23 @@ function VeiwBooking() {
               <IoIosArrowDropdownCircle />
             </span>
           </h2>
-          <div className={`p-4 ${active === 3 ? "block" : "hidden"}`}>
-          <span>Freeze Quotation:</span>
-                      <input
-                        type="file"
-                        accept="application/pdf,image/*"
-                        className="hidden"
-                        id={`file-quatation`}
-                        // onChange={(e) => handleFileUpload(e, {docName: "quatation"})}
-                      />
-                      <label
-                        htmlFor={`file-quatation`}
-                        className="bg-blue-600 text-white px-2 mx-4 py-1 rounded-lg cursor-pointer hover:bg-blue-700"
-                      >
-                        Upload
-                      </label>
-          </div>
+          <div className={`p-4 flex ${active === 3 ? "" : "hidden"}`}>
+            <div className="w-1/2 border-r px-4 border-gray-300">
+            <FileUpload label={"Freeze Quotation"} id={"freezeQuotation"} onChange={addDoc} onRemove={removeDoc} files={doc} catagory={"freezeQuotation"} />
+            </div>
+            <div className="w-1/2 pl-4">
+                <ul>
+                  {doc.length > 0 ? doc.map((file, index) => (
+                    (file.catagory === "freezeQuotation" && (<li className="space-x-2" key={index}>
+                      <a href={file.url} target="_blank" rel="noopener noreferrer">
+                        {file.file.name}
+                      </a>
+                      <button className="text-red-400 cursor-pointer hover:text-red-700" onClick={() => removeDoc(index)}>Remove</button>
+                    </li>))
+                  )): "No documents uploaded"}
+                </ul>
+              </div>
+         </div>
         </div>
 
         {/* Action Buttons */}
