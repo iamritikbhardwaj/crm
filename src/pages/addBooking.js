@@ -55,7 +55,7 @@ const AddBooking = () => {
 const addDocument = (e, catagory) => {
   const files = e.target.files;
   if(files.length > 0){
-    files.forEach((file) => {
+    Array.from(files).forEach((file) => {
       const fileURL = URL.createObjectURL(file);
       setDocuments((prevDocs) => [...prevDocs, { file, url: fileURL, catagory: catagory }]);
     })
@@ -260,7 +260,7 @@ const removeDocument = (index) => {
         )}
 
         {/* Order & Contact Details */}
-        {currentSection === 2 && (
+        {currentSection === 3 && (
           <div className="space-y-4">
             <div className="flex gap-4">
               <div className="w-1/2">
@@ -307,7 +307,7 @@ const removeDocument = (index) => {
         )}
 
         {/* Documents Upload */}
-        {currentSection === 3 && (
+        {currentSection === 2 && (
           <>
           <h3 className="text-2xl font-bold mb-4">Documents Upload</h3>
           <div className={`p-4 `}>
@@ -325,10 +325,11 @@ const removeDocument = (index) => {
             <div className="w-1/2 pl-4">
               <ul>
                 {documents.length > 0 ? documents.map((doc, index) => (
-                  <li key={index}>
+                  <li className="space-x-2" key={index}>
                     <a href={doc.url} target="_blank" rel="noopener noreferrer">
                       {doc.file.name}
                     </a>
+                    <button className="text-red-400 hover:text-red-700" onClick={() => removeDocument(index)}>Remove</button>
                   </li>
                 )): "No documents uploaded"}
               </ul>
