@@ -20,7 +20,7 @@ function FileUpload({ label, id, onChange, catagory }) {
       {/* Hidden file input */}
       <input
         type="file"
-        accept="application/pdf,image/*"
+        accept="application/pdf,image/*,.msg,application/vnd.ms-outlook"
         multiple
         id={id}
         onChange={handleChange}  // assigning the click event handler

@@ -21,14 +21,14 @@ const AddBooking = () => {
     salesSpoc: z.string().min(1, { message: "Sales SPOC is required" }),
     agent: z.string().min(1, { message: "Agent is required" }),
     customerName: z.string().min(1, { message: "Customer Name is required" }),
-    arrivalDate: z.string().min(1, { message: "Arrival Date is required" }).refine(
+    arrivalDate: z.string().datetime({local: true}).min(1, { message: "Arrival Date is required" }).refine(
       (value) => 
       new Date(value) > new Date()
     ,
     {
       message: "Arrival Date must be in the future",
     }),
-    departureDate: z.string().min(1, { message: "Departure Date is required" }).refine(
+    departureDate: z.string().datetime({local: true}).min(1, { message: "Departure Date is required" }).refine(
       (value) => 
         new Date(value) > new Date(watch("arrivalDate"))
       ,
@@ -314,10 +314,10 @@ const removeDocument = (index) => {
           <div className="flex">
             {/* Document Upload List */}
             <div className="w-1/2 border-r border-gray-300 px-2 space-y-2">
-              <FileUpload label={"Air Ticket"} id={"airTicket"} onChange={addDocument} onRemove={removeDocument} files={documents} catagory={"airTicket"} />
+              <FileUpload label={"Air Ticket & Hotel"} id={"airTicket"} onChange={addDocument} onRemove={removeDocument} files={documents} catagory={"airTicket"} />
               <FileUpload label={"Passport"} id={"passport"} onChange={addDocument} onRemove={removeDocument} files={documents} catagory={"passport"} />
               <FileUpload label={"PAN"} id={"pan"} onChange={addDocument} onRemove={removeDocument} files={documents} catagory={"pan"} />
-              <FileUpload label={"Misceleanious"} id={"misc"} onChange={addDocument} onRemove={removeDocument} files={documents} catagory={"misc"} />
+              <FileUpload label={"Sales Sheet"} id={"misc"} onChange={addDocument} onRemove={removeDocument} files={documents} catagory={"misc"} />
               <FileUpload label={"Email Confirmation"} id={"emailConf"} onChange={addDocument} onRemove={removeDocument} files={documents} catagory={"emailConf"} />
             </div>
 
