@@ -83,14 +83,14 @@ const NewBooking = () => {
         console.log(bookings, "Bookings data");
         // Map the bookings data to your desired structure
         const processedData = bookings.map((item) => ({
-          booking_id: item.booking_id,
+          booking_id: item.booking_id.slice(0, 6),
           destination: item.destination,
           bookingDate: item.bookingDate,
           salesSpoc: item.salesSpoc,
           agent: item.agent,
           customerDetails: `${item.customerName} / ${item.pax.C}`,
-          arrivalDate: item.arrivalDate,
-          departureDate: item.departureDate,
+          arrivalDate: item.arrivalDate.slice(0, 10),
+          departureDate: item.departureDate.slice(0, 10),
           travelMonth: getTravelMonthRange(item.arrivalDate, item.departureDate),
           contactDetails: `${item.countryCode} / ${item.whatsappNumber}`,
           orderValue: item.orderValue,

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { IoIosArrowDropdownCircle } from "react-icons/io";
 import BackToHome from "../components/BackToHome";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -8,11 +8,34 @@ import { API_URL } from "../AppConstant";
 import Swal from "sweetalert2";
 import FileUpload from "../components/Input/FileUpload";
 
-function VeiwBooking() {
+export default function VeiwBooking() {
+
+  const location = useLocation();
+  const data = location.state;
+  console.log(data, 'data');
 
   const [active, setActive] = useState(0); // Section toggle
 
-  const [doc, setDoc] = useState([]);
+  const [doc, setDoc] = useState(data.documents);
+  const [opsSpoc, setOpsSpoc] = useState('');
+  const [inputData, setInputData] = useState({...data, documents: doc, opsSpoc: ''});
+
+  useEffect(() => {
+    (async () => {
+      const response = await axios.get(`${API_URL}users/getAllUsers`, {
+        allowCredentials: true,
+        headers: {
+          "Content-Type": "application/json",
+        }
+      })
+      
+if (response.status === 200) {
+        setOpsSpoc(response.data.OUTPUT.filter((user) => user.profile === 'Operations'));
+        console.log(opsSpoc, 'ops');
+}    })();
+  }, []);
+
+
 
   const addDoc = (e, catagory) => {
     const files = e.target.files;
@@ -21,8 +44,12 @@ function VeiwBooking() {
     if(files.length > 0){
       Array.from(files).forEach((file) => {
         const fileURL = URL.createObjectURL(file);
-        setDoc((prevDoc) => [...prevDoc, { file, url: fileURL, catagory: catagory }]);
-      })
+          if(doc){        
+            setDoc((prevDoc) => [...prevDoc, { file, url: fileURL, catagory: catagory }]);
+          }else{
+            setDoc([{ file, url: fileURL, catagory: catagory }]);
+          }
+        })
     };
   };  
   
@@ -31,17 +58,22 @@ function VeiwBooking() {
     setDoc(updatedDoc)
   }
 
-  const location = useLocation();
-  const data = location.state;
-  console.log(data, 'data');
-
   const navigate = useNavigate();
 
   // Accept Booking is to set booking status to confirmed also add salesSpoc
   const acceptBooking = async() => {
     await submit();
-    alert("Booking accepted and saved!");
+    Swal.fire({
+      icon: 'success',
+      title: 'Trip has been created!',
+      showConfirmButton: false,
+      timer: 1500
+    }).then(async()=>{
+      rejectBooking();
+    })
   };
+
+
 
   // Reject Booking is to delete the booking
   const rejectBooking = async() => {
@@ -53,11 +85,11 @@ function VeiwBooking() {
         "Content-Type": "application/json",
       },
     })
-    if (response.status === "ok") {
-      alert("Booking has been deleted successfully");
+    if (response.status === 200) {
+      Swal.fire("Booking has been deleted successfully");
       navigate('/booking')
     } else {
-      alert("Error deleting booking. Please try again later.");
+      Swal.fire("Error deleting booking. Please try again later.");
       navigate('/booking')
     }
    } catch (error) {
@@ -66,19 +98,32 @@ function VeiwBooking() {
   };
 
   const submit = async () => {
-    Swal.fire("submit data")
     const formData = {
-      opsSpoc: "Some One",
-      documents: doc
+      ...inputData
     }
-    const response = await axios.post(`${API_URL}users/createBooking/?id=${data.booking_id}`, formData,
+    const response = await axios.post(`${API_URL}users/createTrip`, formData,
     {
        withCredentials: true,
         headers: {
          "Content-Type": "application/json",
        },
      });
-     navigate('/booking')
+     if (response.status === 200) {
+      (async (data) => {
+        const response = await axios.get(`${API_URL}users/deleteBooking/${data.booking_id}`, {
+        withCredentials: true,
+        headers: {
+          "content-type": "application/json"
+        }
+      });
+      if (response.status === 200) {
+        console.log(response, 'response');
+      } else {
+        Swal.fire("Error creating trip. Please try again later.");
+        navigate('/booking')
+      }
+      })(data);
+     }
     }
 
   return (
@@ -103,11 +148,22 @@ function VeiwBooking() {
               ["Customer Name", data.customerName],
               ["Number of Pax", data.pax.A + data.pax.C],
               ["Travel Month", getTravelMonthRange(data.arrivalDate, data.departureDate)],
-              ["Arrival Date", data.arrivalDate],
-              ["Departure Date", data.departureDate],
-              ["Booking Date", data.bookingDate],
+              ["Arrival Date", data.arrivalDate.slice(0, 10)],
+              ["Departure Date", data.departureDate.slice(0, 10)],
+              ["Booking Date", data.bookingDate.slice(0, 10)],
               ["WhatsApp Number",data.countryCode + " " + data.whatsappNumber],
-              ["Ops Spoc", "some One"], // ask client where will this come from
+              ["Ops Spoc",
+              <select onChange={(e) => {
+                setInputData({...inputData, opsSpoc: e.target.value})
+                  console.log(inputData, 'inputData');
+                }}>
+        {opsSpoc.length > 0 && opsSpoc.map((user, index) => (
+          <option key={index} value={user.name}>
+    {user.name}
+          </option>
+        ))}
+      </select>
+              ], // ask client where will this come from
             ].map(([label, value], index) => (
               <div key={index} className="flex space-x-3">
                 <label className="font-semibold">{label}:</label>
@@ -221,7 +277,7 @@ function VeiwBooking() {
               {/* Document Preview */}
               <div className="w-1/2 pl-4">
                 <ul>
-                  {doc.length > 0 ? doc.map((file, index) => (
+                  {doc ? doc.map((file, index) => (
                     (file.catagory !== "freezeQuotation" && (
                     <li className="space-x-2" key={index}>
                       <a href={file.url} target="_blank" rel="noopener noreferrer">
@@ -265,11 +321,11 @@ function VeiwBooking() {
           </h2>
           <div className={`p-4 flex ${active === 3 ? "" : "hidden"}`}>
             <div className="w-1/2 border-r px-4 border-gray-300">
-            <FileUpload label={"Freeze Quotation"} id={"freezeQuotation"} onChange={addDoc} onRemove={removeDoc} files={doc} catagory={"freezeQuotation"} />
-            </div>
+            <FileUpload label={"Sales Sheet"} id={"misc"} onChange={addDoc} onRemove={removeDoc} files={doc} catagory={"misc"} toAccept=".xls,.xlsx,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" />         
+      </div>
             <div className="w-1/2 pl-4">
                 <ul>
-                  {doc.length > 0 ? doc.map((file, index) => (
+                  {doc ? doc.map((file, index) => (
                     (file.catagory === "freezeQuotation" && (<li className="space-x-2" key={index}>
                       <a href={file.url} target="_blank" rel="noopener noreferrer">
                         {file.file.name}
@@ -300,6 +356,4 @@ function VeiwBooking() {
       </div>
     </div>
   );
-}
-
-export default VeiwBooking;
+};

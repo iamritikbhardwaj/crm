@@ -6,13 +6,14 @@ import axios from "axios";
 import { API_URL } from "../../AppConstant.js"
 import { useLocation } from 'react-router-dom';
 
-function SupForm({editData, setEditData, refetch}) {
+function SupForm({editData, setEditData, refetch, data}) {
 
   console.error("error");
 
     const supplierSchema = z.object({
         name: z.string().nonempty(),
         status: z.string().nonempty().toUpperCase(),
+        destination_id: z.string().nonempty(),
     })
 
     const { handleSubmit, register, setValue, formState: { errors } } = useForm({
@@ -40,9 +41,11 @@ function SupForm({editData, setEditData, refetch}) {
       if (editData.hasOwnProperty('name')) {
         setValue("name", editData?.name);
         setValue("status", editData?.status);
+        setValue("destination_id", editData?.destination_id);
       } else {
         setValue("name", "");
         setValue("status", "");
+        setValue("destination_id", "");
       }
     }, [editData, setEditData]);
 
@@ -61,6 +64,17 @@ function SupForm({editData, setEditData, refetch}) {
                 placeholder="Status"
                 {...register("status")}
               />
+              <select
+              className='w-full p-2 border-[1px] m-2 rounded'
+                {...register("destination_id")}
+              >
+                <option value="">Select destination</option>
+                {data.length > 0 && data.map((item) => (
+                  <option key={item.destination_id} value={item.destination_id}>
+                    {item.destination}
+                  </option>
+                ))}
+              </select>
               {errors.status && <span>{errors.status.message}</span>}
               <button type="submit" className="w-1/2 p-2 border-[1px] m-2 bg-slate-700 text-white rounded hover:bg-slate-600">
                 Save

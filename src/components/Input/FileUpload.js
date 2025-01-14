@@ -1,6 +1,6 @@
 import React from 'react';
 
-function FileUpload({ label, id, onChange, catagory }) {
+function FileUpload({ label, id, onChange, catagory, toAccept }) {
   const [fileSelected, setFileSelected] = React.useState(false);
 
   const handleChange = (e) => {
@@ -20,7 +20,7 @@ function FileUpload({ label, id, onChange, catagory }) {
       {/* Hidden file input */}
       <input
         type="file"
-        accept="application/pdf,image/*,.msg,application/vnd.ms-outlook"
+        accept={toAccept ? toAccept : "application/pdf,image/*,.msg,application/vnd.ms-outlook"}
         multiple
         id={id}
         onChange={handleChange}  // assigning the click event handler

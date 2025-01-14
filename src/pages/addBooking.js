@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
@@ -8,12 +8,15 @@ import { z } from "zod";
 import { API_URL } from "../AppConstant";
 import BackToHome from "../components/BackToHome";
 import FileUpload from "../components/Input/FileUpload";
+import countryCodes from "../sampleData/sampleData";
 
 const AddBooking = () => {
   const sections = ["Booking Details", "Travel Details", "Order & Contact Details", "Documents Upload"];
   const [currentSection, setCurrentSection] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [documents, setDocuments] = useState([]);
+  const [destData, setDestData] = useState([]);
+  const [salesSpoc, setSalesSpoc] = useState([]);
   const navigate = useNavigate();
 
   const bookingSchema = z.object({
@@ -21,14 +24,14 @@ const AddBooking = () => {
     salesSpoc: z.string().min(1, { message: "Sales SPOC is required" }),
     agent: z.string().min(1, { message: "Agent is required" }),
     customerName: z.string().min(1, { message: "Customer Name is required" }),
-    arrivalDate: z.string().datetime({local: true}).min(1, { message: "Arrival Date is required" }).refine(
+    arrivalDate: z.string().min(1, { message: "Arrival Date is required" }).refine(
       (value) => 
       new Date(value) > new Date()
     ,
     {
       message: "Arrival Date must be in the future",
     }),
-    departureDate: z.string().datetime({local: true}).min(1, { message: "Departure Date is required" }).refine(
+    departureDate: z.string().min(1, { message: "Departure Date is required" }).refine(
       (value) => 
         new Date(value) > new Date(watch("arrivalDate"))
       ,
@@ -49,6 +52,32 @@ const AddBooking = () => {
   const { register, handleSubmit, setValue, watch, control, getValues, formState: { errors } } = useForm({
     resolver: zodResolver(bookingSchema),
   });
+
+  useEffect(() => {
+    (async () => {
+      const destRes = await axios.get(`${API_URL}users/getAllDestinations`,{
+        withCredentials: true,
+        headers: {
+          "content-type": "application/json,multipart/form-data"
+        }
+      });
+      if(destRes.status === 200){
+        setDestData(destRes.data.OUTPUT);
+        console.log(destData, 'destData');
+      }
+      const userData = await axios.get(`${API_URL}users/getAllUsers`,{
+        withCredentials: true,
+        headers: {
+          "content-type": "application/json"
+        }
+      });
+      if(userData.status === 200){
+        // console.log(userData.data.OUTPUT, 'userData');
+        setSalesSpoc(userData.data.OUTPUT.filter((user) => user.profile === 'Sales'));
+        console.log(salesSpoc, 'salesSpoc');
+      }
+    })();
+  }, []);
 
   // Add New Document
  
@@ -145,9 +174,9 @@ const removeDocument = (index) => {
                 className="w-full border rounded px-3 py-2"
               >
                 <option value="">Select Destination</option>
-                <option value="Paris">Paris</option>
-                <option value="New York">New York</option>
-                <option value="Tokyo">Tokyo</option>
+                {destData.map((dest, index) => (
+                  <option key={index} value={dest.destination}>{dest.destination}</option>
+                ))}
               </select>
               {errors.destination && <p className="text-red-500">{errors.destination.message}</p> && Swal.fire(errors.destination.message)}
             </div>
@@ -160,19 +189,20 @@ const removeDocument = (index) => {
                 {...register("salesSpoc")}
                 className="w-full border rounded px-3 py-2"
               >
-                <option value="">Select Destination</option>
-                <option value="Paris">Paris</option>
-                <option value="New York">New York</option>
-                <option value="Tokyo">Tokyo</option>
+                <option value="">Select Sales Spoc</option>
+                {salesSpoc.map((user, index) => (
+                  <option key={index} value={user.name}>{user.name}</option>
+                ))}
               </select>
               {errors.salesSpoc && <p className="text-red-500">{errors.salesSpoc.message}</p>}
             </div>
-
             <div>
               <label className="block mb-2">Agent</label>
               <input
                 type="text"
                 name="agent"
+                value={"Agent name"}
+                disabled={true}
                 id="agent"
                 {...register("agent")}
                 className="w-full border rounded px-3 py-2"
@@ -199,7 +229,7 @@ const removeDocument = (index) => {
             <div>
               <label className="block mb-2">Arrival Date</label>
               <input
-                type="date"
+                type="datetime-local"
                 name="arrivalDate"
                 id="arrivalDate"
                 {...register("arrivalDate")}
@@ -210,7 +240,7 @@ const removeDocument = (index) => {
             <div>
               <label className="block mb-2">Departure Date</label>
               <input
-                type="date"
+                type="datetime-local"
                 name="departureDate"
                 id="departureDate"
                 {...register("departureDate")}
@@ -271,11 +301,9 @@ const removeDocument = (index) => {
                   {...register("countryCode")}
                   className="w-full border rounded px-3 py-2"
                 >
-                  <option value="+1">🇺🇸 +1 (USA)</option>
-                  <option value="+44">🇬🇧 +44 (UK)</option>
-                  <option value="+91">🇮🇳 +91 (India)</option>
-                  <option value="+61">🇦🇺 +61 (Australia)</option>
-                  <option value="+81">🇯🇵 +81 (Japan)</option>
+                  {countryCodes.map((country, index) => (
+                    <option key={index} value={country.code}>{country.country} : {country.code}</option>
+                  ))}
                 </select>
               </div>
               <div className="w-1/2">
@@ -317,7 +345,7 @@ const removeDocument = (index) => {
               <FileUpload label={"Air Ticket & Hotel"} id={"airTicket"} onChange={addDocument} onRemove={removeDocument} files={documents} catagory={"airTicket"} />
               <FileUpload label={"Passport"} id={"passport"} onChange={addDocument} onRemove={removeDocument} files={documents} catagory={"passport"} />
               <FileUpload label={"PAN"} id={"pan"} onChange={addDocument} onRemove={removeDocument} files={documents} catagory={"pan"} />
-              <FileUpload label={"Sales Sheet"} id={"misc"} onChange={addDocument} onRemove={removeDocument} files={documents} catagory={"misc"} />
+              <FileUpload label={"Sales Sheet"} id={"misc"} onChange={addDocument} onRemove={removeDocument} files={documents} catagory={"misc"} toAccept=".xls,.xlsx,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" />
               <FileUpload label={"Email Confirmation"} id={"emailConf"} onChange={addDocument} onRemove={removeDocument} files={documents} catagory={"emailConf"} />
             </div>
 

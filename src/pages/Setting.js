@@ -114,6 +114,7 @@ function Setting() {
   const supplierData = sData.map((item) => ({
     supplier: item.name,
     status: <button className={`p-2 rounded-lg ${item.status === "ACTIVE" ? "bg-green-400" : "bg-red-400"}`}>{item.status}</button>,
+    destination: dData.filter((dest) => dest.destination_id === item.destination_id)[0]?.destination,
     actions: <><button onClick={() => setEditData(item)}><MdModeEdit /></button><button 
     className="align-center text-red-400" 
     onClick={() => {
@@ -154,6 +155,7 @@ function Setting() {
   const supplierColumns = [
     { Header: "Supplier Name", accessor: "supplier" },
     { Header: "Status", accessor: "status" },
+    { Header: "Destination", accessor: "destination" },
     {
       Header: "Actions",
       accessor: "actions",
@@ -231,7 +233,7 @@ function Setting() {
             <AgentForm editData={editData} setEditData={setEditData} refetch={refetch} />
           )}
           {activeTab === 3 && (
-            <SupForm editData={editData} setEditData={setEditData} refetch={refetch} />
+            <SupForm editData={editData} setEditData={setEditData} refetch={refetch} data={dData} />
           )}
         </div >
 
