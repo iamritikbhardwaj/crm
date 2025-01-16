@@ -1,4 +1,4 @@
-import React, { use, useEffect, useState } from "react";
+import React, { use, useEffect, useRef, useState } from "react";
 import { IoIosArrowDropdownCircle } from "react-icons/io";
 import BackToHome from "../components/BackToHome";
 import { CustomTable } from "../components/customTable/CustomTable";
@@ -9,19 +9,21 @@ import { API_URL } from "../AppConstant";
 import axios from "axios";
 import FileUpload from "../components/Input/FileUpload";
 import ReconForm from "../components/Form/ReconForm";
+import { set } from "mongoose";
 
 function VeiwAllBooking() {
   const location = useLocation();
   const item = location.state;
-  console.log(item, "data");
   const [active, setActive] = useState(0); // Section toggle
   const [doc, setDoc] = useState(item.documents);
-  console.log(doc, "doc");
-  const [supp, setSupp] = useState(item.supplier);
+  const [supp, setSupp] = useState([]);
+  const [vendor, setVendor] = useState({name: '', destination: item.destination, bookingStatus: '', paymentStatus: ''});
+  const ref = useRef(null);
+  const [vendorTable, setVendorTable] = useState([]);
 
   const handleAddEdit = () => {
     const editForm = document.querySelector("#editForm");
-    if (editForm.classList.contains("hidden")) {
+    if (editForm.classList.contains("hidden")) { 
       editForm.classList.remove("hidden");
     } else {
       editForm.classList.add("hidden");
@@ -29,11 +31,12 @@ function VeiwAllBooking() {
   };
 
   // Predefined booking data
-  const [opsSpoc, setOpsSpoc] = useState(item.opsSpoc);
+  const [opsSpoc, setOpsSpoc] = useState([]);
   const [inputData, setInputData] = useState({
     ...item,
     documents: doc,
     opsSpoc: "",
+    vendor: ""
   });
   const [recon, setRecon] = useState({
     online: "True",
@@ -87,18 +90,21 @@ function VeiwAllBooking() {
           },
         });
 
-        console.log(destData, "destData");
-
         const supData = destData.map((dest) => {
-          // setSupp((prevValue) => [...prevValue, ...supRes.data.OUTPUT.filter((sup) => sup.destination_id === dest.destination_id)]);
-        });
-        // setSupp(supData);
-        console.log(supp, "supplier data");
+          return supRes.data.OUTPUT.filter(
+            (sup) => sup.destination_id === dest.destination_id
+          )});
+        setSupp(supData);
+        console.log(supData, "supplier data");
       })();
     } catch (error) {
       console.log(error);
     }
   }, []);
+
+  const handleChange = (e) => {
+    // console.log(e.target.value);
+  };
 
   const columns = [
     {
@@ -238,20 +244,20 @@ function VeiwAllBooking() {
               ["WhatsApp Number", item.countryCode + " " + item.whatsappNumber],
               [
                 "Ops Spoc",
-                item.opsSpoc,
                 <select
+                defaultChecked={item.opsSpoc}
                   onChange={(e) => {
                     setInputData({ ...inputData, opsSpoc: e.target.value });
                     console.log(inputData, "inputData");
                   }}
                 >
                   {opsSpoc.length > 0 &&
-                    opsSpoc.map((user, index) => (
-                      <option key={index} value={user.name}>
+                    opsSpoc.map((user, index) => 
+                    <option key={index} value={user.name}>
                         {user.name}
                       </option>
-                    ))}
-                </select>,
+                      )}
+                </select>
               ], // ask client where will this come from
             ].map(([label, value], index) => (
               <div key={index} className="flex space-x-3">
@@ -580,13 +586,24 @@ function VeiwAllBooking() {
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Search vendor..."
                 list="vendorList"
+                onChange={(e) => {
+                  setVendor({...vendor, name: e.target.value})
+                console.log(e.target.value, 'vendor');
+                }}
               >
                 <option value="">Select a vendor</option>
-                {/* {supp.map((sup) => (
-                  <option key={sup.supplier_id} value={sup.name}>{sup.name}</option>
-                ))} */}
+                {supp && supp.map((supplier) => 
+                supplier.map((sup, index) => (
+                  <option key={index} value={sup}>{sup.name}</option>
+                ))
+                )}
               </select>
-              <button className="bg-blue-500 text-white px-4 py-2 mt-4 rounded-lg hover:bg-blue-700">
+              <button
+              onClick={() => {
+                setVendorTable(...vendorTable, vendor);
+                setVendor({...vendor, name: ''})
+              }}
+              className="bg-blue-500 text-white px-4 py-2 mt-4 rounded-lg hover:bg-blue-700">
                 Add Vendor
               </button>
             </div>
@@ -601,8 +618,10 @@ function VeiwAllBooking() {
               </thead>
               <tbody>
                 <tr>
-                  <td className="p-2">Vendor Name</td>
-                  <td className="p-2">Bali</td>
+                  {vendorTable.length > 0 && vendorTable.map((ven, index) => (
+                    <>
+                    <td className="p-2">{ven.supplier}</td>
+                  <td className="p-2">{item.destination}</td>
                   <td className="p-2">
                     <select className="border rounded px-2 py-1">
                       <option value="pending">Pending</option>
@@ -616,6 +635,8 @@ function VeiwAllBooking() {
                       <option value="completed">Payment Completed</option>
                     </select>
                   </td>
+                  </>
+                  ))}
                 </tr>
               </tbody>
             </table>
