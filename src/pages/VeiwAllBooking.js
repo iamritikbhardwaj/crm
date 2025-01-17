@@ -11,10 +11,11 @@ import PaymentForm from "../components/Form/PaymentForm";
 import {
   fetchDestinations,
   fetchPayment,
+  fetchRecon,
   fetchSuppliers,
   fetchUsers,
 } from "../components/apiCalls/fetchData";
-import { deletePayment } from "../components/apiCalls/deleteData";
+import { deletePayment, deleteRecon } from "../components/apiCalls/deleteData";
 
 function VeiwAllBooking() {
   const location = useLocation();
@@ -36,28 +37,20 @@ function VeiwAllBooking() {
   // Predefined booking data
   const [opsSpoc, setOpsSpoc] = useState([]);
   const [inputData, setInputData] = useState(null);
-  const [recon, setRecon] = useState({
-    online: "True",
-    offline: "False",
-    land: "",
-    remarks: "",
-    validatedBy: "",
-    action: (
-      <div className="flex justify-around">
-        <button
-          onClick={() => {
-            setInputData(item);
-            editForm.current.style.display = "block";
-          }}
-        >
-          <MdModeEdit />
-        </button>
-        <button className="text-red-500">
-          <MdDelete />
-        </button>
-      </div>
-    ),
-  });
+  const [recon, setRecon] = useState([]);
+
+  const refetchCom = async () => {
+    const reconData = await fetchRecon();
+    if (reconData) {
+      setRecon(reconData);
+      console.log(recon, "recon");
+    }
+
+    const payData = await fetchPayment();
+    if (payData) {
+      setPayment(payData);
+    }
+  };
 
   useEffect(() => {
     try {
@@ -67,10 +60,7 @@ function VeiwAllBooking() {
           setOpsSpoc(data.filter((user) => user.profile === "Operations"));
         }
 
-        const payData = await fetchPayment();
-        if (payData) {
-          setPayment(payData);
-        }
+        refetchCom();
 
         const destOut = await fetchDestinations();
         const destData = destOut.filter(
@@ -173,7 +163,6 @@ function VeiwAllBooking() {
   // Handle file upload
   const addDoc = (e, catagory) => {
     const files = e.target.files;
-
 
     if (files.length > 0) {
       Array.from(files).forEach((file) => {
@@ -367,6 +356,7 @@ function VeiwAllBooking() {
                 <div className="bg-white p-6 rounded-lg w-96">
                   <h3 className="font-semibold mb-4">Edit Payment Details</h3>
                   <PaymentForm
+                    refetch={refetchCom}
                     inputData={inputData}
                     tripId={item.tripId}
                     handlehide={() => {
@@ -377,7 +367,10 @@ function VeiwAllBooking() {
               </div>
               <button
                 className="text-blue-600 ml-[90%] text-3xl"
-                onClick={() => (inpRef.current.style.display = "block")}
+                onClick={() => {
+                  setInputData(null);
+                  inpRef.current.style.display = "block";
+                }}
               >
                 <MdAddCircle />
               </button>
@@ -402,7 +395,10 @@ function VeiwAllBooking() {
                       >
                         <MdEdit />
                       </button>
-                      <button onClick={() => deletePayment(item.payment_id)} className="text-red-600">
+                      <button
+                        onClick={() => {deletePayment(item.payment_id); refetchCom();}}
+                        className="text-red-600"
+                      >
                         <MdDelete />
                       </button>
                     </div>
@@ -429,7 +425,7 @@ function VeiwAllBooking() {
               <h3 className="font-semibold mb-2">Booking Reconciliation</h3>
               {/* Edit Form */}
               <div
-                className="absolute w-fit left-[50%] top-[50%] -translate-x-[50%] -translate-y-[50%] inset-0 bg-black bg-opacity-50 items-center justify-center hidden"
+                className="absolute w-fit left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 inset-0 bg-black bg-opacity-50 items-center justify-center hidden"
                 ref={editForm}
               >
                 <div className="bg-white p-6 rounded-lg w-96">
@@ -437,24 +433,51 @@ function VeiwAllBooking() {
                     Edit Reconciliation Details
                   </h3>
                   <ReconForm
-                    handleHide={() =>
-                      (editForm.current.style.display =
-                        "none")
-                    }
+                    refetch={refetchCom}
+                    tripId={item.tripId}
+                    inputData={inputData}
+                    handleHide={() => (editForm.current.style.display = "none")}
                   />
                 </div>
               </div>
               <button
                 className="text-blue-600 ml-[90%] text-3xl"
-                onClick={() =>
-                  (editForm.current.style.display = "block")
-                }
+                onClick={() => {
+                  setInputData(null);
+                  editForm.current.style.display = "block";
+                }}
               >
                 <MdAddCircle />
               </button>
 
               <CustomTable
-                dataa={[recon]}
+                dataa={recon.map((item, index) => ({
+                  online: item.online,
+                  offline: item.offline,
+                  land: item.land,
+                  action: (
+                    <div className="flex justify-around">
+                      <button
+                        className="text-blue-900"
+                        onClick={() => {
+                          setInputData(item);
+                          editForm.current.style.display = "block";
+                        }}
+                      >
+                        <MdEdit />
+                      </button>
+                      <button
+                        onClick={() => {
+                          deleteRecon(item.recon_id);
+                          refetchCom();
+                        }}
+                        className="text-red-600"
+                      >
+                        <MdDelete />
+                      </button>
+                    </div>
+                  ),
+                }))}
                 columnss={[
                   { Header: "Online Booking", accessor: "online" },
                   {

@@ -6,7 +6,7 @@ import axios from "axios";
 import { API_URL } from "../../AppConstant.js"
 import { set } from 'mongoose';
 
-function PaymentForm({handlehide, tripId, inputData}) {
+function PaymentForm({handlehide, tripId, inputData, refetch}) {
 
     const paymentSchema = z.object({
         tripId: z.string().min(1, { message: "Trip ID is required" }),
@@ -65,6 +65,7 @@ function PaymentForm({handlehide, tripId, inputData}) {
             })
             console.log(response, 'response');
             if (response.status === 200) {
+              await refetch();
               reset();
             }
         })(data)

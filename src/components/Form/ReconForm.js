@@ -1,76 +1,121 @@
-import React from 'react'
-import { z } from 'zod'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useForm } from 'react-hook-form'
+import React, { useState, useEffect } from "react";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { API_URL } from "../../AppConstant";
+import axios from "axios";
 
-function ReconForm({handleHide}) {
+function ReconForm({ handleHide, inputData, tripId, refetch }) {
+  const reconSchema = z.object({
+    online: z.string().min(1, { message: "online is required" }),
+    offline: z.string().min(1, { message: "offline is required" }),
+    land: z.string().min(1, { message: "Status is required" }),
+    tripId: z.string().optional(),
+  });
 
-    const reconSchema = z.object({
-        supplier: z.string().min(1, { message: "Supplier is required" }),
-        amount: z.string().min(1, { message: "Amount is required" }),
-        status: z.string().min(1, { message: "Status is required" }),
-        remarks: z.string().optional(),
-        validatedBy: z.string().min(1, { message: "Validated By is required" }),
-      })
+  const {
+    handleSubmit,
+    register,
+    setValue,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(reconSchema),
+    defaultValues: {
+      tripId: tripId,
+    },
+  });
 
-      const { handleSubmit, register, setValue, formState: { errors } } = useForm({
-        resolver: zodResolver(reconSchema)
-      });
+  useEffect(() => {
+    setValue("online", inputData?.online);
+    setValue("offline", inputData?.offline);
+    setValue("land", inputData?.land);
+  }, [inputData]);
 
-      const reconSubmit = (data) => {
-        console.log(data, 'data');
+  const reset = () => {
+    setValue("online", "");
+    setValue("offline", "");
+    setValue("land", "");
+  };
 
-        handleHide();
+  console.log(errors, "errors");
+
+  const reconSubmit = (data) => {
+    console.log(data, "data");
+    (async (data) => {
+      const response = await axios.post(
+        `${API_URL}users/createRecon/?id=${inputData?.recon_id}`,
+        data,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        }
+      );
+      console.log(response, "response");
+      if (response.status === 200) {
+        await refetch();
+        reset();
       }
+    })(data);
+    handleHide();
+  };
 
   return (
     <form onSubmit={handleSubmit(reconSubmit)} className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Supplier</label>
-                    <input type="text" {...register("supplier")} className="w-full border rounded p-2" />
-                    {errors.supplier && <span className="text-red-500">{errors.supplier.message}</span>}
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Amount</label>
-                    <input type="number" {...register("amount")} className="w-full border rounded p-2" />
-                    {errors.amount && <span className="text-red-500">{errors.amount.message}</span>}
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Status</label>
-                    <select {...register("status")} className="w-full border rounded p-2">
-                      <option>Pending</option>
-                      <option>Completed</option>
-                      <option>Failed</option>
-                    </select>
-                    {errors.status && <span className="text-red-500">{errors.status.message}</span>}
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Remarks</label>
-                    <textarea {...register("remarks")} className="w-full border rounded p-2" rows="3"></textarea>
-                    {errors.remarks && <span className="text-red-500">{errors.remarks.message}</span>}
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Validated By</label>
-                    <input type="text" {...register("validatedBy")} className="w-full border rounded p-2" />
-                    {errors.validatedBy && <span className="text-red-500">{errors.validatedBy.message}</span>}
-                  </div>
-                  <div className="flex justify-end gap-2">
-                    <button 
-                      type="button" 
-                      className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
-                      onClick={handleHide}
-                    >
-                      Cancel
-                    </button>
-                    <button 
-                      type="submit" 
-                      className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-                    >
-                      Save Changes
-                    </button>
-                  </div>
-                </form>
-  )
+      <div>
+        <label className="block text-sm font-medium mb-1">Online Booking</label>
+        <input
+          type="text"
+          {...register("online")}
+          className="w-full border rounded p-2"
+        />
+        {errors.online && (
+          <span className="text-red-500">{errors.online.message}</span>
+        )}
+      </div>
+      <div>
+        <label className="block text-sm font-medium mb-1">
+          Offline Booking(only hotels)
+        </label>
+        <input
+          type="text"
+          {...register("offline")}
+          className="w-full border rounded p-2"
+        />
+        {errors.offline && (
+          <span className="text-red-500">{errors.offline.message}</span>
+        )}
+      </div>
+      <div>
+        <label className="block text-sm font-medium mb-1">Land Combo</label>
+        <input
+          type="text"
+          {...register("land")}
+          className="w-full border rounded p-2"
+        />
+        {errors.land && (
+          <span className="text-red-500">{errors.land.message}</span>
+        )}
+      </div>
+      <div className="flex justify-end gap-2">
+        <button
+          type="button"
+          className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+          onClick={handleHide}
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          onClick={() => console.log("clicked")}
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+        >
+          Save Changes
+        </button>
+      </div>
+    </form>
+  );
 }
 
-export default ReconForm
+export default ReconForm;

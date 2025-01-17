@@ -127,7 +127,7 @@ export const fetchPayment = async () => {
 };
 
 export const fetchRecon = async () => {
-    const response = await axios.get(`${API_URL}users/getAllRecon`, {
+    const response = await axios.get(`${API_URL}users/getAllRecons`, {
         withCredentials: true,
         headers: {
             "content-type": "application/json",
