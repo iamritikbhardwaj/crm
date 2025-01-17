@@ -13,7 +13,8 @@ import {
   fetchPayment,
   fetchSuppliers,
   fetchUsers,
-} from "../components/data/fetchData";
+} from "../components/apiCalls/fetchData";
+import { deletePayment } from "../components/apiCalls/deleteData";
 
 function VeiwAllBooking() {
   const location = useLocation();
@@ -401,7 +402,7 @@ function VeiwAllBooking() {
                       >
                         <MdEdit />
                       </button>
-                      <button className="text-red-600">
+                      <button onClick={() => deletePayment(item.payment_id)} className="text-red-600">
                         <MdDelete />
                       </button>
                     </div>

@@ -7,7 +7,7 @@ import axios from "axios";
 import { API_URL } from "../AppConstant";
 import Swal from "sweetalert2";
 import FileUpload from "../components/Input/FileUpload";
-import { fetchUsers } from "../components/data/fetchData";
+import { fetchUsers } from "../components/apiCalls/fetchData";
 
 export default function VeiwBooking() {
 
