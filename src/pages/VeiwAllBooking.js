@@ -45,6 +45,7 @@ function VeiwAllBooking() {
       <div className="flex justify-around">
         <button
           onClick={() => {
+            setInputData(item);
             editForm.current.style.display = "block";
           }}
         >
@@ -62,18 +63,12 @@ function VeiwAllBooking() {
       (async () => {
         const data = await fetchUsers();
         if (data) {
-          console.log(
-            data.filter((user) => user.profile === "Operations"),
-            "opsSpoc"
-          );
           setOpsSpoc(data.filter((user) => user.profile === "Operations"));
-          console.log(opsSpoc, "ops");
         }
 
         const payData = await fetchPayment();
         if (payData) {
           setPayment(payData);
-          console.log(payment, "payment");
         }
 
         const destOut = await fetchDestinations();
@@ -81,15 +76,12 @@ function VeiwAllBooking() {
           (dest) => dest.destination === item.destination
         );
 
-        console.log(destData, "destination data");
-
         const supData = await fetchSuppliers();
         const final = supData.filter(
           (sup) => sup.destination_id === destData[0].destination_id
         );
 
         setSupp(final);
-        console.log(supp, "supplier data");
       })();
     } catch (error) {
       console.log(error);
@@ -180,7 +172,7 @@ function VeiwAllBooking() {
   // Handle file upload
   const addDoc = (e, catagory) => {
     const files = e.target.files;
-    console.log(files, "files");
+
 
     if (files.length > 0) {
       Array.from(files).forEach((file) => {
@@ -374,6 +366,7 @@ function VeiwAllBooking() {
                 <div className="bg-white p-6 rounded-lg w-96">
                   <h3 className="font-semibold mb-4">Edit Payment Details</h3>
                   <PaymentForm
+                    inputData={inputData}
                     tripId={item.tripId}
                     handlehide={() => {
                       inpRef.current.style.display = "none";
@@ -402,6 +395,7 @@ function VeiwAllBooking() {
                       <button
                         className="text-blue-900"
                         onClick={() => {
+                          setInputData(item);
                           inpRef.current.style.display = "block";
                         }}
                       >
@@ -547,13 +541,11 @@ function VeiwAllBooking() {
                 list="vendorList"
                 onChange={(e) => {
                   setVendor({ ...vendor, name: e.target.value });
-                  console.log(e.target.value, "vendor");
                 }}
               >
                 <option value="">Select a vendor</option>
                 {supp &&
                   supp.map((supplier, index) => {
-                    console.log(supplier, "supplier");
                     return (
                       <option key={index} value={supplier}>
                         {supplier.name}

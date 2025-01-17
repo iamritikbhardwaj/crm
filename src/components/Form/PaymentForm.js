@@ -6,7 +6,7 @@ import axios from "axios";
 import { API_URL } from "../../AppConstant.js"
 import { set } from 'mongoose';
 
-function PaymentForm({handlehide, tripId}) {
+function PaymentForm({handlehide, tripId, inputData}) {
 
     const paymentSchema = z.object({
         tripId: z.string().min(1, { message: "Trip ID is required" }),
@@ -18,16 +18,30 @@ function PaymentForm({handlehide, tripId}) {
         status: z.string().min(1, { message: "Status is required" }),
         remarks: z.string().optional(),
         validatedBy: z.string().min(1, { message: "Validated By is required" }),
+        TripId: z.string().optional()
       })
 
       const { handleSubmit, register, setValue, formState: { errors } } = useForm({
         resolver: zodResolver(paymentSchema)
       });
 
+      console.log(inputData, 'inputData');
+
       useEffect(() => {
-        setValue("validatedBy", "Admin");
-        setValue("tripId", tripId);
-      }, [tripId]);
+        if(tripId)
+        {setValue("validatedBy", "Admin");
+        setValue("tripId", tripId);}
+        if (inputData) {
+          console.log(inputData, 'inputData');
+          setValue("date", inputData.date);
+          setValue("amount", inputData.amount);
+          setValue("conFee", inputData.conFee);
+          setValue("convRate", inputData.convRate);
+          setValue("paymentMode", inputData.paymentMode);
+          setValue("status", inputData.status);
+          setValue("remarks", inputData.remarks);
+        }
+      }, [tripId, inputData]);
 
       const reset = () => {
         setValue("date", "");
@@ -42,7 +56,7 @@ function PaymentForm({handlehide, tripId}) {
       const reconSubmit = (data) => {
         console.log(data, 'data');
         (async (data) => {
-            const response = await axios.post(`${API_URL}users/createPayment`, data,
+            const response = await axios.post(`${API_URL}users/createPayment/?id=${inputData.payment_id}`, data,
             {
                 headers: {
                   'Content-Type': 'application/json',
