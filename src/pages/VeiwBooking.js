@@ -7,13 +7,15 @@ import axios from "axios";
 import { API_URL } from "../AppConstant";
 import Swal from "sweetalert2";
 import FileUpload from "../components/Input/FileUpload";
+import { fetchUsers } from "../components/data/fetchData";
 
 export default function VeiwBooking() {
 
+  // data from table on previous page
   const location = useLocation();
   const data = location.state;
-  console.log(data, 'data');
 
+  // to navigate b/w sections
   const [active, setActive] = useState(0); // Section toggle
 
   const [doc, setDoc] = useState(data.documents);
@@ -22,20 +24,12 @@ export default function VeiwBooking() {
 
   useEffect(() => {
     (async () => {
-      const response = await axios.get(`${API_URL}users/getAllUsers`, {
-        allowCredentials: true,
-        headers: {
-          "Content-Type": "application/json",
-        }
-      })
-      
-if (response.status === 200) {
-        setOpsSpoc(response.data.OUTPUT.filter((user) => user.profile === 'Operations'));
+      const data = await fetchUsers()
+if (data) {
+        setOpsSpoc(data.filter((user) => user.profile === 'Operations'));
         console.log(opsSpoc, 'ops');
 }    })();
   }, []);
-
-
 
   const addDoc = (e, catagory) => {
     const files = e.target.files;
@@ -86,7 +80,7 @@ if (response.status === 200) {
       },
     })
     if (response.status === 200) {
-      Swal.fire("Booking has been deleted successfully");
+      Swal.fire("Trip has been created successfully");
       navigate('/booking')
     } else {
       Swal.fire("Error deleting booking. Please try again later.");

@@ -1,15 +1,19 @@
-import React, { use, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { IoIosArrowDropdownCircle } from "react-icons/io";
 import BackToHome from "../components/BackToHome";
 import { CustomTable } from "../components/customTable/CustomTable";
-import ExcelToTable from "../components/customTable/ExcelToTable";
 import { useLocation } from "react-router-dom";
 import { getTravelMonthRange } from "./Booking";
-import { API_URL } from "../AppConstant";
-import axios from "axios";
 import FileUpload from "../components/Input/FileUpload";
 import ReconForm from "../components/Form/ReconForm";
-import { set } from "mongoose";
+import { MdAddCircle, MdDelete, MdEdit, MdModeEdit } from "react-icons/md";
+import PaymentForm from "../components/Form/PaymentForm";
+import {
+  fetchDestinations,
+  fetchPayment,
+  fetchSuppliers,
+  fetchUsers,
+} from "../components/data/fetchData";
 
 function VeiwAllBooking() {
   const location = useLocation();
@@ -17,85 +21,75 @@ function VeiwAllBooking() {
   const [active, setActive] = useState(0); // Section toggle
   const [doc, setDoc] = useState(item.documents);
   const [supp, setSupp] = useState([]);
-  const [vendor, setVendor] = useState({name: '', destination: item.destination, bookingStatus: '', paymentStatus: ''});
-  const ref = useRef(null);
+  const [vendor, setVendor] = useState({
+    name: "",
+    destination: item.destination,
+    bookingStatus: "",
+    paymentStatus: "",
+  });
   const [vendorTable, setVendorTable] = useState([]);
-
-  const handleAddEdit = () => {
-    const editForm = document.querySelector("#editForm");
-    if (editForm.classList.contains("hidden")) { 
-      editForm.classList.remove("hidden");
-    } else {
-      editForm.classList.add("hidden");
-    }
-  };
+  const inpRef = useRef(null);
+  const editForm = useRef(null);
+  const [payment, setPayment] = useState([]);
 
   // Predefined booking data
   const [opsSpoc, setOpsSpoc] = useState([]);
-  const [inputData, setInputData] = useState({
-    ...item,
-    documents: doc,
-    opsSpoc: "",
-    vendor: ""
-  });
+  const [inputData, setInputData] = useState(null);
   const [recon, setRecon] = useState({
     online: "True",
     offline: "False",
     land: "",
     remarks: "",
     validatedBy: "",
-    add: <button onClick={handleAddEdit}>add</button>,
-    action: <button onClick={handleAddEdit}>Edit</button>,
+    action: (
+      <div className="flex justify-around">
+        <button
+          onClick={() => {
+            editForm.current.style.display = "block";
+          }}
+        >
+          <MdModeEdit />
+        </button>
+        <button className="text-red-500">
+          <MdDelete />
+        </button>
+      </div>
+    ),
   });
 
   useEffect(() => {
     try {
       (async () => {
-        const response = await axios.get(`${API_URL}users/getAllUsers`, {
-          allowCredentials: true,
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-
-        if (response.status === 200) {
+        const data = await fetchUsers();
+        if (data) {
           console.log(
-            response.data.OUTPUT.filter(
-              (user) => user.profile === "Operations"
-            ),
+            data.filter((user) => user.profile === "Operations"),
             "opsSpoc"
           );
-          setOpsSpoc(
-            response.data.OUTPUT.filter((user) => user.profile === "Operations")
-          );
+          setOpsSpoc(data.filter((user) => user.profile === "Operations"));
           console.log(opsSpoc, "ops");
         }
 
-        const destRes = await axios.get(`${API_URL}users/getAllDestinations`, {
-          withCredentials: true,
-          headers: {
-            "content-type": "application/json",
-          },
-        });
+        const payData = await fetchPayment();
+        if (payData) {
+          setPayment(payData);
+          console.log(payment, "payment");
+        }
 
-        // fetching destination data to match destination_id in supplier table
-        const destData = await destRes.data.OUTPUT.filter(
+        const destOut = await fetchDestinations();
+        const destData = destOut.filter(
           (dest) => dest.destination === item.destination
         );
 
-        const supRes = await axios.get(`${API_URL}users/getAllSuppliers`, {
-          withCredentials: true,
-          headers: {
-            "content-type": "application/json",
-          },
-        });
+        console.log(destData, "destination data");
 
-        const supData = destData.map((dest) => {
-          return supRes.data.OUTPUT.filter(
-            (sup) => sup.destination_id === dest.destination_id
-          )});
-        setSupp(supData);
-        console.log(supData, "supplier data");
+        const supData = await fetchSuppliers();
+        const final = supData.filter(
+          (sup) => sup.destination_id === destData[0].destination_id
+        );
+
+        setSupp(final);
+        console.log(supp, "supplier data");
       })();
     } catch (error) {
       console.log(error);
@@ -245,19 +239,18 @@ function VeiwAllBooking() {
               [
                 "Ops Spoc",
                 <select
-                defaultChecked={item.opsSpoc}
+                  defaultChecked={item.opsSpoc}
                   onChange={(e) => {
-                    setInputData({ ...inputData, opsSpoc: e.target.value });
-                    console.log(inputData, "inputData");
+                    item.opsSpoc = e.target.value;
                   }}
                 >
                   {opsSpoc.length > 0 &&
-                    opsSpoc.map((user, index) => 
-                    <option key={index} value={user.name}>
+                    opsSpoc.map((user, index) => (
+                      <option key={index} value={user.name}>
                         {user.name}
                       </option>
-                      )}
-                </select>
+                    ))}
+                </select>,
               ], // ask client where will this come from
             ].map(([label, value], index) => (
               <div key={index} className="flex space-x-3">
@@ -328,7 +321,8 @@ function VeiwAllBooking() {
                   {doc
                     ? doc.map(
                         (file, index) =>
-                          file.catagory !== "freezeQuotation" && file.catagory !== "voucher" && (
+                          file.catagory !== "freezeQuotation" &&
+                          file.catagory !== "voucher" && (
                             <li className="space-x-2" key={index}>
                               <a
                                 href={file.url}
@@ -364,35 +358,61 @@ function VeiwAllBooking() {
           <div className={`p-4 ${active === 2 ? "block" : "hidden"}`}>
             <div className="flex justify-between">
               <p className="font-semibold">
-                Order Value (USD): {inputData.orderValue}
+                Order Value (USD): {item.orderValue}
               </p>
               <p className="font-semibold">Transfer Price(USD): 2000</p>
             </div>
             {/* Payment Details Table */}
             <div className="mb-4">
               <h3 className="font-semibold mb-2">Payment Details</h3>
+              {/* Payment Edit Form */}
+              <div
+                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-fit inset-0 bg-black bg-opacity-50 items-center justify-center hidden"
+                id="payForm"
+                ref={inpRef}
+              >
+                <div className="bg-white p-6 rounded-lg w-96">
+                  <h3 className="font-semibold mb-4">Edit Payment Details</h3>
+                  <PaymentForm
+                    tripId={item.tripId}
+                    handlehide={() => {
+                      inpRef.current.style.display = "none";
+                    }}
+                  />
+                </div>
+              </div>
+              <button
+                className="text-blue-600 ml-[90%] text-3xl"
+                onClick={() => (inpRef.current.style.display = "block")}
+              >
+                <MdAddCircle />
+              </button>
               <CustomTable
-                dataa={[
-                  {
-                    installment: "First Installment",
-                    date: "",
-                    amount: "",
-                    mode: "",
-                    status: "",
-                    remarks: "",
-                    action: (
+                dataa={payment.map((item, index) => ({
+                  installment: "installment" + " " + parseInt(index + 1),
+                  amount: item.amount,
+                  date: item.date.slice(0, 10),
+                  mode: item.paymentMode,
+                  convertionRate: item.convRate,
+                  amtinr: parseFloat(item.conFee + item.amount * item.convRate),
+                  convfee: item.conFee,
+                  remarks: item.remarks,
+                  action: (
+                    <div className="flex justify-around">
                       <button
+                        className="text-blue-900"
                         onClick={() => {
-                          document
-                            .getElementById("paymentForm")
-                            .classList.remove("hidden");
+                          inpRef.current.style.display = "block";
                         }}
                       >
-                        Edit
+                        <MdEdit />
                       </button>
-                    ),
-                  },
-                ]}
+                      <button className="text-red-600">
+                        <MdDelete />
+                      </button>
+                    </div>
+                  ),
+                }))}
                 columnss={[
                   { Header: " ", accessor: "installment" },
                   { Header: "Date/Payment", accessor: "date" },
@@ -401,92 +421,43 @@ function VeiwAllBooking() {
                   { Header: "Amount (USD)", accessor: "amount" },
                   { Header: "CONV: Fee", accessor: "convfee" },
                   { Header: "Amount (INR)", accessor: "amtinr" },
-                  { Header: "Status", accessor: "status" },
+                  { Header: "Remarks", accessor: "remarks" },
                   { Header: "Action", accessor: "action" },
                 ]}
                 size={"text-xs"}
                 hideFilter={true}
               />
-              {/* Payment Edit Form */}
-              <div
-                className="relative w-fit inset-0 bg-black bg-opacity-50 items-center justify-center hidden"
-                id="paymentForm"
-              >
-                <div className="bg-white p-6 rounded-lg w-96">
-                  <h3 className="font-semibold mb-4">Edit Payment Details</h3>
-                  <form className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium mb-1">
-                        Date
-                      </label>
-                      <input
-                        type="date"
-                        className="w-full border rounded p-2"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium mb-1">
-                        Amount
-                      </label>
-                      <input
-                        type="number"
-                        className="w-full border rounded p-2"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium mb-1">
-                        Payment Mode
-                      </label>
-                      <select className="w-full border rounded p-2">
-                        <option>Cash</option>
-                        <option>Credit Card</option>
-                        <option>Bank Transfer</option>
-                        <option>UPI</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium mb-1">
-                        Status
-                      </label>
-                      <select className="w-full border rounded p-2">
-                        <option>Pending</option>
-                        <option>Completed</option>
-                        <option>Failed</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium mb-1">
-                        Remarks
-                      </label>
-                      <textarea className="w-full border rounded p-2"></textarea>
-                    </div>
-                    <div className="flex justify-end gap-2">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          document
-                            .getElementById("paymentForm")
-                            .classList.add("hidden");
-                        }}
-                        className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
-                      >
-                        Cancel
-                      </button>
-                      <button
-                        type="submit"
-                        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-                      >
-                        Save Changes
-                      </button>
-                    </div>
-                  </form>
-                </div>
-              </div>
             </div>
 
             {/* Booking Reconciliation Table */}
             <div className="mb-4">
               <h3 className="font-semibold mb-2">Booking Reconciliation</h3>
+              {/* Edit Form */}
+              <div
+                className="absolute w-fit left-[50%] top-[50%] -translate-x-[50%] -translate-y-[50%] inset-0 bg-black bg-opacity-50 items-center justify-center hidden"
+                ref={editForm}
+              >
+                <div className="bg-white p-6 rounded-lg w-96">
+                  <h3 className="font-semibold mb-4">
+                    Edit Reconciliation Details
+                  </h3>
+                  <ReconForm
+                    handleHide={() =>
+                      (editForm.current.style.display =
+                        "none")
+                    }
+                  />
+                </div>
+              </div>
+              <button
+                className="text-blue-600 ml-[90%] text-3xl"
+                onClick={() =>
+                  (editForm.current.style.display = "block")
+                }
+              >
+                <MdAddCircle />
+              </button>
+
               <CustomTable
                 dataa={[recon]}
                 columnss={[
@@ -496,23 +467,11 @@ function VeiwAllBooking() {
                     accessor: "offline",
                   },
                   { Header: "Land Combo", accessor: "land" },
-                  { Header: "Add", accessor: "add" },
+                  { Header: "Action", accessor: "action" },
                 ]}
                 size={"text-xs"}
                 hideFilter={true}
               />
-              {/* Edit Form */}
-              <div
-                className="relative w-fit inset-0 bg-black bg-opacity-50 items-center justify-center hidden"
-                id="editForm"
-              >
-                <div className="bg-white p-6 rounded-lg w-96">
-                  <h3 className="font-semibold mb-4">
-                    Edit Reconciliation Details
-                  </h3>
-                  <ReconForm />
-                </div>
-              </div>
             </div>
           </div>
         </div>
@@ -587,23 +546,28 @@ function VeiwAllBooking() {
                 placeholder="Search vendor..."
                 list="vendorList"
                 onChange={(e) => {
-                  setVendor({...vendor, name: e.target.value})
-                console.log(e.target.value, 'vendor');
+                  setVendor({ ...vendor, name: e.target.value });
+                  console.log(e.target.value, "vendor");
                 }}
               >
                 <option value="">Select a vendor</option>
-                {supp && supp.map((supplier) => 
-                supplier.map((sup, index) => (
-                  <option key={index} value={sup}>{sup.name}</option>
-                ))
-                )}
+                {supp &&
+                  supp.map((supplier, index) => {
+                    console.log(supplier, "supplier");
+                    return (
+                      <option key={index} value={supplier}>
+                        {supplier.name}
+                      </option>
+                    );
+                  })}
               </select>
               <button
-              onClick={() => {
-                setVendorTable(...vendorTable, vendor);
-                setVendor({...vendor, name: ''})
-              }}
-              className="bg-blue-500 text-white px-4 py-2 mt-4 rounded-lg hover:bg-blue-700">
+                onClick={() => {
+                  setVendorTable(...vendorTable, vendor);
+                  setVendor({ ...vendor, name: "" });
+                }}
+                className="bg-blue-500 text-white px-4 py-2 mt-4 rounded-lg hover:bg-blue-700"
+              >
                 Add Vendor
               </button>
             </div>
@@ -618,25 +582,26 @@ function VeiwAllBooking() {
               </thead>
               <tbody>
                 <tr>
-                  {vendorTable.length > 0 && vendorTable.map((ven, index) => (
-                    <>
-                    <td className="p-2">{ven.supplier}</td>
-                  <td className="p-2">{item.destination}</td>
-                  <td className="p-2">
-                    <select className="border rounded px-2 py-1">
-                      <option value="pending">Pending</option>
-                      <option value="in-progress">In-Progress</option>
-                    </select>
-                  </td>
-                  <td className="p-2">
-                    <select className="border rounded px-2 py-1">
-                      <option value="unpaid">Unpaid</option>
-                      <option value="part-paid">Part-Paid</option>
-                      <option value="completed">Payment Completed</option>
-                    </select>
-                  </td>
-                  </>
-                  ))}
+                  {vendorTable.length > 0 &&
+                    vendorTable.map((ven, index) => (
+                      <div>
+                        <td className="p-2">{ven.supplier}</td>
+                        <td className="p-2">{item.destination}</td>
+                        <td className="p-2">
+                          <select className="border rounded px-2 py-1">
+                            <option value="pending">Pending</option>
+                            <option value="in-progress">In-Progress</option>
+                          </select>
+                        </td>
+                        <td className="p-2">
+                          <select className="border rounded px-2 py-1">
+                            <option value="unpaid">Unpaid</option>
+                            <option value="part-paid">Part-Paid</option>
+                            <option value="completed">Payment Completed</option>
+                          </select>
+                        </td>
+                      </div>
+                    ))}
                 </tr>
               </tbody>
             </table>

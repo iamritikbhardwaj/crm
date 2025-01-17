@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form";
 import axios from "axios";
 import { API_URL } from "../../AppConstant.js"
+import Swal from "sweetalert2";
 import { useLocation, useNavigate } from "react-router-dom";
 function UserForm() {
 
@@ -59,7 +60,7 @@ function UserForm() {
       }
       );
       console.log(response.data, 'response');
-      alert(`User ${id ? 'updated' : 'created'} successfully`);
+      Swal.fire(`User ${id ? 'updated' : 'created'} successfully`);
     } catch (error) {
       console.log(error);
     }
