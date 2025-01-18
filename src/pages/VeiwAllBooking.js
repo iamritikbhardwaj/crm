@@ -13,17 +13,18 @@ import {
   fetchPayment,
   fetchRecon,
   fetchSuppliers,
+  fetchTrips,
   fetchUsers,
   fetchVendors,
 } from "../components/apiCalls/fetchData";
 import { deletePayment, deleteRecon, deleteVendor } from "../components/apiCalls/deleteData";
-import VendorForm from "../components/Form/VendorForm";
 import { API_URL } from "../AppConstant";
 import axios from "axios";
+import Swal from "sweetalert2";
 
-function VeiwAllBooking() {
+export default function VeiwAllBooking() {
   const location = useLocation();
-  const item = location.state;
+  const [item, setItem] = useState(location.state);
   const [active, setActive] = useState(0); // Section toggle
   const [doc, setDoc] = useState(item.documents);
   const [supp, setSupp] = useState([]);
@@ -91,7 +92,8 @@ function VeiwAllBooking() {
         if (data) {
           setOpsSpoc(data.filter((user) => user.profile === "Operations"));
         }
-
+        const itemData = await fetchTrips();
+        setItem(itemData.filter((trip) => trip.tripId === item.tripId)[0]);
         refetchCom();
         refetchSupp();
       })();
@@ -99,87 +101,6 @@ function VeiwAllBooking() {
       console.log(error);
     }
   }, []);
-
-  const handleChange = (e) => {
-    // console.log(e.target.value);
-  };
-
-  const columns = [
-    {
-      Header: "HEAD",
-      accessor: "head",
-    },
-    {
-      Header: "DATE",
-      accessor: "date",
-    },
-    {
-      Header: "DESCRIPTION",
-      accessor: "description",
-    },
-    {
-      Header: "PICKUP LOCATION",
-      accessor: "pickupLocation",
-    },
-    {
-      Header: "DROP LOCATION",
-      accessor: "dropLocation",
-    },
-    {
-      Header: "PRICE (A)",
-      accessor: "priceA",
-    },
-    {
-      Header: "PRICE (T)/MYR",
-      accessor: "priceMYR",
-    },
-    {
-      Header: "PRICE (T)/USD",
-      accessor: "priceUSD",
-    },
-    {
-      Header: "SUPPLIER",
-      accessor: "supplier",
-    },
-  ];
-
-  // Example data based on the table in the image
-  const data = [
-    {
-      head: "HOTEL",
-      date: "19 DEC || 21 DEC",
-      description: "VILLAGE HOTEL SENTOSA BY FAR EAST HOSPITALITY",
-      pickupLocation: "BOOKED BY AGENT",
-      dropLocation: "BOOKED BY AGENT",
-      priceA: "USD 0.00",
-      priceMYR: "",
-      priceUSD: "USD 0.00",
-      supplier: "SELF BOOKED",
-    },
-    {
-      head: "ETICKET",
-      date: "20-Dec",
-      description: "UNIVERSAL STUDIOS NORMAL ADMISSION - TICKETS ONLY",
-      pickupLocation: "=",
-      dropLocation: "=",
-      priceA: "SGD 505.10",
-      priceMYR: "",
-      priceUSD: "USD 373.77",
-      supplier: "GLOBALTIX",
-    },
-    {
-      head: "TRANSFERS",
-      date: "25-Dec",
-      description: "DEPARTURE",
-      pickupLocation: "HILTON GARDEN INN SERAGON",
-      dropLocation: "CHANGI AIRPORT",
-      priceA: "",
-      priceMYR: "",
-      priceUSD: "USD 33.30",
-      supplier: "TDMC",
-    },
-    // Add more rows as needed based on the table in the image
-  ];
 
   // Handle file upload
   const addDoc = (e, catagory) => {
@@ -204,6 +125,25 @@ function VeiwAllBooking() {
     const updatedDoc = doc.filter((_, i) => i !== index);
     setDoc(updatedDoc);
   };
+
+  const addVoucher = (doc) => {
+    (async (doc) => {
+      const response = await axios.post(
+        `${API_URL}users/createTrip/?id=${item.tripId}`, doc, {
+          withCredentials: true,
+          headers: {
+            "Content-Type": "multipart/form-data",
+          }
+        }
+      )
+      if(response.status === 200){
+        Swal.fire(response.data.MESSAGE);
+      }else{
+        Swal.fire(response.data.MESSAGE);
+      }
+    })(doc);
+  };
+
   return (
     <div className="p-4">
       <BackToHome path={"/schedule"} />
@@ -655,7 +595,7 @@ function VeiwAllBooking() {
                 onChange={addDoc}
                 onRemove={removeDoc}
                 files={doc}
-                catagory={"voucher"}
+                catagory={"hotel_voucher"}
               />
             </div>
             <div className="flex gap-4 align-middle">
@@ -665,7 +605,7 @@ function VeiwAllBooking() {
                 onChange={addDoc}
                 onRemove={removeDoc}
                 files={doc}
-                catagory={"voucher"}
+                catagory={"activities_voucher"}
               />
             </div>
             <div className="flex gap-4 align-middle">
@@ -675,7 +615,7 @@ function VeiwAllBooking() {
                 onChange={addDoc}
                 onRemove={removeDoc}
                 files={doc}
-                catagory={"voucher"}
+                catagory={"misc_voucher"}
               />
             </div>
           </div>
@@ -684,7 +624,7 @@ function VeiwAllBooking() {
               {doc.length > 0
                 ? doc.map(
                     (file, index) =>
-                      file.catagory === "voucher" && (
+                      (
                         <li className="space-x-2" key={index}>
                           <a
                             href={file.url}
@@ -705,10 +645,16 @@ function VeiwAllBooking() {
                 : "No documents uploaded"}
             </ul>
           </div>
+          <button
+            onClick={() => {
+              addVoucher(doc);
+            }}
+            className="bg-blue-500 text-white px-4 py-2 rounded"
+          >
+            Save
+          </button>
         </div>
       </div>
     </div>
   );
 }
-
-export default VeiwAllBooking;
