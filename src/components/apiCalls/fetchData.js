@@ -1,5 +1,6 @@
 import axios from "axios";
 import { API_URL } from "../../AppConstant";
+import Swal from "sweetalert2";
 
 export const fetchUsers = async () => {
     const response = await axios.get(`${API_URL}users/getAllUsers`, {
@@ -69,14 +70,9 @@ export const fetchAgents = async () => {
         },
     });
     if(response.status === 200){
-        if(response.status === 200){
-      return response.data.OUTPUT;
-    }else{
-      alert(response.data.MESSAGE);
-      return false;
-    }
+        return response.data.OUTPUT;
       }else{
-        alert(response.data.MESSAGE);
+        Swal.fire(response.data.MESSAGE);
         return false;
       }
 };

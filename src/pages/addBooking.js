@@ -9,14 +9,21 @@ import { API_URL } from "../AppConstant";
 import BackToHome from "../components/BackToHome";
 import FileUpload from "../components/Input/FileUpload";
 import countryCodes from "../sampleData/sampleData";
+import { fetchAgents } from "../components/apiCalls/fetchData";
 
 const AddBooking = () => {
-  const sections = ["Booking Details", "Travel Details", "Order & Contact Details", "Documents Upload"];
+  const sections = [
+    "Booking Details",
+    "Travel Details",
+    "Order & Contact Details",
+    "Documents Upload",
+  ];
   const [currentSection, setCurrentSection] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [documents, setDocuments] = useState([]);
   const [destData, setDestData] = useState([]);
   const [salesSpoc, setSalesSpoc] = useState([]);
+  const [agent, setAgent] = useState([]);
   const navigate = useNavigate();
 
   const bookingSchema = z.object({
@@ -24,21 +31,18 @@ const AddBooking = () => {
     salesSpoc: z.string().min(1, { message: "Sales SPOC is required" }),
     agent: z.string().min(1, { message: "Agent is required" }),
     customerName: z.string().min(1, { message: "Customer Name is required" }),
-    arrivalDate: z.string().min(1, { message: "Arrival Date is required" }).refine(
-      (value) => 
-      new Date(value) > new Date()
-    ,
-    {
-      message: "Arrival Date must be in the future",
-    }),
-    departureDate: z.string().min(1, { message: "Departure Date is required" }).refine(
-      (value) => 
-        new Date(value) > new Date(watch("arrivalDate"))
-      ,
-      {
+    arrivalDate: z
+      .string()
+      .min(1, { message: "Arrival Date is required" })
+      .refine((value) => new Date(value) > new Date(), {
+        message: "Arrival Date must be in the future",
+      }),
+    departureDate: z
+      .string()
+      .min(1, { message: "Departure Date is required" })
+      .refine((value) => new Date(value) > new Date(watch("arrivalDate")), {
         message: "Departure Date must be after Arrival Date",
-      }
-    ),
+      }),
     pax: z.object({
       A: z.string().min(1, { message: "Adults is required" }),
       C: z.string().optional(),
@@ -46,90 +50,105 @@ const AddBooking = () => {
     }),
     orderValue: z.string().min(1, { message: "Order Value is required" }),
     countryCode: z.string().min(1, { message: "Country Code is required" }),
-    whatsappNumber: z.string().min(1, { message: "WhatsApp Number is required" }),
+    whatsappNumber: z
+      .string()
+      .min(1, { message: "WhatsApp Number is required" }),
   });
 
-  const { register, handleSubmit, setValue, watch, control, getValues, formState: { errors } } = useForm({
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    control,
+    getValues,
+    formState: { errors },
+  } = useForm({
     resolver: zodResolver(bookingSchema),
   });
 
   useEffect(() => {
     (async () => {
-      const destRes = await axios.get(`${API_URL}users/getAllDestinations`,{
+      const destRes = await axios.get(`${API_URL}users/getAllDestinations`, {
         withCredentials: true,
         headers: {
-          "content-type": "application/json,multipart/form-data"
-        }
+          "content-type": "application/json,multipart/form-data",
+        },
       });
-      if(destRes.status === 200){
+      if (destRes.status === 200) {
         setDestData(destRes.data.OUTPUT);
-        console.log(destData, 'destData');
+        console.log(destData, "destData");
       }
-      const userData = await axios.get(`${API_URL}users/getAllUsers`,{
+      const userData = await axios.get(`${API_URL}users/getAllUsers`, {
         withCredentials: true,
         headers: {
-          "content-type": "application/json"
-        }
+          "content-type": "application/json",
+        },
       });
-      if(userData.status === 200){
+      if (userData.status === 200) {
         // console.log(userData.data.OUTPUT, 'userData');
-        setSalesSpoc(userData.data.OUTPUT.filter((user) => user.profile === 'Sales'));
-        console.log(salesSpoc, 'salesSpoc');
+        setSalesSpoc(
+          userData.data.OUTPUT.filter((user) => user.profile === "Sales")
+        );
+        console.log(salesSpoc, "salesSpoc");
       }
+      const agentData = await fetchAgents();
+      console.log(agentData, "agentData");
+      setAgent(agentData);
     })();
   }, []);
 
   // Add New Document
- 
-const addDocument = (e, catagory) => {
-  const files = e.target.files;
-  if(files.length > 0){
-    Array.from(files).forEach((file) => {
-      const fileURL = URL.createObjectURL(file);
-      setDocuments((prevDocs) => [...prevDocs, { file, url: fileURL, catagory: catagory }]);
-    })
-  };
-};
 
-const removeDocument = (index) => {
-  const updatedDocs = documents.filter((_, i) => i !== index);
-  setDocuments(updatedDocs);
-};
+  const addDocument = (e, catagory) => {
+    const files = e.target.files;
+    if (files.length > 0) {
+      Array.from(files).forEach((file) => {
+        const fileURL = URL.createObjectURL(file);
+        setDocuments((prevDocs) => [...prevDocs, { file, fileURL, catagory }]);
+      });
+    }
+  };
+
+  const removeDocument = (index) => {
+    const updatedDocs = documents.filter((_, i) => i !== index);
+    setDocuments(updatedDocs);
+  };
 
   console.dir(errors, "errors");
 
+  const submitDocs = async (data) => {
+    const res = axios.post(`${API_URL}users/uploadDocuments:${await (data).tripId}`, documents, {
+      withCredentials: true,
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+    if ((await res).status === 200) {
+      console.log((await res).data, "res");
+      Swal
+      .fire({title:"Documents uploaded successfully", 
+      showCloseButton: false, timer: 1500})
+    } else {
+      Swal.fire("Failed to upload documents");
+    }
+  }
 
   const bookingSubmit = async (data) => {
     console.log("Form data before submission:", data);
-  
-    const formData = {
-      ...data,
-      documents
-    };
-    
-    console.log(formData, 'formData');
-  
     // Submit the form data
     try {
       setIsSubmitting(true);
-      const response = await axios.post(
-        `${API_URL}users/createBooking`, 
-        formData, 
-        { 
-          withCredentials: true,
-          headers: { "Content-Type": "Application/json" } // Use multipart/form-data for file uploads
-        }
-      );
+      const response = await axios.post(`${API_URL}users/createBooking`, data, {
+        withCredentials: true,
+        headers: { "Content-Type": "Application/json" }, // Use multipart/form-data for file uploads
+      });
       console.log("Response", response);
 
       if (response.status !== 200) {
         Swal.fire("Failed to submit the booking");
-      }else{
+      } else {
         Swal.fire("Booking submitted successfully");
+        await submitDocs(response.data.OUTPUT);
       }
-  
-      // Handle response (e.g., navigate or show success message)
-      navigate("/booking");
     } catch (error) {
       console.error("Error submitting the booking:", error);
       // Optionally, handle error (e.g., show error message to the user)
@@ -137,13 +156,40 @@ const removeDocument = (index) => {
       setIsSubmitting(false);
     }
   };
-  
 
-  
+  useEffect(() => {
+    console.log(errors, "errors");
+    currentSection === sections.length - 1 &&
+      Swal.fire(
+        "errors",
+        errors?.agent
+          ? errors.agent.message
+          : "" || errors?.arrivalDate
+          ? errors.arrivalDate.message
+          : "" || errors?.customerName
+          ? errors.customerName.message
+          : "" || errors?.departureDate
+          ? errors.departureDate.message
+          : "" || errors?.destination
+          ? errors.destination.message
+          : "" || errors?.orderValue
+          ? errors.orderValue.message
+          : "" || errors?.whatsappNumber
+          ? errors.whatsappNumber.message
+          : "" || errors?.countryCode
+          ? errors.countryCode.message
+          : "",
+        errors?.pax ? errors.pax.message : "",
+        errors?.salesSpoc ? errors.salesSpoc.message : "",
+        errors?.tripId ? errors.tripId.message : "",
+        errors?.whatsappNumber ? errors.whatsappNumber.message : ""
+      );
+  }, [errors]);
 
-  // Navigation Functions
+  // ! Navigation Functions
   const goToNext = () => {
-    if (currentSection < sections.length - 1) setCurrentSection(currentSection + 1);
+    if (currentSection < sections.length - 1)
+      setCurrentSection(currentSection + 1);
   };
 
   const goToPrevious = () => {
@@ -152,15 +198,21 @@ const removeDocument = (index) => {
 
   // Handle form submission
 
-
   return (
     <div className="container mx-auto p-6 bg-gray-100">
-      <BackToHome />
-      <h1 className="text-3xl font-bold text-center mb-6">Create New Booking</h1>
+      <BackToHome path="/booking" />
+      <h1 className="text-3xl font-bold text-center mb-6">
+        Create New Booking
+      </h1>
 
-      <form onSubmit={handleSubmit(bookingSubmit)} className="bg-white shadow-md rounded p-6">
+      <form
+        onSubmit={handleSubmit(bookingSubmit)}
+        className="bg-white shadow-md rounded p-6"
+      >
         {/* Section Header */}
-        <h2 className="text-2xl font-semibold text-center mb-4">{sections[currentSection]}</h2>
+        <h2 className="text-2xl font-semibold text-center mb-4">
+          {sections[currentSection]}
+        </h2>
 
         {/* Booking Details */}
         {currentSection === 0 && (
@@ -175,10 +227,15 @@ const removeDocument = (index) => {
               >
                 <option value="">Select Destination</option>
                 {destData.map((dest, index) => (
-                  <option key={index} value={dest.destination}>{dest.destination}</option>
+                  <option key={index} value={dest.destination}>
+                    {dest.destination}
+                  </option>
                 ))}
               </select>
-              {errors.destination && <p className="text-red-500">{errors.destination.message}</p> && Swal.fire(errors.destination.message)}
+              {errors.destination && (
+                  <p className="text-red-500">{errors.destination.message}</p>
+                ) &&
+                Swal.fire(errors.destination.message)}
             </div>
 
             <div>
@@ -191,23 +248,34 @@ const removeDocument = (index) => {
               >
                 <option value="">Select Sales Spoc</option>
                 {salesSpoc.map((user, index) => (
-                  <option key={index} value={user.name}>{user.name}</option>
+                  <option key={index} value={user.name}>
+                    {user.name}
+                  </option>
                 ))}
               </select>
-              {errors.salesSpoc && <p className="text-red-500">{errors.salesSpoc.message}</p>}
+              {errors.salesSpoc && (
+                <p className="text-red-500">{errors.salesSpoc.message}</p>
+              )}
             </div>
             <div>
               <label className="block mb-2">Agent</label>
-              <input
+              <select
                 type="text"
-                name="agent"
-                value={"Agent name"}
-                disabled={true}
                 id="agent"
                 {...register("agent")}
                 className="w-full border rounded px-3 py-2"
-              />
-              {errors.agent && <p className="text-red-500">{errors.agent.message}</p>}
+              >
+                <option value="">Select Agent</option>
+                {agent &&
+                  agent.map((user, index) => (
+                    <option key={index} value={user.name}>
+                      {user.name}
+                    </option>
+                  ))}
+              </select>
+              {errors.agent && (
+                <p className="text-red-500">{errors.agent.message}</p>
+              )}
             </div>
             <div>
               <label className="block mb-2">Customer Name</label>
@@ -218,7 +286,9 @@ const removeDocument = (index) => {
                 {...register("customerName")}
                 className="w-full border rounded px-3 py-2"
               />
-              {errors.customerName && <p className="text-red-500">{errors.customerName.message}</p>}
+              {errors.customerName && (
+                <p className="text-red-500">{errors.customerName.message}</p>
+              )}
             </div>
           </div>
         )}
@@ -235,7 +305,9 @@ const removeDocument = (index) => {
                 {...register("arrivalDate")}
                 className="w-full border rounded px-3 py-2"
               />
-              {errors.arrivalDate && <p className="text-red-500">{errors.arrivalDate.message}</p>}
+              {errors.arrivalDate && (
+                <p className="text-red-500">{errors.arrivalDate.message}</p>
+              )}
             </div>
             <div>
               <label className="block mb-2">Departure Date</label>
@@ -246,11 +318,15 @@ const removeDocument = (index) => {
                 {...register("departureDate")}
                 className="w-full border rounded px-3 py-2"
               />
-              {errors.departureDate && <p className="text-red-500">{errors.departureDate.message}</p>}
+              {errors.departureDate && (
+                <p className="text-red-500">{errors.departureDate.message}</p>
+              )}
             </div>
 
             <div>
-              <label className="block mb-2">Number of Passengers (Adults)</label>
+              <label className="block mb-2">
+                Number of Passengers (Adults)
+              </label>
               <input
                 type="number"
                 name="A"
@@ -258,7 +334,9 @@ const removeDocument = (index) => {
                 {...register("pax.A")}
                 className="w-full border rounded px-3 py-2"
               />
-              {errors.pax?.A && <p className="text-red-500">{errors.pax.A.message}</p>}
+              {errors.pax?.A && (
+                <p className="text-red-500">{errors.pax.A.message}</p>
+              )}
             </div>
 
             <div>
@@ -270,22 +348,26 @@ const removeDocument = (index) => {
                 {...register("pax.C")}
                 className="w-full border rounded px-3 py-2"
               />
-              {errors.pax?.C && <p className="text-red-500">{errors.pax.C.message}</p>}
+              {errors.pax?.C && (
+                <p className="text-red-500">{errors.pax.C.message}</p>
+              )}
             </div>
 
             {Array.from({ length: watch("pax.C") || 0 }).map((_, index) => (
-                <div key={index}>
-                  <label className="block mb-2">Child {index + 1} Age</label>
-                  <input
-                    type="number"
-                    name={`Ca${index}`}
-                    id={`Ca${index}`}
-                    {...register(`pax.Ca.${index}`)}
-                    className="w-full border rounded px-3 py-2"
-                  />
-                  {errors.pax?.Ca?.[index] && <p className="text-red-500">{errors.pax.Ca[index].message}</p>}
-                </div>
-              ))}
+              <div key={index}>
+                <label className="block mb-2">Child {index + 1} Age</label>
+                <input
+                  type="number"
+                  name={`Ca${index}`}
+                  id={`Ca${index}`}
+                  {...register(`pax.Ca.${index}`)}
+                  className="w-full border rounded px-3 py-2"
+                />
+                {errors.pax?.Ca?.[index] && (
+                  <p className="text-red-500">{errors.pax.Ca[index].message}</p>
+                )}
+              </div>
+            ))}
           </div>
         )}
 
@@ -302,7 +384,9 @@ const removeDocument = (index) => {
                   className="w-full border rounded px-3 py-2"
                 >
                   {countryCodes.map((country, index) => (
-                    <option key={index} value={country.code}>{country.country} : {country.code}</option>
+                    <option key={index} value={country.code}>
+                      {country.country} : {country.code}
+                    </option>
                   ))}
                 </select>
               </div>
@@ -316,7 +400,11 @@ const removeDocument = (index) => {
                   className="w-full border rounded px-3 py-2"
                   placeholder="Enter phone number"
                 />
-                {errors.whatsappNumber && <p className="text-red-500">{errors.whatsappNumber.message}</p>}
+                {errors.whatsappNumber && (
+                  <p className="text-red-500">
+                    {errors.whatsappNumber.message}
+                  </p>
+                )}
               </div>
             </div>
 
@@ -329,7 +417,9 @@ const removeDocument = (index) => {
                 {...register("orderValue")}
                 className="w-full border rounded px-3 py-2"
               />
-              {errors.orderValue && <p className="text-red-500">{errors.orderValue.message}</p>}
+              {errors.orderValue && (
+                <p className="text-red-500">{errors.orderValue.message}</p>
+              )}
             </div>
           </div>
         )}
@@ -337,33 +427,80 @@ const removeDocument = (index) => {
         {/* Documents Upload */}
         {currentSection === 2 && (
           <>
-          <h3 className="text-2xl font-bold mb-4">Documents Upload</h3>
-          <div className={`p-4 `}>
-          <div className="flex">
-            {/* Document Upload List */}
-            <div className="w-1/2 border-r border-gray-300 px-2 space-y-2">
-              <FileUpload label={"Air Ticket & Hotel"} id={"airTicket"} onChange={addDocument} onRemove={removeDocument} files={documents} catagory={"airTicket"} />
-              <FileUpload label={"Passport"} id={"passport"} onChange={addDocument} onRemove={removeDocument} files={documents} catagory={"passport"} />
-              <FileUpload label={"PAN"} id={"pan"} onChange={addDocument} onRemove={removeDocument} files={documents} catagory={"pan"} />
-              <FileUpload label={"Sales Sheet"} id={"misc"} onChange={addDocument} onRemove={removeDocument} files={documents} catagory={"misc"} toAccept=".xls,.xlsx,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" />
-              <FileUpload label={"Email Confirmation"} id={"emailConf"} onChange={addDocument} onRemove={removeDocument} files={documents} catagory={"emailConf"} />
-            </div>
+            <h3 className="text-2xl font-bold mb-4">Documents Upload</h3>
+            <div className={`p-4 `}>
+              <div className="flex">
+                {/* Document Upload List */}
+                <div className="w-1/2 border-r border-gray-300 px-2 space-y-2">
+                  <FileUpload
+                    label={"Air Ticket & Hotel"}
+                    id={"airTicket"}
+                    onChange={addDocument}
+                    onRemove={removeDocument}
+                    files={documents}
+                    catagory={"airTicket"}
+                  />
+                  <FileUpload
+                    label={"Passport"}
+                    id={"passport"}
+                    onChange={addDocument}
+                    onRemove={removeDocument}
+                    files={documents}
+                    catagory={"passport"}
+                  />
+                  <FileUpload
+                    label={"PAN"}
+                    id={"pan"}
+                    onChange={addDocument}
+                    onRemove={removeDocument}
+                    files={documents}
+                    catagory={"pan"}
+                  />
+                  <FileUpload
+                    label={"Sales Sheet"}
+                    id={"misc"}
+                    onChange={addDocument}
+                    onRemove={removeDocument}
+                    files={documents}
+                    catagory={"freezeQuotation"}
+                    toAccept=".xls,.xlsx,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                  />
+                  <FileUpload
+                    label={"Email Confirmation"}
+                    id={"emailConf"}
+                    onChange={addDocument}
+                    onRemove={removeDocument}
+                    files={documents}
+                    catagory={"emailConf"}
+                  />
+                </div>
 
-            {/* Document Preview */}
-            <div className="w-1/2 pl-4">
-              <ul>
-                {documents.length > 0 ? documents.map((doc, index) => (
-                  <li className="space-x-2" key={index}>
-                    <a href={doc.url} target="_blank" rel="noopener noreferrer">
-                      {doc.file.name}
-                    </a>
-                    <button className="text-red-400 hover:text-red-700" onClick={() => removeDocument(index)}>Remove</button>
-                  </li>
-                )): "No documents uploaded"}
-              </ul>
+                {/* Document Preview */}
+                <div className="w-1/2 pl-4">
+                  <ul>
+                    {documents.length > 0
+                      ? documents.map((doc, index) => (
+                          <li className="space-x-2" key={index}>
+                            <a
+                              href={doc.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              {doc.file.name}
+                            </a>
+                            <button
+                              className="text-red-400 hover:text-red-700"
+                              onClick={() => removeDocument(index)}
+                            >
+                              Remove
+                            </button>
+                          </li>
+                        ))
+                      : "No documents uploaded"}
+                  </ul>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
           </>
         )}
 
@@ -372,26 +509,29 @@ const removeDocument = (index) => {
           <button
             type="button"
             onClick={goToPrevious}
-            className={`px-4 py-2 bg-gray-400 text-white rounded ${currentSection === 0 ? "opacity-50 cursor-not-allowed" : ""}`}
+            className={`px-4 py-2 bg-gray-400 text-white rounded ${
+              currentSection === 0 ? "opacity-50 cursor-not-allowed" : ""
+            }`}
             disabled={currentSection === 0}
           >
             Previous
           </button>
           <button
-          type={isSubmitting ? "submit" : "button"}
-          onClick={currentSection === sections.length - 1 ? handleSubmit(bookingSubmit) : goToNext}
-          // disabled={isSubmitting}
-          className={`px-4 py-2 ${
-            currentSection === sections.length - 1 
-              ? "bg-green-500" 
-              : "bg-blue-500"
-          } text-white rounded`}
-        >
-          {currentSection === sections.length - 1
-            ? "Submit" 
-              : "Next"
-          }
-        </button>
+            type={isSubmitting ? "submit" : "button"}
+            onClick={
+              currentSection === sections.length - 1
+                ? handleSubmit(bookingSubmit)
+                : goToNext
+            }
+            // disabled={isSubmitting}
+            className={`px-4 py-2 ${
+              currentSection === sections.length - 1
+                ? "bg-green-500"
+                : "bg-blue-500"
+            } text-white rounded`}
+          >
+            {currentSection === sections.length - 1 ? "Submit" : "Next"}
+          </button>
         </div>
       </form>
     </div>
