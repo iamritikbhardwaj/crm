@@ -140,3 +140,18 @@ export const fetchRecon = async () => {
       return false;
     }
 };
+
+export const fetchVendors = async () => {
+    const response = await axios.get(`${API_URL}users/getAllVendors`, {
+        withCredentials: true,
+        headers: {
+            "content-type": "application/json",
+        },
+    });
+    if(response.status === 200){
+      return response.data.OUTPUT;
+    }else{
+      alert(response.data.MESSAGE);
+      return false;
+    }
+};

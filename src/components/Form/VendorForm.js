@@ -1,6 +1,11 @@
-import React from 'react'
+import { zodResolver } from '@hookform/resolvers/zod';
+import axios from 'axios';
+import React, { useEffect } from 'react'
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { API_URL } from '../../AppConstant';
 
-function VendorForm() {
+function VendorForm({supplier, dest, refetch, tripId, setInputData}) {
 
     const vendorSchema = z.object({
         name: z.string().min(1, { message: "vendor name is required" }),
@@ -8,6 +13,7 @@ function VendorForm() {
         currency: z.string().min(1, { message: "currency is required" }),
         booking_status: z.string().min(1, { message: "booking status is required" }),
         payment_status: z.string().min(1, { message: "payment status is required" }),
+        tripId: z.string().optional()
       });
 
       const { handleSubmit, register, setValue, formState: { errors } } = useForm({
@@ -16,15 +22,38 @@ function VendorForm() {
           name: "",
           destination: "",
           currency: "",
-          booking_status: "",
-          payment_status: "",
+          booking_status: "Pending",
+          payment_status: "Pending",
+          tripId: tripId
         }
       });
+
+      useEffect(() => {
+        (async () => {
+          await refetch();
+          setValue("currency", dest?.currency);
+        })()
+        setValue("destination", dest?.destination);
+        setValue("tripId", tripId);
+      }, []);
 
       console.log(errors, 'errors');
 
       const vendorSubmit = (data) => {
-          console.log(data, 'data');
+          (async (data) => {
+            const response = await axios.post(`${API_URL}users/createVendor`, data,
+            {
+              withCredentials: true,
+              headers: {
+                "content-type": "application/json"
+              }
+            })
+            console.log(response, 'response');
+            if (response.status === 200) {
+              refetch();
+              setInputData(null);
+            }
+          })(data);
       }
   return (
     <form onSubmit={handleSubmit(vendorSubmit)} className="mb-4">
@@ -39,11 +68,11 @@ function VendorForm() {
                 {...register("name")}
               >
                 <option value="">Select a vendor</option>
-                {supp &&
-                  supp.map((supplier, index) => {
+                {supplier &&
+                  supplier.map(( sup, index) => {
                     return (
-                      <option key={index} value={supplier}>
-                        {supplier.name}
+                      <option key={index} value={sup.name}>
+                        {sup.name}
                       </option>
                     );
                   })}

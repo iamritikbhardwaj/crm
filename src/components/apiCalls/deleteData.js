@@ -40,3 +40,8 @@ export const deleteBooking = async (id) => {
     const response = await axios.delete(`${API_URL}users/deleteBooking/${id}`);
     return response;
 }
+
+export const deleteVendor= async (id) => {
+    const response = await axios.delete(`${API_URL}users/deleteVendor/${id}`);
+    return response;
+}

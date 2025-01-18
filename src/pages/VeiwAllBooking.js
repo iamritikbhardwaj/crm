@@ -14,8 +14,12 @@ import {
   fetchRecon,
   fetchSuppliers,
   fetchUsers,
+  fetchVendors,
 } from "../components/apiCalls/fetchData";
-import { deletePayment, deleteRecon } from "../components/apiCalls/deleteData";
+import { deletePayment, deleteRecon, deleteVendor } from "../components/apiCalls/deleteData";
+import VendorForm from "../components/Form/VendorForm";
+import { API_URL } from "../AppConstant";
+import axios from "axios";
 
 function VeiwAllBooking() {
   const location = useLocation();
@@ -52,6 +56,34 @@ function VeiwAllBooking() {
     }
   };
 
+  const editVendor = (vendor) => {
+    (async () => {
+      const response = await axios.post(
+        `${API_URL}users/createVendor/?id=${vendor.vendor_pay_id}`,
+        vendor,
+      )
+    })();
+  };
+
+  const refetchSupp = async () => {
+    const destOut = await fetchDestinations();
+    const destData = destOut.filter(
+      (dest) => dest.destination === item.destination
+    );
+
+    const vendorData = await fetchVendors();
+
+    setVendorTable(vendorData);
+
+    const supData = await fetchSuppliers();
+    const final = supData.filter(
+      (sup) => sup.destination_id === destData[0].destination_id
+    );
+
+    setSupp(final);
+    setInputData(destData[0]);
+  };
+
   useEffect(() => {
     try {
       (async () => {
@@ -61,18 +93,7 @@ function VeiwAllBooking() {
         }
 
         refetchCom();
-
-        const destOut = await fetchDestinations();
-        const destData = destOut.filter(
-          (dest) => dest.destination === item.destination
-        );
-
-        const supData = await fetchSuppliers();
-        const final = supData.filter(
-          (sup) => sup.destination_id === destData[0].destination_id
-        );
-
-        setSupp(final);
+        refetchSupp();
       })();
     } catch (error) {
       console.log(error);
@@ -396,7 +417,10 @@ function VeiwAllBooking() {
                         <MdEdit />
                       </button>
                       <button
-                        onClick={() => {deletePayment(item.payment_id); refetchCom();}}
+                        onClick={() => {
+                          deletePayment(item.payment_id);
+                          refetchCom();
+                        }}
                         className="text-red-600"
                       >
                         <MdDelete />
@@ -554,73 +578,64 @@ function VeiwAllBooking() {
             </span>
           </h2>
           <div className={`p-4 ${active === 4 ? "block" : "hidden"}`}>
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Vendor Name
-              </label>
-              <select
-                id="vendor"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Search vendor..."
-                list="vendorList"
-                onChange={(e) => {
-                  setVendor({ ...vendor, name: e.target.value });
-                }}
-              >
-                <option value="">Select a vendor</option>
-                {supp &&
-                  supp.map((supplier, index) => {
-                    return (
-                      <option key={index} value={supplier}>
-                        {supplier.name}
-                      </option>
-                    );
-                  })}
-              </select>
-              <button
-                onClick={() => {
-                  setVendorTable(...vendorTable, vendor);
-                  setVendor({ ...vendor, name: "" });
-                }}
-                className="bg-blue-500 text-white px-4 py-2 mt-4 rounded-lg hover:bg-blue-700"
-              >
-                Add Vendor
-              </button>
-            </div>
-            <table className="w-full border border-slate-400 text-sm mb-4">
-              <thead>
-                <tr>
-                  <th className="text-left p-2">Vendor Name</th>
-                  <th className="text-left p-2">Destination</th>
-                  <th className="text-left p-2">Booking Status</th>
-                  <th className="text-left p-2">Payment Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  {vendorTable.length > 0 &&
-                    vendorTable.map((ven, index) => (
-                      <div>
-                        <td className="p-2">{ven.supplier}</td>
-                        <td className="p-2">{item.destination}</td>
-                        <td className="p-2">
-                          <select className="border rounded px-2 py-1">
-                            <option value="pending">Pending</option>
-                            <option value="in-progress">In-Progress</option>
-                          </select>
-                        </td>
-                        <td className="p-2">
-                          <select className="border rounded px-2 py-1">
-                            <option value="unpaid">Unpaid</option>
-                            <option value="part-paid">Part-Paid</option>
-                            <option value="completed">Payment Completed</option>
-                          </select>
-                        </td>
-                      </div>
-                    ))}
-                </tr>
-              </tbody>
-            </table>
+            <
+              setInputData
+              tripId={item.tripId}
+              supplier={supp}
+              dest={inputData}
+              refetch={refetchSupp}
+            />
+            <CustomTable 
+              dataa={vendorTable.map((item, index) => ({
+                name: item.name,
+                destination: item.destination,
+                currecy: item.currency,
+                bookingStatus: 
+                <select onChange={(e) => setInputData({name: item.name, destination: item.destination, currecy: item.currency, bookingStatus: e.target.value})}>
+                  <option value={'Approved'}>Approved</option>
+                  <option value={'Pending'}>Pending</option>
+                  <option value={'Rejected'}>Rejected</option>
+                  </select>,
+                paymentStatus: <>
+                <select onChange={(e) => setInputData({name: item.name, destination: item.destination, currecy: item.currency, paymentStatus: e.target.value})}>
+                  <option value={'Paid'}>Paid</option>
+                  <option value={'Unpaid'}>Unpaid</option>
+                  <option value={'Cancelled'}>Cancelled</option>
+                  </select>
+                </>,
+                action: (
+                  <div className="flex justify-around">
+                    <button
+                      className="text-blue-900"
+                      onClick={() => {
+                        editVendor(inputData);
+                      }}
+                    >
+                      <MdEdit />
+                    </button>
+                    <button
+                      onClick={() => {
+                        deleteVendor(item.vendor_pay_id);
+                        refetchSupp();
+                      }}
+                      className="text-red-600"
+                    >
+                      <MdDelete />
+                    </button>
+                  </div>
+                )
+              }))}
+              columnss={[
+                { Header: "Name", accessor: "name" },
+                { Header: "Destination", accessor: "destination" },
+                { Header: "Currency", accessor: "currecy" },
+                { Header: "Booking Status", accessor: "bookingStatus" },
+                { Header: "Payment Status", accessor: "paymentStatus" },
+                { Header: "Action", accessor: "action" },
+              ]}
+              size={"text-xs"}
+              hideFilter={true}
+            />
           </div>
         </div>
         {/* Voucher details */}
