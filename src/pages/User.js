@@ -6,6 +6,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { API_URL } from '../AppConstant';
 import Swal from 'sweetalert2';
+import SampleFile from '../components/Form/sampleFile';
 function User() {
 
   const navigate = useNavigate();

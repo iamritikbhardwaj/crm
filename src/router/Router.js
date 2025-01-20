@@ -1,5 +1,6 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import { lazy } from "react";
+import sampleFile from "../components/Form/sampleFile";
 
 const Home = lazy(() => import("../App"));
 const User = lazy(() => import("../pages/User"));
@@ -16,6 +17,7 @@ const AddBooking = lazy(() => import("../pages/addBooking"));
 const VeiwAllBooking = lazy(() => import("../pages/VeiwAllBooking"));
 const ExcelToTable = lazy(() => import("../components/customTable/ExcelToTable"))
 const NotFound = lazy(() => import("../errorPages/NotFound.jsx"));
+const DocForm = lazy(() => import("../components/Form/docForm"));
 
 // ProtectedRoute component
 const ProtectedRoute = ({ element }) => {
@@ -87,6 +89,10 @@ const router = createBrowserRouter([
         path: "/destForm",
         element: <ProtectedRoute element={<DestForm />} />,
     },
+    {
+        path: "/docs",
+        element: <ProtectedRoute element={<DocForm />} />,
+    },
     // Public routes
     // {
     //     path: "/userForm",
@@ -100,6 +106,10 @@ const router = createBrowserRouter([
         path: "*",
         element: <NotFound />,
     },
+    {
+        path: "/sample",
+        element: <sampleFile />
+    }
 ]);
 
 export default router;

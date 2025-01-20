@@ -8,6 +8,7 @@ import FileUpload from "../components/Input/FileUpload";
 import ReconForm from "../components/Form/ReconForm";
 import { MdAddCircle, MdDelete, MdEdit, MdModeEdit } from "react-icons/md";
 import PaymentForm from "../components/Form/PaymentForm";
+import VendorForm from "../components/Form/VendorForm";
 import {
   fetchDestinations,
   fetchPayment,
@@ -518,7 +519,7 @@ export default function VeiwAllBooking() {
             </span>
           </h2>
           <div className={`p-4 ${active === 4 ? "block" : "hidden"}`}>
-            <
+            <VendorForm
               setInputData
               tripId={item.tripId}
               supplier={supp}

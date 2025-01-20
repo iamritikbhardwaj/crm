@@ -29,6 +29,7 @@ function FileUpload({ label, id, onChange, catagory, toAccept }) {
 
       {/* Button to trigger file input click */}
       <button
+        type="button"
         onClick={() => document.querySelector(`#${id}`).click()}
         className='cursor-pointer bg-blue-500 px-2 py-1 rounded text-white'
       >

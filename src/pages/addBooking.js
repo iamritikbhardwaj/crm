@@ -16,7 +16,7 @@ const AddBooking = () => {
     "Booking Details",
     "Travel Details",
     "Order & Contact Details",
-    "Documents Upload",
+"Documents Upload",
   ];
   const [currentSection, setCurrentSection] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -60,8 +60,6 @@ const AddBooking = () => {
     handleSubmit,
     setValue,
     watch,
-    control,
-    getValues,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(bookingSchema),
@@ -134,15 +132,18 @@ const AddBooking = () => {
 
   const bookingSubmit = async (data) => {
     console.log("Form data before submission:", data);
-    // Submit the form data
+  
     try {
       setIsSubmitting(true);
       const response = await axios.post(`${API_URL}users/createBooking`, data, {
         withCredentials: true,
-        headers: { "Content-Type": "Application/json" }, // Use multipart/form-data for file uploads
+        headers: { 
+          "content-type": "application/json" 
+         }, 
       });
+  
       console.log("Response", response);
-
+  
       if (response.status !== 200) {
         Swal.fire("Failed to submit the booking");
       } else {
@@ -156,10 +157,11 @@ const AddBooking = () => {
       setIsSubmitting(false);
     }
   };
+  
 
   useEffect(() => {
     console.log(errors, "errors");
-    currentSection === sections.length - 1 &&
+    currentSection === sections.length - 1 && errors &&
       Swal.fire(
         "errors",
         errors?.agent
@@ -517,7 +519,7 @@ const AddBooking = () => {
             Previous
           </button>
           <button
-            type={isSubmitting ? "submit" : "button"}
+            type={currentSection === sections.length - 1 ? "submit" : "button"}
             onClick={
               currentSection === sections.length - 1
                 ? handleSubmit(bookingSubmit)

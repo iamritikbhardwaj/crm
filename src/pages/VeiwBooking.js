@@ -8,6 +8,7 @@ import { API_URL } from "../AppConstant";
 import Swal from "sweetalert2";
 import FileUpload from "../components/Input/FileUpload";
 import { fetchUsers } from "../components/apiCalls/fetchData";
+import SampleFile from "../components/Form/sampleFile";
 
 export default function VeiwBooking() {
 
@@ -20,7 +21,7 @@ export default function VeiwBooking() {
 
   const [doc, setDoc] = useState(data.documents);
   const [opsSpoc, setOpsSpoc] = useState('');
-  const [inputData, setInputData] = useState({...data, documents: doc, opsSpoc: ''});
+  const [inputData, setInputData] = useState({...data, documents: doc, opsSpoc: opsSpoc.length === 1 ? opsSpoc[0].name : opsSpoc, status: "confirmed"});
 
   useEffect(() => {
     (async () => {
