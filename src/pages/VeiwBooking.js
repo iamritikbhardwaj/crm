@@ -316,7 +316,9 @@ if (data) {
           </h2>
           <div className={`p-4 flex ${active === 3 ? "" : "hidden"}`}>
             <div className="w-1/2 border-r px-4 border-gray-300">
-            <FileUpload label={"Sales Sheet"} id={"misc"} onChange={addDoc} onRemove={removeDoc} files={doc} catagory={"freezeQuotation"} toAccept=".xls,.xlsx,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" />         
+            <FileUpload label={"Sales Sheet"} id={"salesSheet"} onChange={addDoc} onRemove={removeDoc} files={doc} catagory={"freezeQuotation"} 
+                  toAccept=".xls,.xlsx,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                  />         
       </div>
             <div className="w-1/2 pl-4">
                 <ul>

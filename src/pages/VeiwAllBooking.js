@@ -622,7 +622,7 @@ export default function VeiwAllBooking() {
           </div>
           <div className="w-1/2">
             <ul>
-              {doc.length > 0
+              {doc
                 ? doc.map(
                     (file, index) =>
                       (

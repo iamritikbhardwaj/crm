@@ -70,12 +70,11 @@ const AddBooking = () => {
       const destRes = await axios.get(`${API_URL}users/getAllDestinations`, {
         withCredentials: true,
         headers: {
-          "content-type": "application/json,multipart/form-data",
+          "content-type": "application/json",
         },
       });
       if (destRes.status === 200) {
         setDestData(destRes.data.OUTPUT);
-        console.log(destData, "destData");
       }
       const userData = await axios.get(`${API_URL}users/getAllUsers`, {
         withCredentials: true,
@@ -84,14 +83,11 @@ const AddBooking = () => {
         },
       });
       if (userData.status === 200) {
-        // console.log(userData.data.OUTPUT, 'userData');
         setSalesSpoc(
           userData.data.OUTPUT.filter((user) => user.profile === "Sales")
         );
-        console.log(salesSpoc, "salesSpoc");
       }
       const agentData = await fetchAgents();
-      console.log(agentData, "agentData");
       setAgent(agentData);
     })();
   }, []);
@@ -113,79 +109,72 @@ const AddBooking = () => {
     setDocuments(updatedDocs);
   };
 
-  console.dir(errors, "errors");
-
-  const submitDocs = async (data) => {
-    const res = axios.post(`${API_URL}users/uploadDocuments:${await (data).tripId}`, documents, {
-      withCredentials: true,
-      headers: { "Content-Type": "multipart/form-data" },
-    });
-    if ((await res).status === 200) {
-      console.log((await res).data, "res");
-      Swal
-      .fire({title:"Documents uploaded successfully", 
-      showCloseButton: false, timer: 1500})
-    } else {
-      Swal.fire("Failed to upload documents");
-    }
-  }
+  console.log(errors, "errors");
 
   const bookingSubmit = async (data) => {
     console.log("Form data before submission:", data);
   
     try {
       setIsSubmitting(true);
-      const response = await axios.post(`${API_URL}users/createBooking`, data, {
+      
+      // Sending POST request with FormData
+      const response = await axios.post(`${API_URL}users/createBooking`, {...data, documents}, {
         withCredentials: true,
-        headers: { 
-          "content-type": "application/json" 
-         }, 
+        headers: {
+          "content-type": "application/json",
+          // "content-Type": "multipart/form-data", // Axios will automatically set the correct boundary, so this is usually optional
+        },
       });
-  
-      console.log("Response", response);
-  
+      
+      // Check the status of the response
       if (response.status !== 200) {
         Swal.fire("Failed to submit the booking");
       } else {
         Swal.fire("Booking submitted successfully");
-        await submitDocs(response.data.OUTPUT);
+        navigate("/booking");
       }
     } catch (error) {
       console.error("Error submitting the booking:", error);
-      // Optionally, handle error (e.g., show error message to the user)
+      // Handle error gracefully (e.g., show error message to the user)
+      Swal.fire("There was an error submitting the booking.");
     } finally {
       setIsSubmitting(false);
     }
   };
-  
 
   useEffect(() => {
-    console.log(errors, "errors");
-    currentSection === sections.length - 1 && errors &&
-      Swal.fire(
-        "errors",
-        errors?.agent
-          ? errors.agent.message
-          : "" || errors?.arrivalDate
-          ? errors.arrivalDate.message
-          : "" || errors?.customerName
-          ? errors.customerName.message
-          : "" || errors?.departureDate
-          ? errors.departureDate.message
-          : "" || errors?.destination
-          ? errors.destination.message
-          : "" || errors?.orderValue
-          ? errors.orderValue.message
-          : "" || errors?.whatsappNumber
-          ? errors.whatsappNumber.message
-          : "" || errors?.countryCode
-          ? errors.countryCode.message
-          : "",
-        errors?.pax ? errors.pax.message : "",
-        errors?.salesSpoc ? errors.salesSpoc.message : "",
-        errors?.tripId ? errors.tripId.message : "",
-        errors?.whatsappNumber ? errors.whatsappNumber.message : ""
-      );
+
+      if (errors !== null) {
+        Swal.fire(
+          {
+            title: "Booking Form",
+            text: (currentSection === sections.length - 1 ? "Creating Booking" : "Booking Form",
+            errors?.agent
+              ? errors.agent.message
+              : "" || errors?.arrivalDate
+              ? errors.arrivalDate.message
+              : "" || errors?.customerName
+              ? errors.customerName.message
+              : "" || errors?.departureDate
+              ? errors.departureDate.message
+              : "" || errors?.destination
+              ? errors.destination.message
+              : "" || errors?.orderValue
+              ? errors.orderValue.message
+              : "" || errors?.whatsappNumber
+              ? errors.whatsappNumber.message
+              : "" || errors?.countryCode
+              ? errors.countryCode.message
+              : "" ||
+            errors?.pax ? errors.pax.message : "" ||
+            errors?.salesSpoc ? errors.salesSpoc.message : "" ||
+            errors?.tripId ? errors.tripId.message : "" ||
+            errors?.whatsappNumber ? errors.whatsappNumber.message : ""),
+            showConfirmButton: false,
+            timer: 1500,
+          },
+        );
+      }
   }, [errors]);
 
   // ! Navigation Functions
@@ -301,7 +290,7 @@ const AddBooking = () => {
             <div>
               <label className="block mb-2">Arrival Date</label>
               <input
-                type="datetime-local"
+                type="date"
                 name="arrivalDate"
                 id="arrivalDate"
                 {...register("arrivalDate")}
@@ -314,7 +303,7 @@ const AddBooking = () => {
             <div>
               <label className="block mb-2">Departure Date</label>
               <input
-                type="datetime-local"
+                type="date"
                 name="departureDate"
                 id="departureDate"
                 {...register("departureDate")}
