@@ -78,7 +78,7 @@ function User() {
                 if (result.isConfirmed) {
                   (async () => {
                     try {
-                      const res = await axios.delete(`http://localhost:5001/api/users/deleteUser/${item.id}`,
+                      const res = await axios.delete(`${API_URL}users/deleteUser/${item.id}`,
                       {
                         withCredentials: true,
                         headers : {
