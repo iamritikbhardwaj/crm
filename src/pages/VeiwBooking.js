@@ -14,6 +14,8 @@ export default function VeiwBooking() {
   const location = useLocation();
   const data = location.state;
 
+  console.log(data.docs, "data.docs");
+
   // to navigate b/w sections
   const [active, setActive] = useState(0); // Section toggle
   const [doc, setDoc] = useState(data.documents);
@@ -101,7 +103,7 @@ export default function VeiwBooking() {
   };
 
   const splitIt = (str) => {
-    const data = str.split("/")
+    const data = new String(str).split("/")
     const result = data[data.length - 1];
     return result;
   };
@@ -256,14 +258,14 @@ export default function VeiwBooking() {
                   {doc
                     ? doc.map(
                         (file, index) =>
-                          file?.catagory !== "freezeQuotation" && (
+                          new String(file).includes("freezeQuotation") ? false : true || ((file.hasOwnProperty("catagory") && (file.catagory !== "freezeQuotation") || file.catagory === "voucher")) && (
                             <li className="space-x-2" key={index}>
                               <a
-                                href={new String(file).includes("http") ? file : file?.url}
+                                href={file.hasOwnProperty("file") ? file.url : file}
                                 target="_blank"
                                 rel="noopener noreferrer"
                               >
-                                {new String(file).includes("http") ? splitIt(file): file?.catagory}
+                                {file.hasOwnProperty("file") ? file.file.name : splitIt(file)}
                               </a>
                               <button
                                 className="text-red-400 rounded-lg cursor-pointer hover:text-red-700"
@@ -328,11 +330,11 @@ export default function VeiwBooking() {
                         file.catagory === "freezeQuotation" && (
                           <li className="space-x-2" key={index}>
                             <a
-                              href={file}
+                              href={file.hasOwnProperty("url") ? file.url : file}
                               target="_blank"
                               rel="noopener noreferrer"
                             >
-                              {splitIt(file)}
+                              {file.hasOwnProperty("file")? file.file.name: splitIt(file)}
                             </a>
                             <button
                               className="text-red-400 cursor-pointer hover:text-red-700"

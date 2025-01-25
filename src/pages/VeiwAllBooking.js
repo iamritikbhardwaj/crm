@@ -271,8 +271,8 @@ export default function VeiwAllBooking() {
                   {doc
                     ? doc.map(
                         (file, index) =>
-                          file?.catagory !== "freezeQuotation" && (
-                            <li className="space-x-2" key={index}>
+                        (new String(file).includes("freezeQuotation") ? false : true) && (
+                          <li className="space-x-2" key={index}>
                               <a
                                 href={new String(file).includes("http" || "https") ? file : file?.url}
                                 target="_blank"
