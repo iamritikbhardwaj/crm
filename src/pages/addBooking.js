@@ -113,17 +113,26 @@ const AddBooking = () => {
 
   const bookingSubmit = async (data) => {
     console.log("Form data before submission:", data);
-  
+    const formData = new FormData();
+    formData.append("data", JSON.stringify(data));
+
+    documents.forEach((doc, index) => {
+      formData.append(`${doc.catagory}`, doc.file);
+    });
+
+    formData.forEach((value, key) => {
+      console.log(`${key}: ${value}`);
+    })
+
     try {
       setIsSubmitting(true);
       
       // Sending POST request with FormData
-      const response = await axios.post(`${API_URL}users/createBooking`, {...data, documents}, {
+      const response = await axios.post(`${API_URL}users/createBooking/`, formData, {
         withCredentials: true,
-        headers: {
-          "content-type": "application/json",
-          // "content-Type": "multipart/form-data", // Axios will automatically set the correct boundary, so this is usually optional
-        },
+          headers: {
+            "content-Type": "multipart/form-data",
+          },
       });
       
       // Check the status of the response

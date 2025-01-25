@@ -67,6 +67,12 @@ export default function VeiwAllBooking() {
     })();
   };
 
+  const splitIt = (str) => {
+    const data = str.split("/");
+    const result = data[data.length - 1];
+    return result;
+  };
+
   const refetchSupp = async () => {
     const destOut = await fetchDestinations();
     const destData = destOut.filter(
@@ -265,15 +271,14 @@ export default function VeiwAllBooking() {
                   {doc
                     ? doc.map(
                         (file, index) =>
-                          file.catagory !== "freezeQuotation" &&
-                          file.catagory !== "voucher" && (
+                          file?.catagory !== "freezeQuotation" && (
                             <li className="space-x-2" key={index}>
                               <a
-                                href={file.url}
+                                href={new String(file).includes("http" || "https") ? file : file?.url}
                                 target="_blank"
                                 rel="noopener noreferrer"
                               >
-                                {file.file.name}
+                                {new String(file).includes("http" || "https") ? splitIt(file): file?.catagory}
                               </a>
                               <button
                                 className="text-red-400 rounded-lg cursor-pointer hover:text-red-700"
@@ -485,14 +490,14 @@ export default function VeiwAllBooking() {
                   {doc
                     ? doc.map(
                         (file, index) =>
-                          file.catagory === "freezeQuotation" && (
+                          (new String(file).includes("freezeQuotation") || file?.catagory === "freezeQuotation") && (
                             <li className="space-x-2" key={index}>
                               <a
-                                href={file.url}
+                                href={new String(file).includes("http" || "https") ? file : file?.url}
                                 target="_blank"
                                 rel="noopener noreferrer"
                               >
-                                {file.file.name}
+                                {new String(file).includes("http" || "https") ? splitIt(file) : file?.name}
                               </a>
                               <button
                                 className="text-red-400 rounded-lg cursor-pointer hover:text-red-700"
@@ -596,7 +601,7 @@ export default function VeiwAllBooking() {
                 onChange={addDoc}
                 onRemove={removeDoc}
                 files={doc}
-                catagory={"hotel_voucher"}
+                catagory={"voucher"}
               />
             </div>
             <div className="flex gap-4 align-middle">
@@ -606,7 +611,7 @@ export default function VeiwAllBooking() {
                 onChange={addDoc}
                 onRemove={removeDoc}
                 files={doc}
-                catagory={"activities_voucher"}
+                catagory={"voucher"}
               />
             </div>
             <div className="flex gap-4 align-middle">
@@ -616,7 +621,7 @@ export default function VeiwAllBooking() {
                 onChange={addDoc}
                 onRemove={removeDoc}
                 files={doc}
-                catagory={"misc_voucher"}
+                catagory={"voucher"}
               />
             </div>
           </div>
@@ -625,14 +630,14 @@ export default function VeiwAllBooking() {
               {doc
                 ? doc.map(
                     (file, index) =>
-                      (
+                      (new String(file).includes("voucher") || file?.catagory === "voucher") && (
                         <li className="space-x-2" key={index}>
                           <a
-                            href={file.url}
+                            href={new String(file).includes('http' || "https") ? file : file?.url}
                             target="_blank"
                             rel="noopener noreferrer"
                           >
-                            {file.file.name}
+                            {new String(file).includes('http' || "https") ? splitIt(file) : file?.name}
                           </a>
                           <button
                             className="text-red-400 cursor-pointer hover:text-red-700"
