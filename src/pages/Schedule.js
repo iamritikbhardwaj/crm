@@ -27,20 +27,23 @@ const AllBookings = () => {
             tripID: item.tripId,
             destination: item.destination,
             bookingDate: item.bookingDate.slice(0, 10),
-            customerName: item.customerName + " / " + item.pax?.A + item.pax?.C,
-            salesSPOC: item.salesSpoc,
+            customerName: <div className="leading-[0.7]">
+            <p>{item.customerName}</p> <br />
+            <p>{item.pax?.A} A / {item.pax?.C} C</p>
+            </div>,            salesSPOC: item.salesSpoc,
             agent: item.agent,
-            TravelDates: item.arrivalDate.slice(0, 10) + " to " + item.departureDate.slice(0, 10),
+            arrivalDate: item.arrivalDate.slice(0, 10),
+            departureDate:  item.departureDate.slice(0, 10),
             travelMonth: getTravelMonthRange(item.arrivalDate, item.departureDate),
             contactDetails: `${item.countryCode} / ${item.whatsappNumber}`,
             orderValue: item.orderValue,
             payment: item.payment,
-            status: item.status,
+            status: <button className="bg-green-400 p-2 rounded-full"></button>,
             opsSpoc: item.opsSpoc,
             action: <button onClick={() => navigate("/viewAllBooking", { state: item })}><GrFormView /></button>,
             paymentstat: <button className="bg-red-400 p-2 rounded-lg text-white">{item.paymentStatus}</button>,
             validation: <button className="bg-red-400 p-2 rounded-lg">{item.validation}</button>,
-            opsstatus: <button className="bg-red-300 p-2 rounded-lg">{item?.opsStatus}</button>
+            opsstatus: <button className="bg-red-700 p-2 rounded-lg">{item?.opsStatus}</button>
           }
       ))
     setBookings(bookings);})();
@@ -53,7 +56,8 @@ const AllBookings = () => {
     { Header: "Sales SPOC", accessor: "salesSPOC" },
     { Header: "Agent", accessor: "agent" },
     { Header: "Customer Name", accessor: "customerName" },
-    { Header: "Travel Dates", accessor: "TravelDates" },
+    { Header: "Arrival Dates", accessor: "arrivalDate" },
+    { Header: "Departure Dates", accessor: "departureDate" },
     { Header: "Travel Month", accessor: "travelMonth" },
     { Header: "Contact Details", accessor: "contactDetails" },
     { Header: "Order Value", accessor: "orderValue" },

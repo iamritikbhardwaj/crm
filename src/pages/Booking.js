@@ -6,45 +6,20 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { API_URL } from "../AppConstant";
 
-export function getTravelMonthRange(arrivalDate, departureDate) {
+export function getTravelMonthRange(arrivalDate) {
     const arrival = new Date(arrivalDate); // Convert to Date object
-    const departure = new Date(departureDate); // Convert to Date object
   
     const arrivalMonth = arrival.getMonth(); // Zero-based month
-    const departureMonth = departure.getMonth(); // Zero-based month
   
     const arrivalYear = arrival.getFullYear(); // Year of arrival
-    const departureYear = departure.getFullYear(); // Year of departure
   
     const months = [
       "January", "February", "March", "April", "May", "June",
       "July", "August", "September", "October", "November", "December"
     ];
   
-    // Case 1: Travel is in the same month
-    if (arrivalMonth === departureMonth && arrivalYear === departureYear) {
-      return months[arrivalMonth];
-    }
-  
-    // Case 2: Travel spans multiple months
-    const travelMonths = [];
-    
-    if (arrivalYear === departureYear) {
-      // If travel is within the same year
-      for (let month = arrivalMonth; month <= departureMonth; month++) {
-        travelMonths.push(months[month]);
-      }
-    } else {
-      // If travel spans over two different years
-      for (let month = arrivalMonth; month < 12; month++) {
-        travelMonths.push(months[month]);
-      }
-      for (let month = 0; month <= departureMonth; month++) {
-        travelMonths.push(months[month]);
-      }
-    }
-  
-    return travelMonths.join(" - ");
+    const arrivalMonthName = months[arrivalMonth];
+    return `${arrivalMonthName} ${arrivalYear}`;
   }
 
 const NewBooking = () => {
@@ -85,13 +60,16 @@ const NewBooking = () => {
         const processedData = bookings.map((item) => ({
           booking_id: item.booking_id.slice(0, 6),
           destination: item.destination,
-          bookingDate: item.bookingDate,
+          bookingDate: item.bookingDate.slice(0, 10),
           salesSpoc: item.salesSpoc,
           agent: item.agent,
-          customerDetails: `${item.customerName} / ${item.pax.C}`,
+          customerDetails: <div className="leading-[0.7]">
+          <p>{item.customerName}</p> <br />
+          <p>{item.pax?.A} A / {item.pax?.C} C</p>
+          </div>,
           arrivalDate: item.arrivalDate.slice(0, 10),
           departureDate: item.departureDate.slice(0, 10),
-          travelMonth: getTravelMonthRange(item.arrivalDate, item.departureDate),
+          travelMonth: getTravelMonthRange(item.arrivalDate),
           contactDetails: `${item.countryCode} / ${item.whatsappNumber}`,
           orderValue: item.orderValue,
           action: (

@@ -16,7 +16,7 @@ const AddBooking = () => {
     "Booking Details",
     "Travel Details",
     "Order & Contact Details",
-"Documents Upload",
+    "Documents Upload",
   ];
   const [currentSection, setCurrentSection] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -112,7 +112,14 @@ const AddBooking = () => {
   console.log(errors, "errors");
 
   const bookingSubmit = async (data) => {
-    console.log("Form data before submission:", data);
+    Swal.fire({
+      title: "Loading...",
+      text: "Please wait while we process your request.",
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading();
+      },
+    });
     const formData = new FormData();
     formData.append("data", JSON.stringify(data));
 
@@ -120,26 +127,27 @@ const AddBooking = () => {
       formData.append(`${doc.catagory}`, doc.file);
     });
 
-    formData.forEach((value, key) => {
-      console.log(`${key}: ${value}`);
-    })
-
     try {
       setIsSubmitting(true);
-      
+
       // Sending POST request with FormData
-      const response = await axios.post(`${API_URL}users/createBooking/`, formData, {
-        withCredentials: true,
+      const response = await axios.post(
+        `${API_URL}users/createBooking/`,
+        formData,
+        {
+          withCredentials: true,
           headers: {
             "content-Type": "multipart/form-data",
           },
-      });
-      
+        }
+      );
+
       // Check the status of the response
       if (response.status !== 200) {
+        Swal.close();
         Swal.fire("Failed to submit the booking");
       } else {
-        Swal.fire("Booking submitted successfully");
+        Swal.close();
         navigate("/booking");
       }
     } catch (error) {
@@ -152,38 +160,42 @@ const AddBooking = () => {
   };
 
   useEffect(() => {
-
-      if (errors !== null) {
-        Swal.fire(
-          {
-            title: "Booking Form",
-            text: (currentSection === sections.length - 1 ? "Creating Booking" : "Booking Form",
-            errors?.agent
-              ? errors.agent.message
-              : "" || errors?.arrivalDate
-              ? errors.arrivalDate.message
-              : "" || errors?.customerName
-              ? errors.customerName.message
-              : "" || errors?.departureDate
-              ? errors.departureDate.message
-              : "" || errors?.destination
-              ? errors.destination.message
-              : "" || errors?.orderValue
-              ? errors.orderValue.message
-              : "" || errors?.whatsappNumber
-              ? errors.whatsappNumber.message
-              : "" || errors?.countryCode
-              ? errors.countryCode.message
-              : "" ||
-            errors?.pax ? errors.pax.message : "" ||
-            errors?.salesSpoc ? errors.salesSpoc.message : "" ||
-            errors?.tripId ? errors.tripId.message : "" ||
-            errors?.whatsappNumber ? errors.whatsappNumber.message : ""),
-            showConfirmButton: false,
-            timer: 1500,
-          },
-        );
-      }
+    if (errors !== null) {
+      Swal.fire({
+        title: "Booking Form",
+        text:
+          (currentSection !== 0
+            ? "Creating Booking"
+            : "Please Fill all the feilds carefully",
+          errors?.agent
+            ? errors.agent.message
+            : "" || errors?.arrivalDate
+            ? errors.arrivalDate.message
+            : "" || errors?.customerName
+            ? errors.customerName.message
+            : "" || errors?.departureDate
+            ? errors.departureDate.message
+            : "" || errors?.destination
+            ? errors.destination.message
+            : "" || errors?.orderValue
+            ? errors.orderValue.message
+            : "" || errors?.whatsappNumber
+            ? errors.whatsappNumber.message
+            : "" || errors?.countryCode
+            ? errors.countryCode.message
+            : "" || errors?.pax
+            ? errors.pax.message
+            : "" || errors?.salesSpoc
+            ? errors.salesSpoc.message
+            : "" || errors?.tripId
+            ? errors.tripId.message
+            : "" || errors?.whatsappNumber
+            ? errors.whatsappNumber.message
+            : ""),
+        showConfirmButton: false,
+        timer: 2000,
+      });
+    }
   }, [errors]);
 
   // ! Navigation Functions
@@ -302,6 +314,7 @@ const AddBooking = () => {
                 type="date"
                 name="arrivalDate"
                 id="arrivalDate"
+                min={new Date()}
                 {...register("arrivalDate")}
                 className="w-full border rounded px-3 py-2"
               />
@@ -315,6 +328,7 @@ const AddBooking = () => {
                 type="date"
                 name="departureDate"
                 id="departureDate"
+                min={new Date(watch("arrivalDate"))}
                 {...register("departureDate")}
                 className="w-full border rounded px-3 py-2"
               />

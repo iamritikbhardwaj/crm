@@ -26,6 +26,7 @@ import Swal from "sweetalert2";
 export default function VeiwAllBooking() {
   const location = useLocation();
   const [item, setItem] = useState(location.state);
+  console.log(item, "item");
   const [active, setActive] = useState(0); // Section toggle
   const [doc, setDoc] = useState(item.documents);
   const [supp, setSupp] = useState([]);
@@ -274,11 +275,11 @@ export default function VeiwAllBooking() {
                         (new String(file).includes("freezeQuotation") ? false : true) && (
                           <li className="space-x-2" key={index}>
                               <a
-                                href={new String(file).includes("http" || "https") ? file : file?.url}
+                                href={file}
                                 target="_blank"
                                 rel="noopener noreferrer"
                               >
-                                {new String(file).includes("http" || "https") ? splitIt(file): file?.catagory}
+                            {new String(file).includes('http' || "https") ? splitIt(file) : file?.file.name}
                               </a>
                               <button
                                 className="text-red-400 rounded-lg cursor-pointer hover:text-red-700"
@@ -497,7 +498,7 @@ export default function VeiwAllBooking() {
                                 target="_blank"
                                 rel="noopener noreferrer"
                               >
-                                {new String(file).includes("http" || "https") ? splitIt(file) : file?.name}
+                                {new String(file).includes("http" || "https") ? splitIt(file) : file?.file.name}
                               </a>
                               <button
                                 className="text-red-400 rounded-lg cursor-pointer hover:text-red-700"
@@ -637,7 +638,7 @@ export default function VeiwAllBooking() {
                             target="_blank"
                             rel="noopener noreferrer"
                           >
-                            {new String(file).includes('http' || "https") ? splitIt(file) : file?.name}
+                            {new String(file).includes('http' || "https") ? splitIt(file) : file.file.name}
                           </a>
                           <button
                             className="text-red-400 cursor-pointer hover:text-red-700"

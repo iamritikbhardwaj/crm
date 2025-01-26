@@ -258,7 +258,7 @@ export default function VeiwBooking() {
                   {doc
                     ? doc.map(
                         (file, index) =>
-                          new String(file).includes("freezeQuotation") ? false : true || ((file.hasOwnProperty("catagory") && (file.catagory !== "freezeQuotation") || file.catagory === "voucher")) && (
+                          ( (file?.catagory !== "freezeQuotation") || !(new String(file).includes("freezeQuotation"))) && (
                             <li className="space-x-2" key={index}>
                               <a
                                 href={file.hasOwnProperty("file") ? file.url : file}
@@ -310,7 +310,7 @@ export default function VeiwBooking() {
               <IoIosArrowDropdownCircle />
             </span>
           </h2>
-          <div className={`p-4 flex ${active === 3 ? "" : "hidden"}`}>
+          <div className={`p-4 ${active === 3 ? "flex" : "hidden"}`}>
             <div className="w-1/2 border-r px-4 border-gray-300">
               <FileUpload
                 label={"Sales Sheet"}
@@ -327,7 +327,8 @@ export default function VeiwBooking() {
                 {doc
                   ? doc.map(
                       (file, index) =>
-                        file.catagory === "freezeQuotation" && (
+
+                          (new String(file).includes("freezeQuotation") || file?.catagory === "freezeQuotation") && (
                           <li className="space-x-2" key={index}>
                             <a
                               href={file.hasOwnProperty("url") ? file.url : file}
