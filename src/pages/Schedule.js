@@ -30,7 +30,8 @@ const AllBookings = () => {
             customerName: <div className="leading-[0.7]">
             <p>{item.customerName}</p> <br />
             <p>{item.pax?.A} A / {item.pax?.C} C</p>
-            </div>,            salesSPOC: item.salesSpoc,
+            </div>,            
+            salesSPOC: item.salesSpoc,
             agent: item.agent,
             arrivalDate: item.arrivalDate.slice(0, 10),
             departureDate:  item.departureDate.slice(0, 10),
@@ -38,7 +39,7 @@ const AllBookings = () => {
             contactDetails: `${item.countryCode} / ${item.whatsappNumber}`,
             orderValue: item.orderValue,
             payment: item.payment,
-            status: <button className="bg-green-400 p-2 rounded-full"></button>,
+            status: <button className={`${item.status === "CANCELLED" ? "bg-red-500" : "bg-green-500"} text-white p-1 m-1 rounded-full`}>{item?.status ? item?.status : "CONFIRMED"}</button>,
             opsSpoc: item.opsSpoc,
             action: <button onClick={() => navigate("/viewAllBooking", { state: item })}><GrFormView /></button>,
             paymentstat: <button className="bg-red-400 p-2 rounded-lg text-white">{item.paymentStatus}</button>,

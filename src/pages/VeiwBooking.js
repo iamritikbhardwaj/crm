@@ -91,7 +91,7 @@ export default function VeiwBooking() {
         }
       );
       if (response.status === 200) {
-        Swal.fire("Trip has been created successfully");
+        Swal.fire("Successfully deleted booking.");
         navigate("/booking");
       } else {
         Swal.fire("Error deleting booking. Please try again later.");
@@ -111,7 +111,8 @@ export default function VeiwBooking() {
   const submit = async () => {
     const formData = new FormData();
     formData.append("data", JSON.stringify(inputData));
-    doc.forEach((doc, index) => {
+
+    doc.forEach((doc) => {
       formData.append(`${doc.catagory}`, doc.file);
     });
     const response = await axios.post(`${API_URL}users/createTrip`, formData, {
@@ -132,7 +133,7 @@ export default function VeiwBooking() {
           }
         );
         if (response.status === 200) {
-          console.log(response, "response");
+          Swal.fire(response.data.MESSAGE);
         } else {
           Swal.fire("Error creating trip. Please try again later.");
           navigate("/booking");
@@ -235,14 +236,6 @@ export default function VeiwBooking() {
                   catagory={"pan"}
                 />
                 <FileUpload
-                  label={"Misceleanious"}
-                  id={"misc"}
-                  onChange={addDoc}
-                  onRemove={removeDoc}
-                  files={doc}
-                  catagory={"misc"}
-                />
-                <FileUpload
                   label={"Email Confirmation"}
                   id={"emailConf"}
                   onChange={addDoc}
@@ -258,7 +251,7 @@ export default function VeiwBooking() {
                   {doc
                     ? doc.map(
                         (file, index) =>
-                          ( (file?.catagory !== "freezeQuotation") || !(new String(file).includes("freezeQuotation"))) && (
+                          !(new String(file).includes("freezeQuotation")) && (
                             <li className="space-x-2" key={index}>
                               <a
                                 href={file.hasOwnProperty("file") ? file.url : file}

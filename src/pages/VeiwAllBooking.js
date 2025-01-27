@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { IoIosArrowDropdownCircle } from "react-icons/io";
 import BackToHome from "../components/BackToHome";
 import { CustomTable } from "../components/customTable/CustomTable";
-import { useLocation } from "react-router-dom";
+import { data, useLocation } from "react-router-dom";
 import { getTravelMonthRange } from "./Booking";
 import FileUpload from "../components/Input/FileUpload";
 import ReconForm from "../components/Form/ReconForm";
@@ -18,7 +18,11 @@ import {
   fetchUsers,
   fetchVendors,
 } from "../components/apiCalls/fetchData";
-import { deletePayment, deleteRecon, deleteVendor } from "../components/apiCalls/deleteData";
+import {
+  deletePayment,
+  deleteRecon,
+  deleteVendor,
+} from "../components/apiCalls/deleteData";
 import { API_URL } from "../AppConstant";
 import axios from "axios";
 import Swal from "sweetalert2";
@@ -30,12 +34,6 @@ export default function VeiwAllBooking() {
   const [active, setActive] = useState(0); // Section toggle
   const [doc, setDoc] = useState(item.documents);
   const [supp, setSupp] = useState([]);
-  const [vendor, setVendor] = useState({
-    name: "",
-    destination: item.destination,
-    bookingStatus: "",
-    paymentStatus: "",
-  });
   const [vendorTable, setVendorTable] = useState([]);
   const inpRef = useRef(null);
   const editForm = useRef(null);
@@ -63,8 +61,8 @@ export default function VeiwAllBooking() {
     (async () => {
       const response = await axios.post(
         `${API_URL}users/createVendor/?id=${vendor.vendor_pay_id}`,
-        vendor,
-      )
+        vendor
+      );
     })();
   };
 
@@ -137,20 +135,70 @@ export default function VeiwAllBooking() {
   const addVoucher = (doc) => {
     (async (doc) => {
       const response = await axios.post(
-        `${API_URL}users/createTrip/?id=${item.tripId}`, doc, {
+        `${API_URL}users/createTrip/?id=${item.tripId}`,
+        doc,
+        {
           withCredentials: true,
           headers: {
             "Content-Type": "multipart/form-data",
-          }
+          },
         }
-      )
-      if(response.status === 200){
+      );
+      if (response.status === 200) {
         Swal.fire(response.data.MESSAGE);
-      }else{
+      } else {
         Swal.fire(response.data.MESSAGE);
       }
     })(doc);
   };
+
+  const updateStatus = async(e) => {
+    const formData = {
+      status : e.target.value
+    }
+    const response = axios.post(`${API_URL}users/updateStatus/?id=${item.tripId}`, formData,
+    {
+      withCredentials: true,
+      headers: {
+        "content-type": "application/json"
+      }
+    });
+    if ((await response).status === 200) {
+      Swal.fire({
+        title: "Status updated successfully",
+        timer: 2000
+      })
+    } else {
+      Swal.fire({
+        text: response.data.MESSAGE,
+        timer: 2000
+      })
+    }
+  }
+
+  const updateOps = async(e) => {
+    const formData = {
+      opsSpoc : e.target.value
+    }
+    const response = axios.post(`${API_URL}users/updateOps/?id=${item.tripId}`, formData,
+    {
+      withCredentials: true,
+      headers: {
+        "content-type": "application/json"
+      }
+    });
+    if ((await response).status === 200) {
+      Swal.fire({
+        title: "Ops updated successfully",
+        timer: 2000
+      })
+    } else {
+      Swal.fire({
+        text: response.data.MESSAGE,
+        timer: 2000
+      })
+    }
+  }
 
   return (
     <div className="p-4">
@@ -159,6 +207,12 @@ export default function VeiwAllBooking() {
         <h1 className="text-2xl font-bold text-center mb-6">
           View Confirmed Booking
         </h1>
+        <div className="flex justify-end">
+          
+          <button className="bg-blue-500 rounded-lg px-2 m-2 text-white py-1">
+            Save Changes
+          </button>
+        </div>
 
         {/* Booking Details */}
         <div className="mb-6">
@@ -178,7 +232,7 @@ export default function VeiwAllBooking() {
               ["Sales Spoc", item.salesSpoc],
               ["Agent", item.agent],
               ["Customer Name", item.customerName],
-              ["Number of Pax", item.pax.A + item.pax.C],
+              ["Number of Pax", item.pax.A + " A " + item.pax.C + " C " + item.pax.Ca ],
               [
                 "Travel Month",
                 getTravelMonthRange(item.arrivalDate, item.departureDate),
@@ -191,9 +245,7 @@ export default function VeiwAllBooking() {
                 "Ops Spoc",
                 <select
                   defaultChecked={item.opsSpoc}
-                  onChange={(e) => {
-                    item.opsSpoc = e.target.value;
-                  }}
+                  onChange={updateOps}
                 >
                   {opsSpoc.length > 0 &&
                     opsSpoc.map((user, index) => (
@@ -202,7 +254,12 @@ export default function VeiwAllBooking() {
                       </option>
                     ))}
                 </select>,
-              ], // ask client where will this come from
+              ],
+              ["Trip Status", <select onChange={updateStatus}>
+                <option value="">Select trip status</option>
+                <option value="CONFIRMED">Confirmed</option>
+                <option value="CANCELLED">Cancelled</option>
+              </select>], // ask client where will this come from
             ].map(([label, value], index) => (
               <div key={index} className="flex space-x-3">
                 <label className="font-semibold">{label}:</label>
@@ -272,14 +329,16 @@ export default function VeiwAllBooking() {
                   {doc
                     ? doc.map(
                         (file, index) =>
-                        (new String(file).includes("freezeQuotation") ? false : true) && (
-                          <li className="space-x-2" key={index}>
+                          !new String(file).includes("freezeQuotation") && (
+                            <li className="space-x-2" key={index}>
                               <a
                                 href={file}
                                 target="_blank"
                                 rel="noopener noreferrer"
                               >
-                            {new String(file).includes('http' || "https") ? splitIt(file) : file?.file.name}
+                                {new String(file).includes("http" || "https")
+                                  ? splitIt(file)
+                                  : file?.file.name}
                               </a>
                               <button
                                 className="text-red-400 rounded-lg cursor-pointer hover:text-red-700"
@@ -491,14 +550,20 @@ export default function VeiwAllBooking() {
                   {doc
                     ? doc.map(
                         (file, index) =>
-                          (new String(file).includes("freezeQuotation") || file?.catagory === "freezeQuotation") && (
+                          new String(file).includes("freezeQuotation") && (
                             <li className="space-x-2" key={index}>
                               <a
-                                href={new String(file).includes("http" || "https") ? file : file?.url}
+                                href={
+                                  new String(file).includes("http" || "https")
+                                    ? file
+                                    : file?.url
+                                }
                                 target="_blank"
                                 rel="noopener noreferrer"
                               >
-                                {new String(file).includes("http" || "https") ? splitIt(file) : file?.file.name}
+                                {new String(file).includes("http" || "https")
+                                  ? splitIt(file)
+                                  : file?.file.name}
                               </a>
                               <button
                                 className="text-red-400 rounded-lg cursor-pointer hover:text-red-700"
@@ -532,24 +597,45 @@ export default function VeiwAllBooking() {
               dest={inputData}
               refetch={refetchSupp}
             />
-            <CustomTable 
+            <CustomTable
               dataa={vendorTable.map((item, index) => ({
                 name: item.name,
                 destination: item.destination,
                 currecy: item.currency,
-                bookingStatus: 
-                <select onChange={(e) => setInputData({name: item.name, destination: item.destination, currecy: item.currency, bookingStatus: e.target.value})}>
-                  <option value={'Approved'}>Approved</option>
-                  <option value={'Pending'}>Pending</option>
-                  <option value={'Rejected'}>Rejected</option>
-                  </select>,
-                paymentStatus: <>
-                <select onChange={(e) => setInputData({name: item.name, destination: item.destination, currecy: item.currency, paymentStatus: e.target.value})}>
-                  <option value={'Paid'}>Paid</option>
-                  <option value={'Unpaid'}>Unpaid</option>
-                  <option value={'Cancelled'}>Cancelled</option>
+                bookingStatus: (
+                  <select
+                    onChange={(e) =>
+                      setInputData({
+                        name: item.name,
+                        destination: item.destination,
+                        currecy: item.currency,
+                        bookingStatus: e.target.value,
+                      })
+                    }
+                  >
+                    <option value={"Approved"}>Approved</option>
+                    <option value={"Pending"}>Pending</option>
+                    <option value={"Rejected"}>Rejected</option>
                   </select>
-                </>,
+                ),
+                paymentStatus: (
+                  <>
+                    <select
+                      onChange={(e) =>
+                        setInputData({
+                          name: item.name,
+                          destination: item.destination,
+                          currecy: item.currency,
+                          paymentStatus: e.target.value,
+                        })
+                      }
+                    >
+                      <option value={"Paid"}>Paid</option>
+                      <option value={"Unpaid"}>Unpaid</option>
+                      <option value={"Cancelled"}>Cancelled</option>
+                    </select>
+                  </>
+                ),
                 action: (
                   <div className="flex justify-around">
                     <button
@@ -570,7 +656,7 @@ export default function VeiwAllBooking() {
                       <MdDelete />
                     </button>
                   </div>
-                )
+                ),
               }))}
               columnss={[
                 { Header: "Name", accessor: "name" },
@@ -631,14 +717,20 @@ export default function VeiwAllBooking() {
               {doc
                 ? doc.map(
                     (file, index) =>
-                      (new String(file).includes("voucher") || file?.catagory === "voucher") && (
+                      new String(file).includes("voucher") && (
                         <li className="space-x-2" key={index}>
                           <a
-                            href={new String(file).includes('http' || "https") ? file : file?.url}
+                            href={
+                              new String(file).includes("http" || "https")
+                                ? file
+                                : file?.url
+                            }
                             target="_blank"
                             rel="noopener noreferrer"
                           >
-                            {new String(file).includes('http' || "https") ? splitIt(file) : file.file.name}
+                            {new String(file).includes("http" || "https")
+                              ? splitIt(file)
+                              : file.file.name}
                           </a>
                           <button
                             className="text-red-400 cursor-pointer hover:text-red-700"

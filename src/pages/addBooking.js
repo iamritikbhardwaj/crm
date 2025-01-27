@@ -113,8 +113,8 @@ const AddBooking = () => {
 
   const bookingSubmit = async (data) => {
     Swal.fire({
-      title: "Loading...",
-      text: "Please wait while we process your request.",
+      title: "Submitting...",
+      text: "Please wait while we create your booking.",
       allowOutsideClick: false,
       didOpen: () => {
         Swal.showLoading();
@@ -147,8 +147,8 @@ const AddBooking = () => {
         Swal.close();
         Swal.fire("Failed to submit the booking");
       } else {
-        Swal.close();
         navigate("/booking");
+        Swal.close();
       }
     } catch (error) {
       console.error("Error submitting the booking:", error);
@@ -159,12 +159,12 @@ const AddBooking = () => {
     }
   };
 
-  useEffect(() => {
+  const errorAlert = () => {
     if (errors !== null) {
       Swal.fire({
         title: "Booking Form",
         text:
-          (currentSection !== 0
+          (currentSection === sections.length - 1
             ? "Creating Booking"
             : "Please Fill all the feilds carefully",
           errors?.agent
@@ -196,7 +196,7 @@ const AddBooking = () => {
         timer: 2000,
       });
     }
-  }, [errors]);
+  };
 
   // ! Navigation Functions
   const goToNext = () => {
@@ -534,7 +534,7 @@ const AddBooking = () => {
             type={currentSection === sections.length - 1 ? "submit" : "button"}
             onClick={
               currentSection === sections.length - 1
-                ? handleSubmit(bookingSubmit)
+                ? errorAlert
                 : goToNext
             }
             // disabled={isSubmitting}
