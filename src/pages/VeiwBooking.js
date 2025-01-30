@@ -27,10 +27,7 @@ export default function VeiwBooking() {
     status: "confirmed",
   });
 
-
-
   useEffect(() => {
-
     (async () => {
       const data = await fetchUsers();
       if (data) {
@@ -91,7 +88,6 @@ export default function VeiwBooking() {
         }
       );
       if (response.status === 200) {
-        Swal.fire("Successfully deleted booking.");
         navigate("/booking");
       } else {
         Swal.fire("Error deleting booking. Please try again later.");
@@ -103,7 +99,7 @@ export default function VeiwBooking() {
   };
 
   const splitIt = (str) => {
-    const data = new String(str).split("/")
+    const data = new String(str).split("/");
     const result = data[data.length - 1];
     return result;
   };
@@ -182,6 +178,7 @@ export default function VeiwBooking() {
                     setInputData({ ...inputData, opsSpoc: e.target.value });
                   }}
                 >
+                  <option defaultChecked={""}>Select opsSpoc</option>
                   {opsSpoc.length > 0 &&
                     opsSpoc.map((user, index) => (
                       <option key={index} value={user.name}>
@@ -251,14 +248,18 @@ export default function VeiwBooking() {
                   {doc
                     ? doc.map(
                         (file, index) =>
-                          !(new String(file).includes("freezeQuotation")) && (
+                          !new String(file).includes("freezeQuotation") && (
                             <li className="space-x-2" key={index}>
                               <a
-                                href={file.hasOwnProperty("file") ? file.url : file}
+                                href={
+                                  file.hasOwnProperty("file") ? file.url : file
+                                }
                                 target="_blank"
                                 rel="noopener noreferrer"
                               >
-                                {file.hasOwnProperty("file") ? file.file.name : splitIt(file)}
+                                {file.hasOwnProperty("file")
+                                  ? file.file.name
+                                  : splitIt(file)}
                               </a>
                               <button
                                 className="text-red-400 rounded-lg cursor-pointer hover:text-red-700"
@@ -320,15 +321,19 @@ export default function VeiwBooking() {
                 {doc
                   ? doc.map(
                       (file, index) =>
-
-                          (new String(file).includes("freezeQuotation") || file?.catagory === "freezeQuotation") && (
+                        (new String(file).includes("freezeQuotation") ||
+                          file?.catagory === "freezeQuotation") && (
                           <li className="space-x-2" key={index}>
                             <a
-                              href={file.hasOwnProperty("url") ? file.url : file}
+                              href={
+                                file.hasOwnProperty("url") ? file.url : file
+                              }
                               target="_blank"
                               rel="noopener noreferrer"
                             >
-                              {file.hasOwnProperty("file")? file.file.name: splitIt(file)}
+                              {file.hasOwnProperty("file")
+                                ? file.file.name
+                                : splitIt(file)}
                             </a>
                             <button
                               className="text-red-400 cursor-pointer hover:text-red-700"
