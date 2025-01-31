@@ -114,7 +114,7 @@ export default function VeiwBooking() {
     const response = await axios.post(`${API_URL}users/createTrip`, formData, {
       withCredentials: true,
       headers: {
-        "Content-Type": "application/json",
+        "Content-Type": "multipart/form-data",
       },
     });
     if (response.status === 200) {
