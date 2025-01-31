@@ -107,6 +107,10 @@ export default function VeiwBooking() {
   const submit = async () => {
     const formData = new FormData();
     formData.append("data", JSON.stringify(inputData));
+    if (data.opsSpoc === "") {
+      Swal.fire("Please select an ops spoc");
+      return;
+    }
 
     doc.forEach((doc) => {
       formData.append(`${doc.catagory}`, doc.file);
