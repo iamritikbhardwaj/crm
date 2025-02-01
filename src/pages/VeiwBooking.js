@@ -8,6 +8,7 @@ import { API_URL } from "../AppConstant";
 import Swal from "sweetalert2";
 import FileUpload from "../components/Input/FileUpload";
 import { fetchUsers } from "../components/apiCalls/fetchData";
+import { deleteBooking } from "../components/apiCalls/deleteData";
 
 export default function VeiwBooking() {
   // data from table on previous page
@@ -64,31 +65,34 @@ export default function VeiwBooking() {
 
   // Accept Booking is to set booking status to confirmed also add salesSpoc
   const acceptBooking = async () => {
-    await submit();
     Swal.fire({
-      icon: "success",
-      title: "Trip has been created!",
-      showConfirmButton: false,
-      timer: 1500,
-    }).then(async () => {
-      rejectBooking();
+      title: "Submitting...",
+      text: "Please wait while we move your booking.",
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading();
+      },
     });
+    const res = await submit();
+    if (res === true) {
+      Swal.close();
+      navigate("/booking");
+      Swal.fire({
+        icon: "success",
+        title: "Trip has been created!",
+        showConfirmButton: false,
+        timer: 1500,
+      });
+    }
   };
 
   // Reject Booking is to delete the booking
   const rejectBooking = async () => {
     try {
-      const response = await axios.delete(
-        `${API_URL}users/deleteBooking/${data.booking_id}`,
-        {
-          withCredentials: true,
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const response = await deleteBooking(data.booking_id);
       if (response.status === 200) {
         navigate("/booking");
+        Swal.close();
       } else {
         Swal.fire("Error deleting booking. Please try again later.");
         navigate("/booking");
@@ -107,40 +111,28 @@ export default function VeiwBooking() {
   const submit = async () => {
     const formData = new FormData();
     formData.append("data", JSON.stringify(inputData));
-    if (data.opsSpoc === "") {
+    if (inputData.opsSpoc === "") {
+      Swal.close();
       Swal.fire("Please select an ops spoc");
-      return;
-    }
-
-    doc.forEach((doc) => {
-      formData.append(`${doc.catagory}`, doc.file);
-    });
-    const response = await axios.post(`${API_URL}users/createTrip`, formData, {
-      withCredentials: true,
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    });
-    if (response.status === 200) {
-      (async (data) => {
-        const response = await axios.get(
-          `${API_URL}users/deleteBooking/${data.booking_id}`,
-          {
-            withCredentials: true,
-            headers: {
-              "content-type": "multipart/form-data",
-            },
-          }
-        );
-        if (response.status === 200) {
-          Swal.fire(response.data.MESSAGE);
-        } else {
-          Swal.fire("Error creating trip. Please try again later.");
-          navigate("/booking");
-        }
-      })(data);
-    }
+      return false;
+    } else {
+      doc.forEach((doc) => {
+        formData.append(`${doc.catagory}`, doc.file);
+      });
+      console.log("still working");
+      const response = await axios.post(`${API_URL}users/createTrip`, formData, {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      if (response.status === 200) {
+       
+          await deleteBooking(data.booking_id);
+          return true;
+      }
   };
+}
 
   return (
     <div className="p-4">
@@ -247,7 +239,7 @@ export default function VeiwBooking() {
               </div>
 
               {/* Document Preview */}
-              <div className="w-1/2 pl-4">
+              <div className="w-1/2 pl-4 overflow-auto">
                 <ul>
                   {doc
                     ? doc.map(

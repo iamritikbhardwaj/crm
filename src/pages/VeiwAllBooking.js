@@ -132,26 +132,6 @@ export default function VeiwAllBooking() {
     setDoc(updatedDoc);
   };
 
-  const addVoucher = (doc) => {
-    (async (doc) => {
-      const response = await axios.post(
-        `${API_URL}users/createTrip/?id=${item.tripId}`,
-        doc,
-        {
-          withCredentials: true,
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-      if (response.status === 200) {
-        Swal.fire(response.data.MESSAGE);
-      } else {
-        Swal.fire(response.data.MESSAGE);
-      }
-    })(doc);
-  };
-
   const updateStatus = async(e) => {
     const formData = {
       status : e.target.value
@@ -200,6 +180,34 @@ export default function VeiwAllBooking() {
     }
   }
 
+  const updateDocs = async () => {
+    const formData = new FormData();
+    doc.forEach((doc) => {
+      if (doc.file) {
+        formData.append(`${doc.catagory}`, doc.file);
+      } else {
+        formData.append("documents", doc);
+      }
+    });
+    console.log(JSON.stringify(doc), "still working");
+    
+    const response = await axios.post(
+      `${API_URL}users/updateDocs/?id=${item.tripId}`,
+      formData,
+      {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+    if (response.status === 200) {
+      Swal.fire(response.data.MESSAGE);
+    } else {
+      Swal.fire(response.data.MESSAGE);
+    }
+  };
+
   return (
     <div className="p-4">
       <BackToHome path={"/schedule"} />
@@ -209,7 +217,7 @@ export default function VeiwAllBooking() {
         </h1>
         <div className="flex justify-end">
           
-          <button className="bg-blue-500 rounded-lg px-2 m-2 text-white py-1">
+          <button onClick={updateDocs} className="bg-blue-500 rounded-lg px-2 m-2 text-white py-1">
             Save Changes
           </button>
         </div>
@@ -744,14 +752,6 @@ export default function VeiwAllBooking() {
                 : "No documents uploaded"}
             </ul>
           </div>
-          <button
-            onClick={() => {
-              addVoucher(doc);
-            }}
-            className="bg-blue-500 text-white px-4 py-2 rounded"
-          >
-            Save
-          </button>
         </div>
       </div>
     </div>
