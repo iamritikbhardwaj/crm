@@ -92,8 +92,8 @@ export const fetchBookings = async () => {
   }
 };
 
-export const fetchTrips = async () => {
-  const response = await axios.get(`${API_URL}users/getAllTrips`, {
+export const fetchTrips = async (id) => {
+  const response = await axios.get(`${API_URL}users/getAllTrips${id ? "/?id=" + id : ""}`, {
     withCredentials: true,
     headers: {
       "content-type": "application/json",

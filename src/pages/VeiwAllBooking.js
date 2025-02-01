@@ -26,13 +26,14 @@ import {
 import { API_URL } from "../AppConstant";
 import axios from "axios";
 import Swal from "sweetalert2";
+import ExcelToTable from "../components/customTable/ExcelToTable";
 
 export default function VeiwAllBooking() {
   const location = useLocation();
   const [item, setItem] = useState(location.state);
   console.log(item, "item");
   const [active, setActive] = useState(0); // Section toggle
-  const [doc, setDoc] = useState(item.documents);
+  const [doc, setDoc] = useState(item?.documents);
   const [supp, setSupp] = useState([]);
   const [vendorTable, setVendorTable] = useState([]);
   const inpRef = useRef(null);
@@ -43,6 +44,17 @@ export default function VeiwAllBooking() {
   const [opsSpoc, setOpsSpoc] = useState([]);
   const [inputData, setInputData] = useState(null);
   const [recon, setRecon] = useState([]);
+
+  
+  const [selectedExcel, setSelectedExcel] = useState(doc.filter((doc) => doc.catagory === "freezeQuotation"));
+
+
+  const refetch = async () => {
+    const itemData = await fetchTrips(location.state?.tripId);
+    setItem(itemData);
+  }
+
+ 
 
   const refetchCom = async () => {
     const reconData = await fetchRecon();
@@ -83,11 +95,9 @@ export default function VeiwAllBooking() {
     setVendorTable(vendorData);
 
     const supData = await fetchSuppliers();
-    const final = supData.filter(
-      (sup) => sup.destination_id === destData[0].destination_id
-    );
 
-    setSupp(final);
+    setSupp(supData);
+    console.log(supp, "supp");
     setInputData(destData[0]);
   };
 
@@ -144,6 +154,7 @@ export default function VeiwAllBooking() {
       }
     });
     if ((await response).status === 200) {
+      await refetch();
       Swal.fire({
         title: "Status updated successfully",
         timer: 2000
@@ -168,6 +179,7 @@ export default function VeiwAllBooking() {
       }
     });
     if ((await response).status === 200) {
+      await refetch();
       Swal.fire({
         title: "Ops updated successfully",
         timer: 2000
@@ -202,6 +214,7 @@ export default function VeiwAllBooking() {
       }
     );
     if (response.status === 200) {
+      await refetch();
       Swal.fire(response.data.MESSAGE);
     } else {
       Swal.fire(response.data.MESSAGE);
@@ -240,19 +253,19 @@ export default function VeiwAllBooking() {
               ["Sales Spoc", item.salesSpoc],
               ["Agent", item.agent],
               ["Customer Name", item.customerName],
-              ["Number of Pax", item.pax.A + " A " + item.pax.C + " C " + item.pax.Ca ],
+              ["Number of Pax", item.pax.A + " A "+ "/ " + item.pax.C + " C " + "-" + (item.pax?.Ca === undefined ? "" : item.pax.Ca )],
               [
                 "Travel Month",
-                getTravelMonthRange(item.arrivalDate, item.departureDate),
+                getTravelMonthRange(item.arrivalDate),
               ],
-              ["Arrival Date", item.arrivalDate.slice(0, 10)],
-              ["Departure Date", item.departureDate.slice(0, 10)],
-              ["Booking Date", item.bookingDate.slice(0, 10)],
+              ["Arrival Date", item.arrivalDate.slice(0, 10).split("-")[2] + " " + getTravelMonthRange(item.arrivalDate)],
+              ["Departure Date", item.departureDate.slice(0, 10).split("-")[2] + " " + getTravelMonthRange(item.departureDate)],
+              ["Booking Date", item.bookingDate.slice(0, 10).split("-")[2] + " " + getTravelMonthRange(item.bookingDate)],
               ["WhatsApp Number", item.countryCode + " " + item.whatsappNumber],
               [
                 "Ops Spoc",
                 <select
-                  defaultChecked={item.opsSpoc}
+                  value={item?.opsSpoc}
                   onChange={updateOps}
                 >
                   {opsSpoc.length > 0 &&
@@ -264,7 +277,6 @@ export default function VeiwAllBooking() {
                 </select>,
               ],
               ["Trip Status", <select onChange={updateStatus}>
-                <option value="">Select trip status</option>
                 <option value="CONFIRMED">Confirmed</option>
                 <option value="CANCELLED">Cancelled</option>
               </select>], // ask client where will this come from
@@ -541,6 +553,9 @@ export default function VeiwAllBooking() {
             </span>
           </h2>
           <div className={`p-4 ${active === 3 ? "flex-col" : "hidden"} h-fit`}>
+            <div>
+             { ExcelToTable(selectedExcel[selectedExcel.length -1])}
+            </div>
             <div className="flex gap-4">
               <div className="w-1/2">
                 <FileUpload
@@ -557,8 +572,9 @@ export default function VeiwAllBooking() {
                 <ul>
                   {doc
                     ? doc.map(
-                        (file, index) =>
-                          new String(file).includes("freezeQuotation") && (
+                        (file, index) => 
+                          new String(file).includes("freezeQuotation") && 
+                          (
                             <li className="space-x-2" key={index}>
                               <a
                                 href={
@@ -592,7 +608,7 @@ export default function VeiwAllBooking() {
         {/* vendor details */}
         <div className="mb-6">
           <h2 className="text-lg font-semibold bg-gray-200 p-2 rounded flex justify-between">
-            Vendor Details
+            Supplier Details
             <span onClick={() => setActive(active === 4 ? null : 4)}>
               <IoIosArrowDropdownCircle />
             </span>
@@ -688,37 +704,31 @@ export default function VeiwAllBooking() {
           </span>
         </h2>
         <div className={`p-4 ${active === 5 ? "flex" : "hidden"} min-h-36`}>
-          <div className="w-1/2 my-auto h-full border-r-[1px] border-slate-400">
-            <div className="flex gap-4 align-middle">
+          <div className="w-1/2 my-auto px-2 h-full border-r-[1px] space-y-2 border-slate-400">
               <FileUpload
                 label={"Hotel Voucher"}
                 id={"hotel-voucher"}
                 onChange={addDoc}
                 onRemove={removeDoc}
                 files={doc}
-                catagory={"voucher"}
+                catagory={"hotel-voucher"}
               />
-            </div>
-            <div className="flex gap-4 align-middle">
               <FileUpload
                 label={"Activities Voucher"}
                 id={"activities-voucher"}
                 onChange={addDoc}
                 onRemove={removeDoc}
                 files={doc}
-                catagory={"voucher"}
+                catagory={"activities-voucher"}
               />
-            </div>
-            <div className="flex gap-4 align-middle">
               <FileUpload
                 label={"Miscellaneous Voucher"}
                 id={"misc-voucher"}
                 onChange={addDoc}
                 onRemove={removeDoc}
                 files={doc}
-                catagory={"voucher"}
+                catagory={"misc-voucher"}
               />
-            </div>
           </div>
           <div className="w-1/2">
             <ul>

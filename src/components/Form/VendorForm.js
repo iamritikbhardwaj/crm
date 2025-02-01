@@ -4,6 +4,7 @@ import React, { useEffect } from 'react'
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { API_URL } from '../../AppConstant';
+import { fetchDestinations } from '../apiCalls/fetchData';
 
 function VendorForm({supplier, dest, refetch, tripId, setInputData}) {
 
@@ -28,16 +29,23 @@ function VendorForm({supplier, dest, refetch, tripId, setInputData}) {
         }
       });
 
-      useEffect(() => {
-        (async () => {
-          await refetch();
-          setValue("currency", dest?.currency);
-        })()
-        setValue("destination", dest?.destination);
-        setValue("tripId", tripId);
-      }, []);
+      // useEffect(() => {
+      //   (async () => {
+      //     await refetch();
+      //     setValue("currency", await fetchDestinations(supplier?.destination_id).currency);
+      //   })()
+      //   setValue("destination", dest?.destination);
+      //   setValue("tripId", tripId);
+      // }, []);
 
       console.log(errors, 'errors');
+
+      const handleChange = (e) => {
+        const dest = fetchDestinations().filter( (des) => [...supplier].filter( sup => sup.name === e.target.value)[0].destination_id === des.destination_id)[0];
+        setValue("destination", new String(dest?.destination));
+        setValue("currency", new String(dest?.currency));
+        setValue("tripId", tripId);
+      }
 
       const vendorSubmit = (data) => {
           (async (data) => {
@@ -66,6 +74,7 @@ function VendorForm({supplier, dest, refetch, tripId, setInputData}) {
                 placeholder="Search vendor..."
                 list="vendorList"
                 {...register("name")}
+                onChange={handleChange}
               >
                 <option value="">Select a vendor</option>
                 {supplier &&

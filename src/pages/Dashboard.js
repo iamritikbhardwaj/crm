@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Bar, Pie, Line } from "react-chartjs-2";
+import { Bar, Pie } from "react-chartjs-2";
 import "chart.js/auto"; // Required for Chart.js v3+ compatibility
 import BackToHome from "../components/BackToHome";
 import UserActivityTable from "../components/charts/userVsActivity";
