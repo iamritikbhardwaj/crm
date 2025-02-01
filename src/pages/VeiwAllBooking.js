@@ -186,7 +186,7 @@ export default function VeiwAllBooking() {
       if (doc.file) {
         formData.append(`${doc.catagory}`, doc.file);
       } else {
-        formData.append("documents", doc);
+        formData.append("docs", doc);
       }
     });
     console.log(JSON.stringify(doc), "still working");
