@@ -3,12 +3,13 @@ import * as XLSX from 'xlsx';
 import { CustomTable } from './CustomTable'; // Assuming CustomTable is in the same folder
 
 function ExcelToTable(fileUrl) {
+  console.log(fileUrl, "fileUrl");
   const [filesData, setFilesData] = useState([]); // Array to store data of multiple files
   const [selectedFileIndex, setSelectedFileIndex] = useState(null); // Index of the currently displayed file
 
   // Fetch the Excel file from the URL and convert it to data
   useEffect(() => {
-    if (fileUrl) {
+    if (new String(fileUrl).includes('http')) {
       fetchExcelData(fileUrl);
     }
   }, [fileUrl]);
@@ -18,10 +19,10 @@ function ExcelToTable(fileUrl) {
       const response = await fetch(url);
       const arrayBuffer = await response.arrayBuffer();
       const workbook = XLSX.read(arrayBuffer, { type: 'array' });
-      console.log(workbook, "workbook");
 
       const worksheet = workbook.Sheets[workbook.SheetNames[0]];
       const sheetData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+      console.log(sheetData, "sheetData");
 
       const headers = sheetData[0].map((header, index) => ({
         Header: header ? String(header) : `Column ${index + 1}`, // Convert to string and handle nulls

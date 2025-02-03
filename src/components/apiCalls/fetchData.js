@@ -152,3 +152,17 @@ export const fetchVendors = async () => {
   }
 };
 
+export const fetchSalesDocs = async (id) => {
+  const response = await axios.get(`${API_URL}users/getSalesDocs${id ? "/?id=" + id : ""}`, {
+    withCredentials: true,
+    headers: {
+      "content-type": "application/json",
+    },
+  });
+  if (response.status === 200) {
+    return response.data.OUTPUT;
+  } else {
+    alert(response.data.MESSAGE);
+    return false;
+  }
+}

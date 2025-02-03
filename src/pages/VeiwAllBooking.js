@@ -13,6 +13,7 @@ import {
   fetchDestinations,
   fetchPayment,
   fetchRecon,
+  fetchSalesDocs,
   fetchSuppliers,
   fetchTrips,
   fetchUsers,
@@ -31,7 +32,6 @@ import ExcelToTable from "../components/customTable/ExcelToTable";
 export default function VeiwAllBooking() {
   const location = useLocation();
   const [item, setItem] = useState(location.state);
-  console.log(item, "item");
   const [active, setActive] = useState(0); // Section toggle
   const [doc, setDoc] = useState(item?.documents);
   const [supp, setSupp] = useState([]);
@@ -46,21 +46,17 @@ export default function VeiwAllBooking() {
   const [recon, setRecon] = useState([]);
 
   
-  const [selectedExcel, setSelectedExcel] = useState(doc.filter((doc) => doc.catagory === "freezeQuotation"));
-
+  const [selectedExcel, setSelectedExcel] = useState([]);
 
   const refetch = async () => {
     const itemData = await fetchTrips(location.state?.tripId);
     setItem(itemData);
   }
 
- 
-
   const refetchCom = async () => {
     const reconData = await fetchRecon();
     if (reconData) {
       setRecon(reconData);
-      console.log(recon, "recon");
     }
 
     const payData = await fetchPayment();
@@ -97,9 +93,14 @@ export default function VeiwAllBooking() {
     const supData = await fetchSuppliers();
 
     setSupp(supData);
-    console.log(supp, "supp");
     setInputData(destData[0]);
   };
+
+  const handleFreezeQuotationClick = (e) => {
+    e.preventDefault();
+    setSelectedExcel(e.target.href);
+    console.log(e.target.href);
+  }
 
   useEffect(() => {
     try {
@@ -112,6 +113,8 @@ export default function VeiwAllBooking() {
         setItem(itemData.filter((trip) => trip.tripId === item.tripId)[0]);
         refetchCom();
         refetchSupp();
+        const sdata = await fetchSalesDocs(item.tripId)
+        setSelectedExcel(sdata[sdata.length - 1]);
       })();
     } catch (error) {
       console.log(error);
@@ -201,7 +204,6 @@ export default function VeiwAllBooking() {
         formData.append("docs", doc);
       }
     });
-    console.log(JSON.stringify(doc), "still working");
     
     const response = await axios.post(
       `${API_URL}users/updateDocs/?id=${item.tripId}`,
@@ -554,7 +556,7 @@ export default function VeiwAllBooking() {
           </h2>
           <div className={`p-4 ${active === 3 ? "flex-col" : "hidden"} h-fit`}>
             <div>
-             { ExcelToTable(selectedExcel[selectedExcel.length -1])}
+             { ExcelToTable(selectedExcel)}
             </div>
             <div className="flex gap-4">
               <div className="w-1/2">
@@ -577,6 +579,7 @@ export default function VeiwAllBooking() {
                           (
                             <li className="space-x-2" key={index}>
                               <a
+                                onClick={handleFreezeQuotationClick}
                                 href={
                                   new String(file).includes("http" || "https")
                                     ? file
