@@ -1,77 +1,102 @@
+import { set } from 'mongoose';
 import React, { useState, useEffect } from 'react';
 import * as XLSX from 'xlsx';
-import { CustomTable } from './CustomTable'; // Assuming CustomTable is in the same folder
 
-function ExcelToTable(fileUrl) {
-  console.log(fileUrl, "fileUrl");
+let transferPrice = 0;
+function ExcelToTable({url, setPrice}) {
+  console.log(url, "url");
   const [filesData, setFilesData] = useState([]); // Array to store data of multiple files
   const [selectedFileIndex, setSelectedFileIndex] = useState(null); // Index of the currently displayed file
-
   // Fetch the Excel file from the URL and convert it to data
   useEffect(() => {
-    if (new String(fileUrl).includes('http')) {
-      fetchExcelData(fileUrl);
+    if (new String(url).includes('http')) {
+      fetchExcelData(url);
     }
-  }, [fileUrl]);
+  }, [url]);
 
   const fetchExcelData = async (url) => {
     try {
       const response = await fetch(url);
       const arrayBuffer = await response.arrayBuffer();
       const workbook = XLSX.read(arrayBuffer, { type: 'array' });
-
-      const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+  
+      const firstSheetName = workbook.SheetNames[0]; // Get the first sheet name
+      const worksheet = workbook.Sheets[firstSheetName];
+  
+      // Convert sheet to JSON (array format, keeping all data intact)
       const sheetData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
-      console.log(sheetData, "sheetData");
-
+  
+      if (!sheetData || sheetData.length === 0) {
+        console.error('Empty sheet or unreadable data');
+        return;
+      }
+  
+      console.log(sheetData, "Extracted Sheet Data");
+  
+      // Extract headers (row 0), ensuring no null headers
       const headers = sheetData[0].map((header, index) => ({
-        Header: header ? String(header) : `Column ${index + 1}`, // Convert to string and handle nulls
-        accessor: header
-          ? String(header).toLowerCase().replace(/\s+/g, '_')
-          : `column_${index}`, // Unique keys for null headers
+        Header: header ? String(header) : `Column ${index + 1}`,
+        accessor: header ? String(header).toLowerCase().replace(/\s+/g, '_') : `column_${index}`,
       }));
-
+  
+      // Extract data (from row 1 onward)
       const rows = sheetData.slice(1).map((row) =>
-        row.reduce((acc, cell, index) => {
-          acc[headers[index].accessor] = cell;
+        headers.reduce((acc, column, index) => {
+          acc[column.accessor] = row[index] !== undefined ? row[index] : ''; // Handle empty cells
           return acc;
         }, {})
       );
-
-      const newFileData = {
-        fileName: url.split('/').pop(), // Use the file name from the URL
-        columns: headers,
-        data: rows,
-      };
-
-      setFilesData([newFileData]);
-      setSelectedFileIndex(0); // Automatically display the first (and only) file
+  
+      setFilesData([{ fileName: url.split('/').pop(), columns: headers, data: rows }]);
+      setSelectedFileIndex(0);
+  
     } catch (error) {
       console.error('Error fetching or parsing Excel file:', error);
     }
   };
-
-  const handleRemoveFile = () => {
-    setFilesData([]); // Clear filesData if you want to remove the displayed file
-    setSelectedFileIndex(null);
+  
+  const ExcelLikeTable = ({ data, columns }) => {
+    return (
+      <div className="overflow-x-auto">
+        <table className="min-w-full table-auto text-sm border-collapse border">
+          <thead className="bg-gray-200 border-b">
+            <tr>
+              {columns.map((column, index) => (
+                <th key={index} className="px-2 py-1 text-center font-medium text-gray-700 border">
+                  {column.Header}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {data.length > 0 ? (
+              data.map((row, rowIndex) => (
+                <tr key={rowIndex} className="border-b">
+                  {columns.map((column, colIndex) => {
+                    if(data.length - 1 === rowIndex && columns.length - 2 === colIndex){
+                      setPrice(row[column.accessor]);
+                    }
+                    return(
+                    <td key={colIndex} className={`px-4 py-2 border ${data.length - 1 === rowIndex ? 'font-extrabold' : ''}`}>{row[column.accessor] ? (new String(row[column.accessor]).includes('.') ? new String(row[column.accessor]).split('.')[0] + '.' + new String(row[column.accessor]).split('.')[1].slice(0, 2) : row[column.accessor] ) : ' '}</td>
+                  )})}
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={columns.length} className="px-4 py-2 text-center text-gray-500">
+                  No data available
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    );
   };
 
   return (
     <div className="p-4">
       <h1 className="text-lg font-bold mb-4">Sales Sheet Preview</h1>
-
-      {filesData.length > 0 && (
-        <div className="mb-4">
-          <h2 className="text-md font-semibold mb-2">File:</h2>
-          <span className="text-black">{filesData[0].fileName}</span>
-          <button
-            onClick={handleRemoveFile}
-            className="ml-4 bg-red-500 text-white px-2 py-1 rounded hover:bg-red-700"
-          >
-            Remove
-          </button>
-        </div>
-      )}
 
       {selectedFileIndex !== null && filesData[selectedFileIndex] && (
         <div>
@@ -79,14 +104,9 @@ function ExcelToTable(fileUrl) {
             Displaying: {filesData[selectedFileIndex].fileName}
           </h2>
           <div>
-            <CustomTable
-              className="overflow-x-auto"
-              dataa={filesData[selectedFileIndex].data}
-              columnss={filesData[selectedFileIndex].columns}
-              button={false}
-              path="/"
-              size="text-sm"
-              hideFilter={true}
+            <ExcelLikeTable
+              data={filesData[selectedFileIndex].data}
+              columns={filesData[selectedFileIndex].columns}
             />
           </div>
         </div>
@@ -94,5 +114,5 @@ function ExcelToTable(fileUrl) {
     </div>
   );
 }
-
+export {transferPrice};
 export default ExcelToTable;

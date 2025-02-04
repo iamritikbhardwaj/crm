@@ -116,9 +116,7 @@ function CustomTable({ dataa, columnss, button, path, size, hideFilter }) {
           {'>'}
         </button>
         <button onClick={() => gotoPage(pageCount - 1)} disabled={!canNextPage} className="bg-slate-800 text-white p-2 rounded-lg mx-2 hover:bg-slate-300">{'>>'}</button>
-        
       </div>}
-      
     </div>
   );
 }

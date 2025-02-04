@@ -34,12 +34,17 @@ export default function VeiwAllBooking() {
   const [item, setItem] = useState(location.state);
   const [active, setActive] = useState(0); // Section toggle
   const [doc, setDoc] = useState(item?.documents);
+  console.log(doc, "doc");
   const [supp, setSupp] = useState([]);
   const [vendorTable, setVendorTable] = useState([]);
+  const [transferPrice, setTransferPrice] = useState();
+
+  const setPrice = (price) => {
+    setTransferPrice(price);
+  } 
   const inpRef = useRef(null);
   const editForm = useRef(null);
   const [payment, setPayment] = useState([]);
-
   // Predefined booking data
   const [opsSpoc, setOpsSpoc] = useState([]);
   const [inputData, setInputData] = useState(null);
@@ -74,8 +79,9 @@ export default function VeiwAllBooking() {
     })();
   };
 
+
   const splitIt = (str) => {
-    const data = str.split("/");
+    const data = new String(str).split("/");
     const result = data[data.length - 1];
     return result;
   };
@@ -120,6 +126,10 @@ export default function VeiwAllBooking() {
       console.log(error);
     }
   }, []);
+
+  useEffect(() => {
+    console.log(transferPrice, "transferPrice");
+  })
 
   // Handle file upload
   const addDoc = (e, catagory) => {
@@ -360,7 +370,7 @@ export default function VeiwAllBooking() {
                               >
                                 {new String(file).includes("http" || "https")
                                   ? splitIt(file)
-                                  : file?.file.name}
+                                  : file?.file?.name}
                               </a>
                               <button
                                 className="text-red-400 rounded-lg cursor-pointer hover:text-red-700"
@@ -391,7 +401,7 @@ export default function VeiwAllBooking() {
               <p className="font-semibold">
                 Order Value (USD): {item.orderValue}
               </p>
-              <p className="font-semibold">Transfer Price(USD): 2000</p>
+              <p className="font-semibold">Transfer Price(USD): {new String(transferPrice).split(".")[0] + "." + new String(transferPrice).split(".")[1].slice(0, 2)}</p>
             </div>
             {/* Payment Details Table */}
             <div className="mb-4">
@@ -556,7 +566,9 @@ export default function VeiwAllBooking() {
           </h2>
           <div className={`p-4 ${active === 3 ? "flex-col" : "hidden"} h-fit`}>
             <div>
-             { ExcelToTable(selectedExcel)}
+             <ExcelToTable
+             url={selectedExcel}
+             setPrice={setPrice} />
             </div>
             <div className="flex gap-4">
               <div className="w-1/2">
