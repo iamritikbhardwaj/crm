@@ -33,8 +33,7 @@ export default function VeiwAllBooking() {
   const location = useLocation();
   const [item, setItem] = useState(location.state);
   const [active, setActive] = useState(0); // Section toggle
-  const [doc, setDoc] = useState(item?.documents);
-  console.log(doc, "doc");
+  const [doc, setDoc] = useState();
   const [supp, setSupp] = useState([]);
   const [vendorTable, setVendorTable] = useState([]);
   const [transferPrice, setTransferPrice] = useState();
@@ -54,8 +53,9 @@ export default function VeiwAllBooking() {
   const [selectedExcel, setSelectedExcel] = useState([]);
 
   const refetch = async () => {
-    const itemData = await fetchTrips(location.state?.tripId);
-    setItem(itemData);
+    const itemData = await fetchTrips(location.state.tripId);
+    setDoc(itemData?.documents);
+    return itemData;
   }
 
   const refetchCom = async () => {
@@ -105,7 +105,6 @@ export default function VeiwAllBooking() {
   const handleFreezeQuotationClick = (e) => {
     e.preventDefault();
     setSelectedExcel(e.target.href);
-    console.log(e.target.href);
   }
 
   useEffect(() => {
@@ -119,6 +118,7 @@ export default function VeiwAllBooking() {
         setItem(itemData.filter((trip) => trip.tripId === item.tripId)[0]);
         refetchCom();
         refetchSupp();
+        refetch();
         const sdata = await fetchSalesDocs(item.tripId)
         setSelectedExcel(sdata[sdata.length - 1]);
       })();
@@ -206,6 +206,14 @@ export default function VeiwAllBooking() {
   }
 
   const updateDocs = async () => {
+    Swal.fire({
+      title: "Submitting...",
+      text: "Please wait while we update your documents.",
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading();
+      },
+    })
     const formData = new FormData();
     doc.forEach((doc) => {
       if (doc.file) {
@@ -227,8 +235,10 @@ export default function VeiwAllBooking() {
     );
     if (response.status === 200) {
       await refetch();
+      Swal.close();
       Swal.fire(response.data.MESSAGE);
     } else {
+      Swal.close();
       Swal.fire(response.data.MESSAGE);
     }
   };
@@ -361,7 +371,8 @@ export default function VeiwAllBooking() {
                   {doc
                     ? doc.map(
                         (file, index) =>
-                          !new String(file).includes("freezeQuotation") && (
+                          !new String(file).includes("freezeQuotation") && !new String(file).includes("voucher") && 
+                          (
                             <li className="space-x-2" key={index}>
                               <a
                                 href={file}
@@ -401,7 +412,7 @@ export default function VeiwAllBooking() {
               <p className="font-semibold">
                 Order Value (USD): {item.orderValue}
               </p>
-              <p className="font-semibold">Transfer Price(USD): {new String(transferPrice).split(".")[0] + "." + new String(transferPrice).split(".")[1].slice(0, 2)}</p>
+              <p className="font-semibold">Transfer Price(USD): {parseFloat(transferPrice).toFixed(2)}</p>
             </div>
             {/* Payment Details Table */}
             <div className="mb-4">
@@ -592,17 +603,13 @@ export default function VeiwAllBooking() {
                             <li className="space-x-2" key={index}>
                               <a
                                 onClick={handleFreezeQuotationClick}
-                                href={
-                                  new String(file).includes("http" || "https")
-                                    ? file
-                                    : file?.url
-                                }
+                                href={file}
                                 target="_blank"
                                 rel="noopener noreferrer"
                               >
                                 {new String(file).includes("http" || "https")
                                   ? splitIt(file)
-                                  : file?.file.name}
+                                  : file?.file?.name}
                               </a>
                               <button
                                 className="text-red-400 rounded-lg cursor-pointer hover:text-red-700"
@@ -722,27 +729,27 @@ export default function VeiwAllBooking() {
           <div className="w-1/2 my-auto px-2 h-full border-r-[1px] space-y-2 border-slate-400">
               <FileUpload
                 label={"Hotel Voucher"}
-                id={"hotel-voucher"}
+                id={"hotelvoucher"}
                 onChange={addDoc}
                 onRemove={removeDoc}
                 files={doc}
-                catagory={"hotel-voucher"}
+                catagory={"hotelvoucher"}
               />
               <FileUpload
                 label={"Activities Voucher"}
-                id={"activities-voucher"}
+                id={"activitiesvoucher"}
                 onChange={addDoc}
                 onRemove={removeDoc}
                 files={doc}
-                catagory={"activities-voucher"}
+                catagory={"activitiesvoucher"}
               />
               <FileUpload
                 label={"Miscellaneous Voucher"}
-                id={"misc-voucher"}
+                id={"miscvoucher"}
                 onChange={addDoc}
                 onRemove={removeDoc}
                 files={doc}
-                catagory={"misc-voucher"}
+                catagory={"miscvoucher"}
               />
           </div>
           <div className="w-1/2">
@@ -750,23 +757,20 @@ export default function VeiwAllBooking() {
               {doc
                 ? doc.map(
                     (file, index) =>
-                      new String(file).includes("voucher") && (
+                      new String(file).includes("voucher") && 
+                      (
                         <li className="space-x-2" key={index}>
                           <a
-                            href={
-                              new String(file).includes("http" || "https")
-                                ? file
-                                : file?.url
-                            }
+                            href={file}
                             target="_blank"
                             rel="noopener noreferrer"
                           >
                             {new String(file).includes("http" || "https")
                               ? splitIt(file)
-                              : file.file.name}
+                              : file?.file?.name}
                           </a>
                           <button
-                            className="text-red-400 cursor-pointer hover:text-red-700"
+                            className="text-red-400 rounded-lg cursor-pointer hover:text-red-700"
                             onClick={() => removeDoc(index)}
                           >
                             Remove

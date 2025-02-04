@@ -137,19 +137,6 @@ function PaymentForm({handlehide, tripId, inputData, refetch}) {
     </div>
     <div>
       <label className="block text-sm font-medium mb-1">
-        Status
-      </label>
-      <select
-      {...register("status")}
-      className="w-full border rounded p-2">
-        <option>Pending</option>
-        <option>Completed</option>
-        <option>Failed</option>
-      </select>
-      {errors.status && <span className="text-red-500">{errors.status.message}</span>}
-    </div>
-    <div>
-      <label className="block text-sm font-medium mb-1">
         Remarks
       </label>
       <textarea
