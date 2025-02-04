@@ -33,7 +33,8 @@ export default function VeiwAllBooking() {
   const location = useLocation();
   const [item, setItem] = useState(location.state);
   const [active, setActive] = useState(0); // Section toggle
-  const [doc, setDoc] = useState();
+  const [doc, setDoc] = useState(item.documents);
+  console.log(doc, "doc");
   const [supp, setSupp] = useState([]);
   const [vendorTable, setVendorTable] = useState([]);
   const [transferPrice, setTransferPrice] = useState();
@@ -54,7 +55,7 @@ export default function VeiwAllBooking() {
 
   const refetch = async () => {
     const itemData = await fetchTrips(location.state.tripId);
-    setDoc(itemData?.documents);
+    // setDoc(itemData.documents);
     return itemData;
   }
 
@@ -105,6 +106,7 @@ export default function VeiwAllBooking() {
   const handleFreezeQuotationClick = (e) => {
     e.preventDefault();
     setSelectedExcel(e.target.href);
+    console.log(e.target.href);
   }
 
   useEffect(() => {
