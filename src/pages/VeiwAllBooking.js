@@ -2,11 +2,11 @@ import React, { useEffect, useRef, useState } from "react";
 import { IoIosArrowDropdownCircle } from "react-icons/io";
 import BackToHome from "../components/BackToHome";
 import { CustomTable } from "../components/customTable/CustomTable";
-import { data, useLocation } from "react-router-dom";
+import { redirect, useLocation } from "react-router-dom";
 import { getTravelMonthRange } from "./Booking";
 import FileUpload from "../components/Input/FileUpload";
 import ReconForm from "../components/Form/ReconForm";
-import { MdAddCircle, MdDelete, MdEdit, MdModeEdit } from "react-icons/md";
+import { MdAddCircle, MdDelete, MdEdit } from "react-icons/md";
 import PaymentForm from "../components/Form/PaymentForm";
 import VendorForm from "../components/Form/VendorForm";
 import {
@@ -31,17 +31,18 @@ import ExcelToTable from "../components/customTable/ExcelToTable";
 
 export default function VeiwAllBooking() {
   const location = useLocation();
-  const [item, setItem] = useState(location.state);
+  const trip = location.state;
+  const tripId = trip.tripId;
+  const [item, setItem] = useState();
   const [active, setActive] = useState(0); // Section toggle
-  const [doc, setDoc] = useState(item.documents);
-  console.log(doc, "doc");
-  const [supp, setSupp] = useState([]);
+  const [doc, setDoc] = useState(item?.documents);
   const [vendorTable, setVendorTable] = useState([]);
+  console.log(vendorTable, "vendorTable");
   const [transferPrice, setTransferPrice] = useState();
 
   const setPrice = (price) => {
     setTransferPrice(price);
-  } 
+  };
   const inpRef = useRef(null);
   const editForm = useRef(null);
   const [payment, setPayment] = useState([]);
@@ -50,14 +51,15 @@ export default function VeiwAllBooking() {
   const [inputData, setInputData] = useState(null);
   const [recon, setRecon] = useState([]);
 
-  
   const [selectedExcel, setSelectedExcel] = useState([]);
 
   const refetch = async () => {
-    const itemData = await fetchTrips(location.state.tripId);
-    // setDoc(itemData.documents);
-    return itemData;
-  }
+    const itemData = await fetchTrips(tripId);
+    setItem(itemData);
+    setDoc(itemData?.documents);
+    const vendorData = await fetchVendors();
+    setVendorTable(vendorData);
+  };
 
   const refetchCom = async () => {
     const reconData = await fetchRecon();
@@ -71,15 +73,19 @@ export default function VeiwAllBooking() {
     }
   };
 
-  const editVendor = (vendor) => {
+  const editVendor = (item, vendor) => {
     (async () => {
       const response = await axios.post(
-        `${API_URL}users/createVendor/?id=${vendor.vendor_pay_id}`,
+        `${API_URL}users/createVendor/?id=${item.vendor_pay_id}`,
         vendor
       );
+      Swal.fire({
+        title: "Vendor updated successfully",
+        timer: 2000,
+      });
+      console.log(response, "response");
     })();
   };
-
 
   const splitIt = (str) => {
     const data = new String(str).split("/");
@@ -87,27 +93,10 @@ export default function VeiwAllBooking() {
     return result;
   };
 
-  const refetchSupp = async () => {
-    const destOut = await fetchDestinations();
-    const destData = destOut.filter(
-      (dest) => dest.destination === item.destination
-    );
-
-    const vendorData = await fetchVendors();
-
-    setVendorTable(vendorData);
-
-    const supData = await fetchSuppliers();
-
-    setSupp(supData);
-    setInputData(destData[0]);
-  };
-
   const handleFreezeQuotationClick = (e) => {
     e.preventDefault();
     setSelectedExcel(e.target.href);
-    console.log(e.target.href);
-  }
+  };
 
   useEffect(() => {
     try {
@@ -116,22 +105,15 @@ export default function VeiwAllBooking() {
         if (data) {
           setOpsSpoc(data.filter((user) => user.profile === "Operations"));
         }
-        const itemData = await fetchTrips();
-        setItem(itemData.filter((trip) => trip.tripId === item.tripId)[0]);
         refetchCom();
-        refetchSupp();
         refetch();
-        const sdata = await fetchSalesDocs(item.tripId)
+        const sdata = await fetchSalesDocs(tripId);
         setSelectedExcel(sdata[sdata.length - 1]);
       })();
     } catch (error) {
       console.log(error);
     }
   }, []);
-
-  useEffect(() => {
-    console.log(transferPrice, "transferPrice");
-  })
 
   // Handle file upload
   const addDoc = (e, catagory) => {
@@ -157,55 +139,61 @@ export default function VeiwAllBooking() {
     setDoc(updatedDoc);
   };
 
-  const updateStatus = async(e) => {
+  const updateStatus = async (e) => {
     const formData = {
-      status : e.target.value
-    }
-    const response = axios.post(`${API_URL}users/updateStatus/?id=${item.tripId}`, formData,
-    {
-      withCredentials: true,
-      headers: {
-        "content-type": "application/json"
+      status: e.target.value,
+    };
+    const response = axios.post(
+      `${API_URL}users/updateStatus/?id=${tripId}`,
+      formData,
+      {
+        withCredentials: true,
+        headers: {
+          "content-type": "application/json",
+        },
       }
-    });
+    );
     if ((await response).status === 200) {
       await refetch();
       Swal.fire({
         title: "Status updated successfully",
-        timer: 2000
-      })
+        timer: 2000,
+      });
     } else {
       Swal.fire({
         text: response.data.MESSAGE,
-        timer: 2000
-      })
+        timer: 2000,
+      });
     }
-  }
+  };
 
-  const updateOps = async(e) => {
+  const updateOps = async (e) => {
     const formData = {
-      opsSpoc : e.target.value
-    }
-    const response = axios.post(`${API_URL}users/updateOps/?id=${item.tripId}`, formData,
-    {
-      withCredentials: true,
-      headers: {
-        "content-type": "application/json"
+      opsSpoc: e.target.value,
+    };
+    const response = axios.post(
+      `${API_URL}users/updateOps/?id=${tripId}`,
+      formData,
+      {
+        withCredentials: true,
+        headers: {
+          "content-type": "application/json",
+        },
       }
-    });
+    );
     if ((await response).status === 200) {
       await refetch();
       Swal.fire({
         title: "Ops updated successfully",
-        timer: 2000
-      })
+        timer: 2000,
+      });
     } else {
       Swal.fire({
         text: response.data.MESSAGE,
-        timer: 2000
-      })
+        timer: 2000,
+      });
     }
-  }
+  };
 
   const updateDocs = async () => {
     Swal.fire({
@@ -215,7 +203,7 @@ export default function VeiwAllBooking() {
       didOpen: () => {
         Swal.showLoading();
       },
-    })
+    });
     const formData = new FormData();
     doc.forEach((doc) => {
       if (doc.file) {
@@ -224,9 +212,9 @@ export default function VeiwAllBooking() {
         formData.append("docs", doc);
       }
     });
-    
+
     const response = await axios.post(
-      `${API_URL}users/updateDocs/?id=${item.tripId}`,
+      `${API_URL}users/updateDocs/?id=${tripId}`,
       formData,
       {
         withCredentials: true,
@@ -253,8 +241,10 @@ export default function VeiwAllBooking() {
           View Confirmed Booking
         </h1>
         <div className="flex justify-end">
-          
-          <button onClick={updateDocs} className="bg-blue-500 rounded-lg px-2 m-2 text-white py-1">
+          <button
+            onClick={updateDocs}
+            className="bg-blue-500 rounded-lg px-2 m-2 text-white py-1"
+          >
             Save Changes
           </button>
         </div>
@@ -273,25 +263,46 @@ export default function VeiwAllBooking() {
             } grid grid-cols-2 gap-4 p-4`}
           >
             {[
-              ["Destination", item.destination],
-              ["Sales Spoc", item.salesSpoc],
-              ["Agent", item.agent],
-              ["Customer Name", item.customerName],
-              ["Number of Pax", item.pax.A + " A "+ "/ " + item.pax.C + " C " + "-" + (item.pax?.Ca === undefined ? "" : item.pax.Ca )],
+              ["Destination", item?.destination],
+              ["Sales Spoc", item?.salesSpoc],
+              ["Agent", item?.agent],
+              ["Customer Name", item?.customerName],
               [
-                "Travel Month",
-                getTravelMonthRange(item.arrivalDate),
+                "Number of Pax",
+                item?.pax.A +
+                  " A " +
+                  "/ " +
+                  item?.pax.C +
+                  " C " +
+                  "-" +
+                  (item?.pax?.Ca === undefined ? "" : item?.pax.Ca),
               ],
-              ["Arrival Date", item.arrivalDate.slice(0, 10).split("-")[2] + " " + getTravelMonthRange(item.arrivalDate)],
-              ["Departure Date", item.departureDate.slice(0, 10).split("-")[2] + " " + getTravelMonthRange(item.departureDate)],
-              ["Booking Date", item.bookingDate.slice(0, 10).split("-")[2] + " " + getTravelMonthRange(item.bookingDate)],
-              ["WhatsApp Number", item.countryCode + " " + item.whatsappNumber],
+              ["Travel Month", getTravelMonthRange(item?.arrivalDate)],
+              [
+                "Arrival Date",
+                item?.arrivalDate.slice(0, 10).split("-")[2] +
+                  " " +
+                  getTravelMonthRange(item?.arrivalDate),
+              ],
+              [
+                "Departure Date",
+                item?.departureDate.slice(0, 10).split("-")[2] +
+                  " " +
+                  getTravelMonthRange(item?.departureDate),
+              ],
+              [
+                "Booking Date",
+                item?.bookingDate.slice(0, 10).split("-")[2] +
+                  " " +
+                  getTravelMonthRange(item?.bookingDate),
+              ],
+              [
+                "WhatsApp Number",
+                item?.countryCode + " " + item?.whatsappNumber,
+              ],
               [
                 "Ops Spoc",
-                <select
-                  value={item?.opsSpoc}
-                  onChange={updateOps}
-                >
+                <select value={item?.opsSpoc} onChange={updateOps}>
                   {opsSpoc.length > 0 &&
                     opsSpoc.map((user, index) => (
                       <option key={index} value={user.name}>
@@ -300,10 +311,13 @@ export default function VeiwAllBooking() {
                     ))}
                 </select>,
               ],
-              ["Trip Status", <select onChange={updateStatus}>
-                <option value="CONFIRMED">Confirmed</option>
-                <option value="CANCELLED">Cancelled</option>
-              </select>], // ask client where will this come from
+              [
+                "Trip Status",
+                <select onChange={updateStatus}>
+                  <option value="CONFIRMED">Confirmed</option>
+                  <option value="CANCELLED">Cancelled</option>
+                </select>,
+              ], // ask client where will this come from
             ].map(([label, value], index) => (
               <div key={index} className="flex space-x-3">
                 <label className="font-semibold">{label}:</label>
@@ -331,7 +345,7 @@ export default function VeiwAllBooking() {
                   onChange={addDoc}
                   onRemove={removeDoc}
                   files={doc}
-                  catagory={"airTicket"}
+                  catagory={"airTicketdoc"}
                 />
                 <FileUpload
                   label={"Passport"}
@@ -339,7 +353,7 @@ export default function VeiwAllBooking() {
                   onChange={addDoc}
                   onRemove={removeDoc}
                   files={doc}
-                  catagory={"passport"}
+                  catagory={"passportdoc"}
                 />
                 <FileUpload
                   label={"PAN"}
@@ -347,7 +361,7 @@ export default function VeiwAllBooking() {
                   onChange={addDoc}
                   onRemove={removeDoc}
                   files={doc}
-                  catagory={"pan"}
+                  catagory={"pandoc"}
                 />
                 <FileUpload
                   label={"Misceleanious"}
@@ -355,7 +369,7 @@ export default function VeiwAllBooking() {
                   onChange={addDoc}
                   onRemove={removeDoc}
                   files={doc}
-                  catagory={"misc"}
+                  catagory={"miscdoc"}
                 />
                 <FileUpload
                   label={"Email Confirmation"}
@@ -363,7 +377,7 @@ export default function VeiwAllBooking() {
                   onChange={addDoc}
                   onRemove={removeDoc}
                   files={doc}
-                  catagory={"emailConf"}
+                  catagory={"emailConfdoc"}
                 />
               </div>
 
@@ -373,8 +387,8 @@ export default function VeiwAllBooking() {
                   {doc
                     ? doc.map(
                         (file, index) =>
-                          !new String(file).includes("freezeQuotation") && !new String(file).includes("voucher") && 
-                          (
+                          !new String(file).includes("freezeQuotation") &&
+                          !new String(file).includes("voucher") && (
                             <li className="space-x-2" key={index}>
                               <a
                                 href={file}
@@ -412,9 +426,11 @@ export default function VeiwAllBooking() {
           <div className={`p-4 ${active === 2 ? "block" : "hidden"}`}>
             <div className="flex justify-between">
               <p className="font-semibold">
-                Order Value (USD): {item.orderValue}
+                Order Value (USD): {item?.orderValue}
               </p>
-              <p className="font-semibold">Transfer Price(USD): {parseFloat(transferPrice).toFixed(2)}</p>
+              <p className="font-semibold">
+                Transfer Price(USD): {parseFloat(transferPrice).toFixed(2)}
+              </p>
             </div>
             {/* Payment Details Table */}
             <div className="mb-4">
@@ -430,7 +446,7 @@ export default function VeiwAllBooking() {
                   <PaymentForm
                     refetch={refetchCom}
                     inputData={inputData}
-                    tripId={item.tripId}
+                    tripId={tripId}
                     handlehide={() => {
                       inpRef.current.style.display = "none";
                     }}
@@ -449,13 +465,18 @@ export default function VeiwAllBooking() {
               <CustomTable
                 dataa={payment.map((item, index) => ({
                   installment: "installment" + " " + parseInt(index + 1),
-                  amount: item.amount,
-                  date: item.date.slice(0, 10),
-                  mode: item.paymentMode,
-                  convertionRate: item.convRate,
-                  amtinr: parseFloat(item.conFee + item.amount * item.convRate),
-                  convfee: item.conFee,
-                  remarks: item.remarks,
+                  amount: item?.amount,
+                  date:
+                    item?.date.slice(0, 2) +
+                    " " +
+                    getTravelMonthRange(item?.date),
+                  mode: item?.paymentMode,
+                  convertionRate: item?.convRate,
+                  amtinr: parseFloat(
+                    (item?.conFee + item?.amount) * item?.convRate
+                  ),
+                  convfee: item?.conFee,
+                  remarks: item?.remarks,
                   action: (
                     <div className="flex justify-around">
                       <button
@@ -469,7 +490,7 @@ export default function VeiwAllBooking() {
                       </button>
                       <button
                         onClick={() => {
-                          deletePayment(item.payment_id);
+                          deletePayment(item?.payment_id);
                           refetchCom();
                         }}
                         className="text-red-600"
@@ -483,7 +504,7 @@ export default function VeiwAllBooking() {
                   { Header: " ", accessor: "installment" },
                   { Header: "Date/Payment", accessor: "date" },
                   { Header: "Mode", accessor: "mode" },
-                  { Header: "Conv: Rate", accessor: "convertionRate" },
+                  { Header: "Conv. Rate", accessor: "convertionRate" },
                   { Header: "Amount (USD)", accessor: "amount" },
                   { Header: "CONV: Fee", accessor: "convfee" },
                   { Header: "Amount (INR)", accessor: "amtinr" },
@@ -509,7 +530,7 @@ export default function VeiwAllBooking() {
                   </h3>
                   <ReconForm
                     refetch={refetchCom}
-                    tripId={item.tripId}
+                    tripId={tripId}
                     inputData={inputData}
                     handleHide={() => (editForm.current.style.display = "none")}
                   />
@@ -527,9 +548,9 @@ export default function VeiwAllBooking() {
 
               <CustomTable
                 dataa={recon.map((item, index) => ({
-                  online: item.online,
-                  offline: item.offline,
-                  land: item.land,
+                  online: item?.online + " USD",
+                  offline: item?.offline + " USD",
+                  land: item?.land + " USD",
                   action: (
                     <div className="flex justify-around">
                       <button
@@ -543,7 +564,7 @@ export default function VeiwAllBooking() {
                       </button>
                       <button
                         onClick={() => {
-                          deleteRecon(item.recon_id);
+                          deleteRecon(item?.recon_id);
                           refetchCom();
                         }}
                         className="text-red-600"
@@ -579,9 +600,7 @@ export default function VeiwAllBooking() {
           </h2>
           <div className={`p-4 ${active === 3 ? "flex-col" : "hidden"} h-fit`}>
             <div>
-             <ExcelToTable
-             url={selectedExcel}
-             setPrice={setPrice} />
+              <ExcelToTable url={selectedExcel} setPrice={setPrice} />
             </div>
             <div className="flex gap-4">
               <div className="w-1/2">
@@ -599,9 +618,9 @@ export default function VeiwAllBooking() {
                 <ul>
                   {doc
                     ? doc.map(
-                        (file, index) => 
-                          new String(file).includes("freezeQuotation") && 
-                          (
+                        (file, index) =>
+                          !new String(file).includes("doc") &&
+                          !new String(file).includes("voucher") && (
                             <li className="space-x-2" key={index}>
                               <a
                                 onClick={handleFreezeQuotationClick}
@@ -639,27 +658,22 @@ export default function VeiwAllBooking() {
           </h2>
           <div className={`p-4 ${active === 4 ? "block" : "hidden"}`}>
             <VendorForm
-              setInputData
-              tripId={item.tripId}
-              supplier={supp}
-              dest={inputData}
-              refetch={refetchSupp}
+              setInputData={setInputData}
+              tripId={tripId}
+              refetch={refetch}
             />
             <CustomTable
               dataa={vendorTable.map((item, index) => ({
-                name: item.name,
-                destination: item.destination,
-                currecy: item.currency,
+                name: item?.name,
+                destination: item?.destination,
+                currecy: item?.currency,
                 bookingStatus: (
                   <select
-                    onChange={(e) =>
-                      setInputData({
-                        name: item.name,
-                        destination: item.destination,
-                        currecy: item.currency,
-                        bookingStatus: e.target.value,
-                      })
-                    }
+                    value={item?.booking_status}
+                    onChange={(e) => {
+                      editVendor(item, { booking_status: e.target.value });
+                      refetch();
+                    }}
                   >
                     <option value={"Approved"}>Approved</option>
                     <option value={"Pending"}>Pending</option>
@@ -669,14 +683,11 @@ export default function VeiwAllBooking() {
                 paymentStatus: (
                   <>
                     <select
-                      onChange={(e) =>
-                        setInputData({
-                          name: item.name,
-                          destination: item.destination,
-                          currecy: item.currency,
-                          paymentStatus: e.target.value,
-                        })
-                      }
+                      onChange={(e) => {
+                        editVendor(item, { payment_status: e.target.value });
+                        refetch();
+                      }}
+                      value={item?.payment_status}
                     >
                       <option value={"Paid"}>Paid</option>
                       <option value={"Unpaid"}>Unpaid</option>
@@ -686,18 +697,18 @@ export default function VeiwAllBooking() {
                 ),
                 action: (
                   <div className="flex justify-around">
-                    <button
+                    {/* <button
                       className="text-blue-900"
                       onClick={() => {
-                        editVendor(inputData);
+                        editVendor(item,inputData);
                       }}
                     >
                       <MdEdit />
-                    </button>
+                    </button> */}
                     <button
                       onClick={() => {
-                        deleteVendor(item.vendor_pay_id);
-                        refetchSupp();
+                        deleteVendor(item?.vendor_pay_id);
+                        refetch();
                       }}
                       className="text-red-600"
                     >
@@ -729,38 +740,38 @@ export default function VeiwAllBooking() {
         </h2>
         <div className={`p-4 ${active === 5 ? "flex" : "hidden"} min-h-36`}>
           <div className="w-1/2 my-auto px-2 h-full border-r-[1px] space-y-2 border-slate-400">
-              <FileUpload
-                label={"Hotel Voucher"}
-                id={"hotelvoucher"}
-                onChange={addDoc}
-                onRemove={removeDoc}
-                files={doc}
-                catagory={"hotelvoucher"}
-              />
-              <FileUpload
-                label={"Activities Voucher"}
-                id={"activitiesvoucher"}
-                onChange={addDoc}
-                onRemove={removeDoc}
-                files={doc}
-                catagory={"activitiesvoucher"}
-              />
-              <FileUpload
-                label={"Miscellaneous Voucher"}
-                id={"miscvoucher"}
-                onChange={addDoc}
-                onRemove={removeDoc}
-                files={doc}
-                catagory={"miscvoucher"}
-              />
+            <FileUpload
+              label={"Hotel Voucher"}
+              id={"hotelvoucher"}
+              onChange={addDoc}
+              onRemove={removeDoc}
+              files={doc}
+              catagory={"hotelvoucher"}
+            />
+            <FileUpload
+              label={"Activities Voucher"}
+              id={"activitiesvoucher"}
+              onChange={addDoc}
+              onRemove={removeDoc}
+              files={doc}
+              catagory={"activitiesvoucher"}
+            />
+            <FileUpload
+              label={"Miscellaneous Voucher"}
+              id={"miscvoucher"}
+              onChange={addDoc}
+              onRemove={removeDoc}
+              files={doc}
+              catagory={"miscvoucher"}
+            />
           </div>
           <div className="w-1/2">
             <ul>
               {doc
                 ? doc.map(
                     (file, index) =>
-                      new String(file).includes("voucher") && 
-                      (
+                      !new String(file).includes("freezeQuotation") &&
+                      !new String(file).includes("doc") && (
                         <li className="space-x-2" key={index}>
                           <a
                             href={file}

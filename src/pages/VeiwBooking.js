@@ -210,7 +210,7 @@ export default function VeiwBooking() {
                   onChange={addDoc}
                   onRemove={removeDoc}
                   files={doc}
-                  catagory={"airTicket"}
+                  catagory={"airTicketdoc"}
                 />
                 <FileUpload
                   label={"Passport"}
@@ -218,7 +218,7 @@ export default function VeiwBooking() {
                   onChange={addDoc}
                   onRemove={removeDoc}
                   files={doc}
-                  catagory={"passport"}
+                  catagory={"passportdoc"}
                 />
                 <FileUpload
                   label={"PAN"}
@@ -226,7 +226,7 @@ export default function VeiwBooking() {
                   onChange={addDoc}
                   onRemove={removeDoc}
                   files={doc}
-                  catagory={"pan"}
+                  catagory={"pandoc"}
                 />
                 <FileUpload
                   label={"Email Confirmation"}
@@ -234,7 +234,7 @@ export default function VeiwBooking() {
                   onChange={addDoc}
                   onRemove={removeDoc}
                   files={doc}
-                  catagory={"emailConf"}
+                  catagory={"emailConfdoc"}
                 />
               </div>
 
@@ -317,7 +317,7 @@ export default function VeiwBooking() {
                 {doc
                   ? doc.map(
                       (file, index) =>
-                        (new String(file).includes("freezeQuotation") ||
+                        (!new String(file).includes("doc") ||
                           file?.catagory === "freezeQuotation") && (
                           <li className="space-x-2" key={index}>
                             <a

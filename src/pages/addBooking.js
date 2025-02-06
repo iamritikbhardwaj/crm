@@ -452,7 +452,7 @@ const AddBooking = () => {
                     onChange={addDocument}
                     onRemove={removeDocument}
                     files={documents}
-                    catagory={"airTicket"}
+                    catagory={"airTicketdoc"}
                   />
                   <FileUpload
                     label={"Passport"}
@@ -460,7 +460,7 @@ const AddBooking = () => {
                     onChange={addDocument}
                     onRemove={removeDocument}
                     files={documents}
-                    catagory={"passport"}
+                    catagory={"passportdoc"}
                   />
                   <FileUpload
                     label={"PAN"}
@@ -468,7 +468,7 @@ const AddBooking = () => {
                     onChange={addDocument}
                     onRemove={removeDocument}
                     files={documents}
-                    catagory={"pan"}
+                    catagory={"pandoc"}
                   />
                   <FileUpload
                     label={"Sales Sheet"}
@@ -485,7 +485,7 @@ const AddBooking = () => {
                     onChange={addDocument}
                     onRemove={removeDocument}
                     files={documents}
-                    catagory={"emailConf"}
+                    catagory={"emailConfdoc"}
                   />
                 </div>
 

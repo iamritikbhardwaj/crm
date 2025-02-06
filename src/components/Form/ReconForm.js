@@ -29,6 +29,7 @@ function ReconForm({ handleHide, inputData, tripId, refetch }) {
     setValue("online", inputData?.online);
     setValue("offline", inputData?.offline);
     setValue("land", inputData?.land);
+    setValue("tripId", tripId);
   }, [inputData]);
 
   const reset = () => {
@@ -38,12 +39,13 @@ function ReconForm({ handleHide, inputData, tripId, refetch }) {
   };
 
   console.log(errors, "errors");
+  console.log(tripId, "tripId");
 
   const reconSubmit = (data) => {
     console.log(data, "data");
     (async (data) => {
       const response = await axios.post(
-        `${API_URL}users/createRecon/?id=${inputData?.recon_id}`,
+        `${API_URL}users/createRecon${inputData?.recon_id ? "/?id=" + inputData.recon_id : ""}`,
         data,
         {
           headers: {

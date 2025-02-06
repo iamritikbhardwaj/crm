@@ -4,18 +4,16 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import axios from "axios";
 import { API_URL } from "../../AppConstant.js"
-import { set } from 'mongoose';
 
 function PaymentForm({handlehide, tripId, inputData, refetch}) {
 
     const paymentSchema = z.object({
         tripId: z.string().min(1, { message: "Trip ID is required" }),
         date: z.string().min(1, { message: "Date is required" }),
-        amount: z.string().min(1, { message: "Amount is required" }),
-        conFee: z.string().min(1, { message: "Convenience Fee is required" }),
-        convRate: z.string().min(1, { message: "Convenience Rate is required" }),
+        amount: z.number().min(1, { message: "Amount is required" }),
+        conFee: z.number().min(1, { message: "Convenience Fee is required" }),
+        convRate: z.number().min(1, { message: "Convenience Rate is required" }),
         paymentMode: z.string().min(1, { message: "Payment Mode is required" }),
-        status: z.string().min(1, { message: "Status is required" }),
         remarks: z.string().optional(),
         validatedBy: z.string().min(1, { message: "Validated By is required" }),
         TripId: z.string().optional()
@@ -38,7 +36,6 @@ function PaymentForm({handlehide, tripId, inputData, refetch}) {
           setValue("conFee", inputData.conFee);
           setValue("convRate", inputData.convRate);
           setValue("paymentMode", inputData.paymentMode);
-          setValue("status", inputData.status);
           setValue("remarks", inputData.remarks);
         }
       }, [tripId, inputData]);
@@ -49,14 +46,13 @@ function PaymentForm({handlehide, tripId, inputData, refetch}) {
         setValue("conFee", "");
         setValue("convRate", "");
         setValue("paymentMode", "");
-        setValue("status", "");
         setValue("remarks", "")
       }
 
       const reconSubmit = (data) => {
         console.log(data, 'data');
         (async (data) => {
-            const response = await axios.post(`${API_URL}users/createPayment/?id=${inputData.payment_id}`, data,
+            const response = await axios.post(`${API_URL}users/createPayment${inputData?.payment_id ? '/?id=' + inputData?.payment_id : ``}`, JSON.stringify(data),
             {
                 headers: {
                   'Content-Type': 'application/json',
@@ -82,7 +78,7 @@ function PaymentForm({handlehide, tripId, inputData, refetch}) {
         Date
       </label>
       <input
-        type="datetime-local"
+        type="date"
         className="w-full border rounded p-2"
         {...register("date")}
       />
@@ -95,7 +91,9 @@ function PaymentForm({handlehide, tripId, inputData, refetch}) {
       <input
         type="number"
         className="w-full border rounded p-2"
-        {...register("amount")}
+        {...register("amount", {
+          setValueAs: (v) => parseFloat(v) // Convert to number
+        })}
       />
       {errors.amount && <span className="text-red-500">{errors.amount.message}</span>}
     </div>
@@ -106,7 +104,9 @@ function PaymentForm({handlehide, tripId, inputData, refetch}) {
       <input
         type="number"
         className="w-full border rounded p-2"
-        {...register("conFee")}
+        {...register("conFee", {
+          setValueAs: (v) => parseFloat(v) // Convert to number
+        })}
       />
       {errors.conFee && <span className="text-red-500">{errors.conFee.message}</span>}
     </div>
@@ -117,7 +117,9 @@ function PaymentForm({handlehide, tripId, inputData, refetch}) {
       <input
         type="number"
         className="w-full border rounded p-2"
-        {...register("convRate")}
+        {...register("convRate", {
+          setValueAs: (v) => parseFloat(v) // Convert to number
+        })}
       />
       {errors.convRate && <span className="text-red-500">{errors.convRate.message}</span>}
     </div>
