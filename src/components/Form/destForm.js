@@ -4,7 +4,12 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import axios from "axios";
 import { API_URL } from "../../AppConstant.js";
+<<<<<<< HEAD
 import Swal from "sweetalert2";
+=======
+import { set } from "mongoose";
+import e from "express";
+>>>>>>> refs/remotes/origin/main
 
 function DestForm({ editData, setEditData, refetch }) {
  
@@ -28,14 +33,22 @@ function DestForm({ editData, setEditData, refetch }) {
         }
       })
       console.log(response, 'response');
+<<<<<<< HEAD
       if (response.status === 201) {
+=======
+      if (response.data.STATUS === 'FAIL') {
+>>>>>>> refs/remotes/origin/main
         Swal.fire({
           icon: 'error',
           title: 'User Creation Failed',
           text: "Destination already exists",
           showConfirmButton: true,
         })
+<<<<<<< HEAD
       } else{
+=======
+      } else if (response.status === 200) {
+>>>>>>> refs/remotes/origin/main
         refetch();
       }
     })(data);
