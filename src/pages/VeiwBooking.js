@@ -158,14 +158,38 @@ export default function VeiwBooking() {
               ["Sales Spoc", data.salesSpoc],
               ["Agent", data.agent],
               ["Customer Name", data.customerName],
-              ["Number of Pax", data.pax.A + data.pax.C],
+              [
+                "Number of Pax",
+                data?.pax.A +
+                  " A " +
+                  " / " +
+                  data?.pax.C +
+                  " C " +
+                  "- " +
+                  (data?.pax?.Ca === undefined ? "" : data?.pax.Ca),
+              ],
               [
                 "Travel Month",
                 getTravelMonthRange(data.arrivalDate, data.departureDate),
               ],
-              ["Arrival Date", data.arrivalDate.slice(0, 10)],
-              ["Departure Date", data.departureDate.slice(0, 10)],
-              ["Booking Date", data.bookingDate.slice(0, 10)],
+              [
+                "Arrival Date",
+                data?.arrivalDate.slice(0, 10).split("-")[2] +
+                  " " +
+                  getTravelMonthRange(data?.arrivalDate),
+              ],
+              [
+                "Departure Date",
+                data?.departureDate.slice(0, 10).split("-")[2] +
+                  " " +
+                  getTravelMonthRange(data?.departureDate),
+              ],
+              [
+                "Booking Date",
+                data?.bookingDate.slice(0, 10).split("-")[2] +
+                  " " +
+                  getTravelMonthRange(data?.bookingDate),
+              ],
               ["WhatsApp Number", data.countryCode + " " + data.whatsappNumber],
               [
                 "Ops Spoc",

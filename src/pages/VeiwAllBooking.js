@@ -271,10 +271,10 @@ export default function VeiwAllBooking() {
                 "Number of Pax",
                 item?.pax.A +
                   " A " +
-                  "/ " +
+                  " / " +
                   item?.pax.C +
                   " C " +
-                  "-" +
+                  "- " +
                   (item?.pax?.Ca === undefined ? "" : item?.pax.Ca),
               ],
               ["Travel Month", getTravelMonthRange(item?.arrivalDate)],
@@ -314,8 +314,8 @@ export default function VeiwAllBooking() {
               [
                 "Trip Status",
                 <select onChange={updateStatus}>
-                  <option value="CONFIRMED">Confirmed</option>
-                  <option value="CANCELLED">Cancelled</option>
+                  <option value="CONFIRMED">CONFIRMED</option>
+                  <option value="CANCELLED">CANCELLED</option>
                 </select>,
               ], // ask client where will this come from
             ].map(([label, value], index) => (
@@ -362,14 +362,6 @@ export default function VeiwAllBooking() {
                   onRemove={removeDoc}
                   files={doc}
                   catagory={"pandoc"}
-                />
-                <FileUpload
-                  label={"Misceleanious"}
-                  id={"misc"}
-                  onChange={addDoc}
-                  onRemove={removeDoc}
-                  files={doc}
-                  catagory={"miscdoc"}
                 />
                 <FileUpload
                   label={"Email Confirmation"}

@@ -60,18 +60,18 @@ const NewBooking = () => {
         const processedData = bookings.map((item) => ({
           booking_id: item.booking_id.slice(0, 6),
           destination: item.destination,
-          bookingDate: item.bookingDate.slice(0, 10),
+          bookingDate: item.bookingDate.slice(8, 10) + "/" + item.bookingDate.slice(5, 7) + "/" + item.bookingDate.slice(0, 4),
           salesSpoc: item.salesSpoc,
           agent: item.agent,
           customerDetails: <div className="leading-[0.7]">
           <p>{item.customerName}</p> <br />
           <p>{item.pax?.A} A / {item.pax?.C} C</p>
           </div>,
-          arrivalDate: item.arrivalDate.slice(0, 10),
-          departureDate: item.departureDate.slice(0, 10),
+          arrivalDate: item.arrivalDate.slice(8, 10) + "/" + item.arrivalDate.slice(5, 7) + "/" + item.arrivalDate.slice(0, 4),
+          departureDate: item.departureDate.slice(8, 10) + "/" + item.departureDate.slice(5, 7) + "/" + item.departureDate.slice(0, 4),
           travelMonth: getTravelMonthRange(item.arrivalDate),
           contactDetails: `${item.countryCode} / ${item.whatsappNumber}`,
-          orderValue: item.orderValue,
+          orderValue: item.orderValue + " USD",
           action: (
             <button onClick={() => navigate("/viewBooking", { state: item })}>
               <FaInfoCircle />

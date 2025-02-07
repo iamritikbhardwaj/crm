@@ -26,22 +26,22 @@ const AllBookings = () => {
           {
             tripID: item.tripId,
             destination: item.destination,
-            bookingDate: item.bookingDate.slice(0, 10),
+            bookingDate: item.bookingDate.slice(8, 10) + "/" + item.bookingDate.slice(5, 7) + "/" + item.bookingDate.slice(0, 4),
             customerName: <div className="leading-[0.7]">
             <p>{item.customerName}</p> <br />
             <p>{item.pax?.A} A / {item.pax?.C} C</p>
             </div>,            
             salesSPOC: item.salesSpoc,
             agent: item.agent,
-            arrivalDate: item.arrivalDate.slice(0, 10),
-            departureDate:  item.departureDate.slice(0, 10),
+            arrivalDate: item.arrivalDate.slice(8, 10) + "/" + item.arrivalDate.slice(5, 7) + "/" + item.arrivalDate.slice(0, 4),
+            departureDate:  item.departureDate.slice(8, 10) + "/" + item.departureDate.slice(5, 7) + "/" + item.departureDate.slice(0, 4),
             travelMonth: getTravelMonthRange(item.arrivalDate, item.departureDate),
             contactDetails: `${item.countryCode} / ${item.whatsappNumber}`,
-            orderValue: item.orderValue,
-            payment: item.payment,
+            orderValue: item.orderValue + " USD",
+            payment: item.payment + " USD",
             status: <button className={`${item.status === "CANCELLED" ? "bg-red-500" : "bg-green-500"} text-white p-1 m-1 rounded-full`}>{item?.status ? item?.status : "CONFIRMED"}</button>,
             opsSpoc: item.opsSpoc,
-            action: <button onClick={() => navigate("/viewAllBooking", { state: item })}><GrFormView /></button>,
+            action: <button className="text-3xl" onClick={() => navigate("/viewAllBooking", { state: item })}><GrFormView /></button>,
             paymentstat: <button className="bg-red-400 p-2 rounded-lg text-white">{item.paymentStatus}</button>,
             validation: <button className="bg-red-400 p-2 rounded-lg">{item.validation}</button>,
             opsstatus: <button className="bg-red-700 p-2 rounded-lg">{item?.opsStatus}</button>
@@ -61,12 +61,12 @@ const AllBookings = () => {
     { Header: "Departure Dates", accessor: "departureDate" },
     { Header: "Travel Month", accessor: "travelMonth" },
     { Header: "Contact Details", accessor: "contactDetails" },
-    { Header: "Order Value", accessor: "orderValue" },
-    { Header: "Payment", accessor: "payment" },
+    { Header: "Order.V", accessor: "orderValue" },
+    { Header: "Agent.P", accessor: "payment" },
     { Header: "Status", accessor: "status" },
-    { Header: "Ops Spoc", accessor: "opsSpoc" },
+    { Header: "Ops SPOC", accessor: "opsSpoc" },
     { Header: "Action", accessor: "action" },
-    { Header: "Payment", accessor: "paymentstat" },
+    { Header: "Supp.Pay", accessor: "paymentstat" },
     { Header: "Validation", accessor: "validation" },
     { Header: "Ops Status", accessor: "opsstatus"}
   ];
