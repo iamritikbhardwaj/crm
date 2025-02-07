@@ -26,23 +26,14 @@ function AgentForm({editData, setEditData, refetch}) {
               "content-type": "application/json"
             }
           })
-<<<<<<< HEAD
           if (response.status === 201) {
-=======
-          console.log(response, 'response');
-          if (response.data.STATUS === 'FAIL') {
->>>>>>> refs/remotes/origin/main
             Swal.fire({
               icon: 'error',
               title: 'User Creation Failed',
               text: "Agent already exists",
               showConfirmButton: true,
             })
-<<<<<<< HEAD
           } else{
-=======
-          } else if ((await response).status === 200) {
->>>>>>> refs/remotes/origin/main
             refetch();
           }
           console.log(response, 'response');

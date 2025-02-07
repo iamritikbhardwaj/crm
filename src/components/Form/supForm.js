@@ -31,7 +31,6 @@ function SupForm({editData, setEditData, refetch, data}) {
                 "content-type": "application/json" 
             }
         })
-<<<<<<< HEAD
         if (response.status === 201) {
           Swal.fire({
             icon: 'error',
@@ -41,17 +40,6 @@ function SupForm({editData, setEditData, refetch, data}) {
           })
         } else{
           refetch();
-=======
-        if (response.data.STATUS === 'FAIL') {
-          Swal.fire({
-            icon: 'error',
-            title: 'User Creation Failed',
-            text: "Supplier already exists",
-            showConfirmButton: true,
-          })
-        } else if (response.status === 200) {
-            refetch();
->>>>>>> refs/remotes/origin/main
         }
         console.log(response, 'response');
         })(data);
