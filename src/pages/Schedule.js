@@ -44,7 +44,7 @@ const AllBookings = () => {
             action: <button className="text-3xl" onClick={() => navigate("/viewAllBooking", { state: item })}><GrFormView /></button>,
             paymentstat: <button className="bg-red-400 p-2 rounded-lg text-white">{item.paymentStatus}</button>,
             validation: <button className="bg-red-400 p-2 rounded-lg">{item.validation}</button>,
-            opsstatus: <button className="bg-red-700 p-2 rounded-lg">{item?.opsStatus}</button>
+            opsstatus: <button className="bg-red-400 p-2 rounded-lg">{item?.opsStatus}</button>
           }
       ))
     setBookings(bookings);})();

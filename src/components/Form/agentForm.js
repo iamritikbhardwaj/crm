@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { API_URL } from '../../AppConstant';
 import axios from 'axios';
+import Swal from 'sweetalert2';
 
 function AgentForm({editData, setEditData, refetch}) {
 
@@ -25,10 +26,17 @@ function AgentForm({editData, setEditData, refetch}) {
               "content-type": "application/json"
             }
           })
-          console.log(response, 'response');
-          if ((await response).status === 200) {
+          if (response.status === 201) {
+            Swal.fire({
+              icon: 'error',
+              title: 'User Creation Failed',
+              text: "Agent already exists",
+              showConfirmButton: true,
+            })
+          } else{
             refetch();
           }
+          console.log(response, 'response');
         })(data);     
     }
 
@@ -66,4 +74,4 @@ function AgentForm({editData, setEditData, refetch}) {
   )
 }
 
-export default AgentForm
+export default AgentForm;

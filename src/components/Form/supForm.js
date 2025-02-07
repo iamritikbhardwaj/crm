@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import axios from "axios";
 import { API_URL } from "../../AppConstant.js"
+import Swal from "sweetalert2";
 import { useLocation } from 'react-router-dom';
 
 function SupForm({editData, setEditData, refetch, data}) {
@@ -30,8 +31,15 @@ function SupForm({editData, setEditData, refetch, data}) {
                 "content-type": "application/json" 
             }
         })
-        if (response.status === 200) {
-            refetch();
+        if (response.status === 201) {
+          Swal.fire({
+            icon: 'error',
+            title: 'User Creation Failed',
+            text: "Destination already exists",
+            showConfirmButton: true,
+          })
+        } else{
+          refetch();
         }
         console.log(response, 'response');
         })(data);

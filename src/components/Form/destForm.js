@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import axios from "axios";
 import { API_URL } from "../../AppConstant.js";
-import { set } from "mongoose";
+import Swal from "sweetalert2";
 
 function DestForm({ editData, setEditData, refetch }) {
  
@@ -28,7 +28,14 @@ function DestForm({ editData, setEditData, refetch }) {
         }
       })
       console.log(response, 'response');
-      if (response.status === 200) {
+      if (response.status === 201) {
+        Swal.fire({
+          icon: 'error',
+          title: 'User Creation Failed',
+          text: "Destination already exists",
+          showConfirmButton: true,
+        })
+      } else{
         refetch();
       }
     })(data);
