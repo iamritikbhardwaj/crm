@@ -130,10 +130,11 @@ function PaymentForm({handlehide, tripId, inputData, refetch}) {
       <select
       {...register("paymentMode")}
       className="w-full border rounded p-2">
-        <option>Cash</option>
-        <option>Credit Card</option>
-        <option>Bank Transfer</option>
-        <option>UPI</option>
+        <option>INR ACCOUNT</option>
+        <option>CASH</option>
+        <option>CREDIT CARD</option>
+        <option>REMITTANCE</option>
+        <option>FLYREMIT</option>
       </select>
       {errors.paymentMode && <span className="text-red-500">{errors.paymentMode.message}</span>}
     </div>

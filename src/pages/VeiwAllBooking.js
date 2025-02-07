@@ -6,7 +6,7 @@ import { redirect, useLocation } from "react-router-dom";
 import { getTravelMonthRange } from "./Booking";
 import FileUpload from "../components/Input/FileUpload";
 import ReconForm from "../components/Form/ReconForm";
-import { MdAddCircle, MdDelete, MdEdit } from "react-icons/md";
+import { MdAddCircle, MdDelete, MdEdit, MdSave } from "react-icons/md";
 import PaymentForm from "../components/Form/PaymentForm";
 import VendorForm from "../components/Form/VendorForm";
 import {
@@ -457,7 +457,7 @@ export default function VeiwAllBooking() {
               <CustomTable
                 dataa={payment.map((item, index) => ({
                   installment: "installment" + " " + parseInt(index + 1),
-                  amount: item?.amount,
+                  amount: item?.amount + " " + "USD",
                   date:
                     item?.date.slice(0, 2) +
                     " " +
@@ -466,7 +466,7 @@ export default function VeiwAllBooking() {
                   convertionRate: item?.convRate,
                   amtinr: parseFloat(
                     (item?.conFee + item?.amount) * item?.convRate
-                  ),
+                  ) + " INR",
                   convfee: item?.conFee,
                   remarks: item?.remarks,
                   action: (
@@ -503,8 +503,8 @@ export default function VeiwAllBooking() {
                   { Header: "Remarks", accessor: "remarks" },
                   { Header: "Action", accessor: "action" },
                 ]}
-                size={"text-xs"}
                 hideFilter={true}
+                size={"text-md"}
               />
             </div>
 
@@ -547,12 +547,12 @@ export default function VeiwAllBooking() {
                     <div className="flex justify-around">
                       <button
                         className="text-blue-900"
-                        onClick={() => {
-                          setInputData(item);
-                          editForm.current.style.display = "block";
-                        }}
+                        // onClick={() => {
+                        //   setInputData(item);
+                        //   editForm.current.style.display = "block";
+                        // }}
                       >
-                        <MdEdit />
+                        <MdSave />
                       </button>
                       <button
                         onClick={() => {
@@ -575,9 +575,10 @@ export default function VeiwAllBooking() {
                   { Header: "Land Combo", accessor: "land" },
                   { Header: "Action", accessor: "action" },
                 ]}
-                size={"text-xs"}
+                size={"text-md"}
                 hideFilter={true}
               />
+
             </div>
           </div>
         </div>
@@ -655,6 +656,7 @@ export default function VeiwAllBooking() {
               refetch={refetch}
             />
             <CustomTable
+            
               dataa={vendorTable.map((item, index) => ({
                 name: item?.name,
                 destination: item?.destination,
@@ -667,9 +669,9 @@ export default function VeiwAllBooking() {
                       refetch();
                     }}
                   >
-                    <option value={"Approved"}>Approved</option>
-                    <option value={"Pending"}>Pending</option>
-                    <option value={"Rejected"}>Rejected</option>
+                    <option value={"PENDING"}>PENDING</option>
+                    <option value={"IN-PROGRESS"}>IN-PROGRESS</option>
+                    <option value={"COMPLETED"}>COMPLETED</option>
                   </select>
                 ),
                 paymentStatus: (
@@ -681,9 +683,9 @@ export default function VeiwAllBooking() {
                       }}
                       value={item?.payment_status}
                     >
-                      <option value={"Paid"}>Paid</option>
-                      <option value={"Unpaid"}>Unpaid</option>
-                      <option value={"Cancelled"}>Cancelled</option>
+                      <option value={"UNPAID"}>UNPAID</option>
+                      <option value={"PARTPAID"}>PARTPAID</option>
+                      <option value={"FULL-PAID"}>FULL-PAID</option>
                     </select>
                   </>
                 ),
@@ -717,7 +719,7 @@ export default function VeiwAllBooking() {
                 { Header: "Payment Status", accessor: "paymentStatus" },
                 { Header: "Action", accessor: "action" },
               ]}
-              size={"text-xs"}
+              size={"text-md"}
               hideFilter={true}
             />
           </div>
@@ -749,7 +751,7 @@ export default function VeiwAllBooking() {
               catagory={"activitiesvoucher"}
             />
             <FileUpload
-              label={"Miscellaneous Voucher"}
+              label={"Transfer Voucher"}
               id={"miscvoucher"}
               onChange={addDoc}
               onRemove={removeDoc}

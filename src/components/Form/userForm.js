@@ -60,12 +60,22 @@ function UserForm() {
       }
       );
       console.log(response.data, 'response');
-      Swal.fire(`User ${id ? 'updated' : 'created'} successfully`);
+      if (response.data.STATUS === 'FAIL') {
+        Swal.fire({
+          icon: 'error',
+          title: 'User Creation Failed',
+          text: "Either email or phone number already exists",
+          showConfirmButton: true,
+        })
+      } else {
+        Swal.fire(`User ${id ? 'updated' : 'created'} successfully`);
+        console.log("Form Data Submitted:", data);
+    navigate("/user");
+      }
+      
     } catch (error) {
       console.log(error);
     }
-    console.log("Form Data Submitted:", data);
-    navigate("/user");
   };
 
   return (

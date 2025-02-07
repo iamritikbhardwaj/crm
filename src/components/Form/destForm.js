@@ -5,6 +5,7 @@ import { z } from "zod";
 import axios from "axios";
 import { API_URL } from "../../AppConstant.js";
 import { set } from "mongoose";
+import e from "express";
 
 function DestForm({ editData, setEditData, refetch }) {
  
@@ -28,7 +29,14 @@ function DestForm({ editData, setEditData, refetch }) {
         }
       })
       console.log(response, 'response');
-      if (response.status === 200) {
+      if (response.data.STATUS === 'FAIL') {
+        Swal.fire({
+          icon: 'error',
+          title: 'User Creation Failed',
+          text: "Destination already exists",
+          showConfirmButton: true,
+        })
+      } else if (response.status === 200) {
         refetch();
       }
     })(data);

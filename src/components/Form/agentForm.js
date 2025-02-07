@@ -26,7 +26,14 @@ function AgentForm({editData, setEditData, refetch}) {
             }
           })
           console.log(response, 'response');
-          if ((await response).status === 200) {
+          if (response.data.STATUS === 'FAIL') {
+            Swal.fire({
+              icon: 'error',
+              title: 'User Creation Failed',
+              text: "Agent already exists",
+              showConfirmButton: true,
+            })
+          } else if ((await response).status === 200) {
             refetch();
           }
         })(data);     
