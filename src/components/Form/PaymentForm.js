@@ -90,6 +90,7 @@ function PaymentForm({handlehide, tripId, inputData, refetch}) {
       </label>
       <input
         type="number"
+        step="0.01"
         className="w-full border rounded p-2"
         {...register("amount", {
           setValueAs: (v) => parseFloat(v) // Convert to number
@@ -103,6 +104,7 @@ function PaymentForm({handlehide, tripId, inputData, refetch}) {
       </label>
       <input
         type="number"
+        step="0.01"
         className="w-full border rounded p-2"
         {...register("conFee", {
           setValueAs: (v) => parseFloat(v) // Convert to number
@@ -116,6 +118,7 @@ function PaymentForm({handlehide, tripId, inputData, refetch}) {
       </label>
       <input
         type="number"
+        step="0.01"
         className="w-full border rounded p-2"
         {...register("convRate", {
           setValueAs: (v) => parseFloat(v) // Convert to number

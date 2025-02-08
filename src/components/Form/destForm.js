@@ -47,7 +47,6 @@ function DestForm({ editData, setEditData, refetch }) {
       setValue("currency", editData?.currency);
       console.log(editData?.destination, 'editData');
     }}, [editData, setEditData]);
-  
 
   return (
     <form onSubmit={handleSubmit(destSubmit)}>

@@ -19,7 +19,7 @@ function AgentForm({editData, setEditData, refetch}) {
     const agentSubmit = (data) => {
       // console.log('data', data)
         (async (data) => {
-          const response = axios.post(`${API_URL}users/createAgent${editData.hasOwnProperty('agent_id') ? `/?id=${editData?.agent_id}` : ""}`, data,
+          const response = await axios.post(`${API_URL}users/createAgent${editData.hasOwnProperty('agent_id') ? `/?id=${editData?.agent_id}` : ""}`, data,
           {
             withCredentials: true,
             headers: {
@@ -36,7 +36,7 @@ function AgentForm({editData, setEditData, refetch}) {
           } else{
             refetch();
           }
-          console.log(response, 'response');
+          console.log(response, 'agent response');
         })(data);     
     }
 
@@ -60,12 +60,16 @@ function AgentForm({editData, setEditData, refetch}) {
                 {...register("name")}
               />
               {errors.name && <p className="text-red-500">{errors.name.message}</p>}
-              <input
+              <select
                 className="w-full p-2 border-[1px] m-2 rounded"
                 type="text"
                 placeholder="Status"
                 {...register("status")}
-              />
+              >
+                <option value="">Select Status</option>
+                <option value="ACTIVE">ACTIVE</option>
+                <option value="INACTIVE">INACTIVE</option>
+              </select>
               {errors.status && <p className="text-red-500">{errors.status.message}</p>}
               <button type="submit" className="w-1/2 p-2 border-[1px] m-2 bg-slate-700 text-white rounded hover:bg-slate-600">
                 Save

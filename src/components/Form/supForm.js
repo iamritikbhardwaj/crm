@@ -66,12 +66,16 @@ function SupForm({editData, setEditData, refetch, data}) {
                 {...register("name")}
               />
               {errors.name && <span>{errors.name.message}</span>}
-              <input
+              <select
                 className="w-full p-2 border-[1px] m-2 rounded"
                 type="text"
                 placeholder="Status"
                 {...register("status")}
-              />
+              >
+                <option value="">Select Status</option>
+                <option value="ACTIVE">ACTIVE</option>
+                <option value="IN-ACTIVE">INACTIVE</option>
+              </select>
               <select
               className='w-full p-2 border-[1px] m-2 rounded'
                 {...register("destination_id")}
