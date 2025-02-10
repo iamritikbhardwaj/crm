@@ -37,7 +37,6 @@ export default function VeiwAllBooking() {
   const [active, setActive] = useState(0); // Section toggle
   const [doc, setDoc] = useState(item?.documents);
   const [vendorTable, setVendorTable] = useState([]);
-  console.log(vendorTable, "vendorTable");
   const [transferPrice, setTransferPrice] = useState();
 
   const setPrice = (price) => {
@@ -313,9 +312,11 @@ export default function VeiwAllBooking() {
               ],
               [
                 "Trip Status",
-                <select onChange={updateStatus}>
+                <select value={item?.status} onChange={updateStatus}>
                   <option value="CONFIRMED">CONFIRMED</option>
                   <option value="CANCELLED">CANCELLED</option>
+                  <option value="ON-TOUR">ON-TOUR</option>
+                  <option value="TRAVELLED">TRAVELLED</option>
                 </select>,
               ], // ask client where will this come from
             ].map(([label, value], index) => (
@@ -457,17 +458,17 @@ export default function VeiwAllBooking() {
               <CustomTable
                 dataa={payment.map((item, index) => ({
                   installment: "installment" + " " + parseInt(index + 1),
-                  amount: item?.amount + " " + "USD",
+                  amount: parseFloat(item?.amount).toFixed(2) + " " + "USD",
                   date:
                     item?.date.slice(0, 2) +
                     " " +
                     getTravelMonthRange(item?.date),
                   mode: item?.paymentMode,
-                  convertionRate: item?.convRate,
-                  amtinr: parseFloat(
-                    (item?.conFee + item?.amount) * item?.convRate
-                  ) + " INR",
-                  convfee: item?.conFee,
+                  convertionRate: parseFloat(item?.convRate).toFixed(2) + " USD",
+                  amtinr: 
+                  ((parseFloat(item?.conFee) + parseFloat((item?.amount))) * item?.convRate).toFixed(2)
+                   + " INR",
+                  convfee: parseFloat(item?.conFee).toFixed(2) + " USD",
                   remarks: item?.remarks,
                   action: (
                     <div className="flex justify-around">
@@ -539,24 +540,28 @@ export default function VeiwAllBooking() {
               </button>
 
               <CustomTable
-                dataa={recon.map((item, index) => ({
-                  online: item?.online + " USD",
-                  offline: item?.offline + " USD",
-                  land: item?.land + " USD",
+                dataa={recon.map((data, index) => ({
+                  online: data?.online + " USD",
+                  offline: data?.offline + " USD",
+                  land: data?.land + " USD",
                   action: (
                     <div className="flex justify-around">
                       <button
                         className="text-blue-900"
-                        // onClick={() => {
-                        //   setInputData(item);
-                        //   editForm.current.style.display = "block";
-                        // }}
+                        onClick={() => {
+                          if (parseFloat(data?.online) + parseInt(data?.offline) + parseInt(data?.land) !== parseInt(item.orderValue)) {
+                            Swal.fire("Online + Offline + Land must be equal to Order Value");
+                          } else{
+                            console.log("done");
+                            // edit options are available in case we want to add edit functionality
+                          }
+                        }}
                       >
                         <MdSave />
                       </button>
                       <button
                         onClick={() => {
-                          deleteRecon(item?.recon_id);
+                          deleteRecon(data?.recon_id);
                           refetchCom();
                         }}
                         className="text-red-600"

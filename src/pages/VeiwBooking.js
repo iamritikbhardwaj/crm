@@ -65,6 +65,7 @@ export default function VeiwBooking() {
 
   // Accept Booking is to set booking status to confirmed also add salesSpoc
   const acceptBooking = async () => {
+    
     Swal.fire({
       title: "Submitting...",
       text: "Please wait while we move your booking.",
@@ -101,6 +102,32 @@ export default function VeiwBooking() {
       console.log(error);
     }
   };
+
+  const rejectvalidation = () => {
+    {Swal.fire({
+      title: `Do you want to Reject Booking?`,
+      showDenyButton: true,
+      confirmButtonText: `reject`,
+      denyButtonText: `Don't reject`,
+    }).then((result) => {
+      if (result.isConfirmed) {
+        rejectBooking();
+      }
+    })}
+  }
+
+  const acceptValidation = () => {
+    {Swal.fire({
+      title: `Do you want to Accept Booking?`,
+      showDenyButton: true,
+      confirmButtonText: `Accept`,
+      denyButtonText: `Don't accept`,
+    }).then((result) => {
+      if (result.isConfirmed) {
+        acceptBooking();
+      }
+    })}
+  }
 
   const splitIt = (str) => {
     const data = new String(str).split("/");
@@ -373,13 +400,13 @@ export default function VeiwBooking() {
         {/* Action Buttons */}
         <div className="p-4 flex justify-between">
           <button
-            onClick={acceptBooking}
+            onClick={acceptValidation}
             className="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600"
           >
             Accept Booking
           </button>
           <button
-            onClick={rejectBooking}
+            onClick={rejectvalidation}
             className="bg-red-500 text-white px-6 py-2 rounded hover:bg-red-600"
           >
             Reject Booking

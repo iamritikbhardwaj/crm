@@ -95,7 +95,7 @@ function VendorForm({ dest, refetch, tripId, setInputData }) {
         {supplier &&
           Array.from(supplier).map((sup, index) => {
             return (
-              <option key={index} value={sup.name}>
+              <option key={index} className={`${sup.status === "ACTIVE" ? "" : "hidden"}`} value={sup.name}>
                 {sup.name}
               </option>
             );

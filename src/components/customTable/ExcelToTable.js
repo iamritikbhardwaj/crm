@@ -24,8 +24,9 @@ function ExcelToTable({url, setPrice}) {
       const worksheet = workbook.Sheets[firstSheetName];
   
       // Convert sheet to JSON (array format, keeping all data intact)
-      const sheetData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
-  
+      const sheetData = XLSX.utils.sheet_to_json(worksheet, { header: 1, raw: true });
+      console.log(sheetData, "Sheet Data")
+
       if (!sheetData || sheetData.length === 0) {
         console.error('Empty sheet or unreadable data');
         return;
@@ -47,14 +48,13 @@ function ExcelToTable({url, setPrice}) {
         }, {})
       );
   
-      setFilesData([{ fileName: url.split('/').pop(), columns: headers, data: rows }]);
+      setFilesData([{ fileName: <a href={url}>{url.split('/').pop()}</a>, columns: headers, data: rows }]);
       setSelectedFileIndex(0);
   
     } catch (error) {
       console.error('Error fetching or parsing Excel file:', error);
     }
   };
-  
   const ExcelLikeTable = ({ data, columns }) => {
     return (
       <div className="overflow-x-auto">
@@ -77,7 +77,10 @@ function ExcelToTable({url, setPrice}) {
                       setPrice(row[column.accessor]);
                     }
                     return(
-                    <td key={colIndex} className={`px-4 py-2 border ${data.length - 1 === rowIndex ? 'font-extrabold' : ''}`}>{row[column.accessor] ? (new String(row[column.accessor]).includes('.') ? new String(row[column.accessor]).split('.')[0] + '.' + new String(row[column.accessor]).split('.')[1].slice(0, 2) : row[column.accessor] ) : ' '}</td>
+                    <td key={colIndex} className={`px-4 py-2 border ${data.length - 1 === rowIndex ? 'font-extrabold' : ''}`}> 
+                    {/* {row[column.accessor] ? row[column.accessor] : ' '} */}
+                      {row[column.accessor] ? (new String(row[column.accessor]).includes('.') ? new String(row[column.accessor]).split('.')[0] + '.' + new String(row[column.accessor]).split('.')[1].slice(0, 2) : row[column.accessor] ) : ' '}
+                      </td>
                   )})}
                 </tr>
               ))

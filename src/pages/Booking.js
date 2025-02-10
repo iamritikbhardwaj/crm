@@ -14,8 +14,8 @@ export function getTravelMonthRange(arrivalDate) {
     const arrivalYear = arrival.getFullYear(); // Year of arrival
   
     const months = [
-      "January", "February", "March", "April", "May", "June",
-      "July", "August", "September", "October", "November", "December"
+      "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
     ];
   
     const arrivalMonthName = months[arrivalMonth];

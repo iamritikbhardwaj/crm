@@ -15,8 +15,8 @@ const AddBooking = () => {
   const sections = [
     "Booking Details",
     "Travel Details",
-    "Order & Contact Details",
     "Documents Upload",
+    "Order & Contact Details",
   ];
   const [currentSection, setCurrentSection] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -246,8 +246,7 @@ const AddBooking = () => {
               </select>
               {errors.destination && (
                   <p className="text-red-500">{errors.destination.message}</p>
-                ) &&
-                Swal.fire(errors.destination.message)}
+                )}
             </div>
 
             <div>
@@ -279,11 +278,13 @@ const AddBooking = () => {
               >
                 <option value="">Select Agent</option>
                 {agent &&
-                  agent.map((user, index) => (
-                    <option key={index} value={user.name}>
+                  agent.map((user, index) => 
+                     (
+                    <option key={index} className={`${user.status === "ACTIVE" ? "": "hidden"}`} value={user.name}>
                       {user.name}
                     </option>
-                  ))}
+                  )
+                  )}
               </select>
               {errors.agent && (
                 <p className="text-red-500">{errors.agent.message}</p>
@@ -405,7 +406,7 @@ const AddBooking = () => {
                 </select>
               </div>
               <div className="w-1/2">
-                <label className="block mb-2">WhatsApp Number</label>
+                <label className="block mb-2">Customer WhatsApp Number</label>
                 <input
                   type="tel"
                   name="whatsappNumber"
@@ -423,7 +424,7 @@ const AddBooking = () => {
             </div>
 
             <div>
-              <label className="block mb-2">Order Value</label>
+              <label className="block mb-2">Order Value {"(USD)"}</label>
               <input
                 type="number"
                 name="orderValue"

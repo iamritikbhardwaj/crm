@@ -10,9 +10,9 @@ function PaymentForm({handlehide, tripId, inputData, refetch}) {
     const paymentSchema = z.object({
         tripId: z.string().min(1, { message: "Trip ID is required" }),
         date: z.string().min(1, { message: "Date is required" }),
-        amount: z.number().min(1, { message: "Amount is required" }),
-        conFee: z.number().min(1, { message: "Convenience Fee is required" }),
-        convRate: z.number().min(1, { message: "Convenience Rate is required" }),
+        amount: z.string().min(1, { message: "Amount is required" }),
+        conFee: z.string().optional(),
+        convRate: z.string().min(1, { message: "Convenience Rate is required" }),
         paymentMode: z.string().min(1, { message: "Payment Mode is required" }),
         remarks: z.string().optional(),
         validatedBy: z.string().min(1, { message: "Validated By is required" }),
@@ -93,7 +93,7 @@ function PaymentForm({handlehide, tripId, inputData, refetch}) {
         step="0.01"
         className="w-full border rounded p-2"
         {...register("amount", {
-          setValueAs: (v) => parseFloat(v) // Convert to number
+          setValueAs: (v) => parseFloat(v).toFixed(2) // Convert to number
         })}
       />
       {errors.amount && <span className="text-red-500">{errors.amount.message}</span>}
@@ -107,7 +107,7 @@ function PaymentForm({handlehide, tripId, inputData, refetch}) {
         step="0.01"
         className="w-full border rounded p-2"
         {...register("conFee", {
-          setValueAs: (v) => parseFloat(v) // Convert to number
+          setValueAs: (v) => parseFloat(v).toFixed(2) // Convert to number
         })}
       />
       {errors.conFee && <span className="text-red-500">{errors.conFee.message}</span>}
@@ -121,7 +121,7 @@ function PaymentForm({handlehide, tripId, inputData, refetch}) {
         step="0.01"
         className="w-full border rounded p-2"
         {...register("convRate", {
-          setValueAs: (v) => parseFloat(v) // Convert to number
+          setValueAs: (v) => parseFloat(v).toFixed(2) // Convert to number
         })}
       />
       {errors.convRate && <span className="text-red-500">{errors.convRate.message}</span>}
