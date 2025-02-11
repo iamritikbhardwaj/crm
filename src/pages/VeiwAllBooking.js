@@ -212,6 +212,7 @@ export default function VeiwAllBooking() {
   };
 
   const updateStatus = async (e) => {
+    const value = e.target.value;
     Swal.fire({
       title: "Do you want to Update changes?",
       showDenyButton: true,
@@ -221,7 +222,7 @@ export default function VeiwAllBooking() {
       /* Read more about isConfirmed, isDenied below */
       if (result.isConfirmed) {
         const formData = {
-          status: e.target.value,
+          status: value,
         };
         const response = axios.post(
           `${API_URL}users/updateStatus/?id=${tripId}`,
