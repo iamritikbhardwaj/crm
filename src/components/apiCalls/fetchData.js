@@ -107,46 +107,46 @@ export const fetchTrips = async (id) => {
   }
 };
 
-export const fetchPayment = async () => {
-  const response = await axios.get(`${API_URL}users/getAllPayments`, {
+export const fetchPayment = async (id) => {
+  const response = await axios.get(`${API_URL}users/getAllPayments/?id=${id}`, {
     withCredentials: true,
     headers: {
       "content-type": "application/json",
     },
   });
   if (response.status === 200) {
-    return response.data.OUTPUT;
-  } else {
+    return await response.data.OUTPUT;
+} else {
     alert(response.data.MESSAGE);
     return false;
   }
 };
 
 export const fetchRecon = async (id) => {
-  const response = await axios.get(`${API_URL}users/getAllRecons${id ? "/?id=" + id : ""}`, {
+  const response = await axios.get(`${API_URL}users/getAllRecons/?id=${id}`, {
     withCredentials: true,
     headers: {
       "content-type": "application/json",
     },
   });
   if (response.status === 200) {
-    return response.data.OUTPUT;
-  } else {
+    return await response.data.OUTPUT;
+} else {
     alert(response.data.MESSAGE);
     return false;
   }
 };
 
-export const fetchVendors = async () => {
-  const response = await axios.get(`${API_URL}users/getAllVendors`, {
+export const fetchVendors = async (id) => {
+  const response = await axios.get(`${API_URL}users/getAllVendors/?id=${id}`, {
     withCredentials: true,
     headers: {
       "content-type": "application/json",
     },
   });
   if (response.status === 200) {
-    return response.data.OUTPUT;
-  } else {
+    return await response.data.OUTPUT;
+} else {
     alert(response.data.MESSAGE);
     return false;
   }

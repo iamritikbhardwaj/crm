@@ -18,30 +18,12 @@ const AllBookings = () => {
   const [opsStat, setOpsStat] = useState("bg-red-400");
   const [spStat, setSpStat] = useState(true);
 
-  const payStat = async (id) => {
-    const supPay = await fetchVendors();
-    console.log(supPay, "supPay");
-    Array.from(supPay).forEach((payData, index) => {
-      if (payData.payment_status !== "FULL-PAID") {
-        console.log("triggered");
-        setSpStat(false);
-      }
-    });
-    
-    // this is for recon may be removed if not needed
-
-    // const recon = await fetchRecon();
-    // const rec = parseFloat(recon[0].land) + parseFloat(recon[0].online) + parseFloat(recon[0].offline);
-    // console.log(recon, "rec");
-  };
-
   // Simulate fetching data
   useEffect(() => {
     (async () => {
       const data = await fetchTrips();
-      payStat(data[0].tripId);
-      const payment = await fetchPayment();
-      const pay = payment.reduce((acc, item) => parseFloat(acc) + parseFloat(item.amount), 0);
+      console.log(data, "data")
+      
       const bookings = data.map((item) => ({
         tripID: item.tripId,
         destination: item.destination,
@@ -79,12 +61,10 @@ const AllBookings = () => {
         apayment: (
           <div
             className={`${
-              item.orderValue === pay
-                ? "text-green-500"
-                : "text-red-500"
+              parseFloat(item.orderValue) === parseFloat(item?.payment) ? "text-green-500" : "text-red-500"
             }`}
           >
-            {pay + " USD"}
+            {item?.payment + " USD"}
           </div>
         ),
         status: (
@@ -114,7 +94,9 @@ const AllBookings = () => {
         paymentstat: (
           <button
             className={`${
-              spStat ? "bg-green-400" : "bg-red-400"
+              item?.paymentStatus !== "FULL-PAID"
+                ? "bg-red-400"
+                : "bg-green-400"
             } p-2 rounded-lg`}
           ></button>
         ),

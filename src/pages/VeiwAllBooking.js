@@ -10,11 +10,9 @@ import { MdAddCircle, MdDelete, MdEdit, MdSave } from "react-icons/md";
 import PaymentForm from "../components/Form/PaymentForm";
 import VendorForm from "../components/Form/VendorForm";
 import {
-  fetchDestinations,
   fetchPayment,
   fetchRecon,
   fetchSalesDocs,
-  fetchSuppliers,
   fetchTrips,
   fetchUsers,
   fetchVendors,
@@ -56,19 +54,24 @@ export default function VeiwAllBooking() {
     const itemData = await fetchTrips(tripId);
     setItem(itemData);
     setDoc(itemData?.documents);
-    const vendorData = await fetchVendors();
+    const vendorData = await fetchVendors(tripId);
+    console.log(vendorData, "vendorData")
     setVendorTable(vendorData);
   };
 
   const refetchCom = async () => {
-    const reconData = await fetchRecon();
+    const reconData = await fetchRecon(tripId);
     if (reconData) {
       setRecon(reconData);
+    }else{
+      setRecon([])
     }
 
-    const payData = await fetchPayment();
+    const payData = await fetchPayment(tripId);
     if (payData) {
       setPayment(payData);
+    }else{
+      setPayment([])
     }
   };
 
@@ -78,6 +81,15 @@ export default function VeiwAllBooking() {
         `${API_URL}users/createVendor/?id=${item.vendor_pay_id}`,
         vendor
       );
+      const vend = await fetchVendors(tripId);
+      const ven = vend.filter((item)=> (item.payment_status !== "FULL-PAID"))
+      if(Array.from(ven).length === 0) {
+        const res = await axios.post(`${API_URL}users/updatePayStat/?id=${tripId}`, {paymentStatus: "FULL-PAID"});
+        console.log(res, "res for paymentStatus")
+      }else{
+        const res = await axios.post(`${API_URL}users/updatePayStat/?id=${tripId}`, {paymentStatus: "UNPAID"});
+        console.log(res, "res for paymentStatus")
+      }
       Swal.fire({
         title: "Vendor updated successfully",
         timer: 2000,
@@ -456,26 +468,26 @@ export default function VeiwAllBooking() {
                 <MdAddCircle />
               </button>
               <CustomTable
-                dataa={payment.map((item, index) => ({
+                dataa={payment.map((data, index) => ({
                   installment: "installment" + " " + parseInt(index + 1),
-                  amount: parseFloat(item?.amount).toFixed(2) + " " + "USD",
+                  amount: parseFloat(data?.amount).toFixed(2) + " " + "USD",
                   date:
-                    item?.date.slice(0, 2) +
+                    data?.date.slice(8, 10) +
                     " " +
-                    getTravelMonthRange(item?.date),
-                  mode: item?.paymentMode,
-                  convertionRate: parseFloat(item?.convRate).toFixed(2) + " USD",
+                    getTravelMonthRange(data?.date),
+                  mode: data?.paymentMode,
+                  convertionRate: parseFloat(data?.convRate).toFixed(2) + " USD",
                   amtinr: 
-                  ((parseFloat(item?.conFee) + parseFloat((item?.amount))) * item?.convRate).toFixed(2)
+                  ((parseFloat(data?.conFee) + parseFloat((data?.amount))) * data?.convRate).toFixed(2)
                    + " INR",
-                  convfee: parseFloat(item?.conFee).toFixed(2) + " USD",
-                  remarks: item?.remarks,
+                  convfee: parseFloat(data?.conFee).toFixed(2) + " USD",
+                  remarks: data?.remarks,
                   action: (
                     <div className="flex justify-around">
                       <button
                         className="text-blue-900"
                         onClick={() => {
-                          setInputData(item);
+                          setInputData(data);
                           inpRef.current.style.display = "block";
                         }}
                       >
@@ -483,7 +495,7 @@ export default function VeiwAllBooking() {
                       </button>
                       <button
                         onClick={() => {
-                          deletePayment(item?.payment_id);
+                          deletePayment(data?.payment_id);
                           refetchCom();
                         }}
                         className="text-red-600"
@@ -661,7 +673,6 @@ export default function VeiwAllBooking() {
               refetch={refetch}
             />
             <CustomTable
-            
               dataa={vendorTable.map((item, index) => ({
                 name: item?.name,
                 destination: item?.destination,

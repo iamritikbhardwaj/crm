@@ -71,7 +71,7 @@ function CustomTable({ dataa, columnss, button, path, size, hideFilter }) {
                 {...row.getRowProps()}
               >
                 {row.cells.map((cell) => (
-                  <td className="hover:bg-slate-300 border whitespace-nowrap border-slate-300" {...cell.getCellProps()}>
+                  <td className="hover:bg-slate-300 border whitespace-nowrap p-2 border-slate-300" {...cell.getCellProps()}>
                     {cell.render('Cell')}
                   </td>
                 ))}
