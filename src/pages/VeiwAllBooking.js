@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { IoIosArrowDropdownCircle } from "react-icons/io";
 import BackToHome from "../components/BackToHome";
 import { CustomTable } from "../components/customTable/CustomTable";
-import { redirect, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { getTravelMonthRange } from "./Booking";
 import FileUpload from "../components/Input/FileUpload";
 import ReconForm from "../components/Form/ReconForm";
@@ -36,6 +36,7 @@ export default function VeiwAllBooking() {
   const [doc, setDoc] = useState(item?.documents);
   const [vendorTable, setVendorTable] = useState([]);
   const [transferPrice, setTransferPrice] = useState();
+  const [orderValue, setOrderValue] = useState();
 
   const setPrice = (price) => {
     setTransferPrice(price);
@@ -54,49 +55,108 @@ export default function VeiwAllBooking() {
     const itemData = await fetchTrips(tripId);
     setItem(itemData);
     setDoc(itemData?.documents);
-    const vendorData = await fetchVendors(tripId);
-    console.log(vendorData, "vendorData")
-    setVendorTable(vendorData);
   };
+
+  const refetchVend = async() => {
+    const vendorData = await fetchVendors(tripId);
+    console.log(vendorData, "vendorData");
+    setVendorTable(vendorData);
+  }
 
   const refetchCom = async () => {
     const reconData = await fetchRecon(tripId);
     if (reconData) {
       setRecon(reconData);
-    }else{
-      setRecon([])
+    } else {
+      setRecon([]);
     }
 
     const payData = await fetchPayment(tripId);
     if (payData) {
       setPayment(payData);
-    }else{
-      setPayment([])
+    } else {
+      setPayment([]);
     }
   };
 
   const editVendor = (item, vendor) => {
-    (async () => {
-      const response = await axios.post(
-        `${API_URL}users/createVendor/?id=${item.vendor_pay_id}`,
-        vendor
-      );
-      const vend = await fetchVendors(tripId);
-      const ven = vend.filter((item)=> (item.payment_status !== "FULL-PAID"))
-      if(Array.from(ven).length === 0) {
-        const res = await axios.post(`${API_URL}users/updatePayStat/?id=${tripId}`, {paymentStatus: "FULL-PAID"});
-        console.log(res, "res for paymentStatus")
-      }else{
-        const res = await axios.post(`${API_URL}users/updatePayStat/?id=${tripId}`, {paymentStatus: "UNPAID"});
-        console.log(res, "res for paymentStatus")
+    Swal.fire({
+      title: "Do you want to Update changes?",
+      showDenyButton: true,
+      confirmButtonText: "Update",
+      denyButtonText: `Don't Update`,
+    }).then((result) => {
+      /* Read more about isConfirmed, isDenied below */
+      if (result.isConfirmed) {
+        (async () => {
+          const response = await axios.post(
+            `${API_URL}users/createVendor/?id=${item.vendor_pay_id}`,
+            vendor
+          );
+          if(response){
+            refetchVend();
+           }
+          const vend = await fetchVendors(tripId);
+          const payStat = vend.filter(
+            (item) => item.payment_status !== "FULL-PAID"
+          );
+          const bookStat = vend.filter(
+            (item) => item.booking_status !== "COMPLETED"
+          );
+          if (Array.from(payStat).length === 0 && Array.from(bookStat).length === 0) {
+            const res = await axios.post(
+              `${API_URL}users/updatePayStat/?id=${tripId}`,
+              { paymentStatus: "FULL-PAID", opsStatus: "COMPLETED"  }
+            );
+          } else if (
+            Array.from(payStat).length !== 0 &&
+            Array.from(bookStat).length === 0
+          ) {
+            const res = await axios.post(
+              `${API_URL}users/updatePayStat/?id=${tripId}`,
+              { paymentStatus: "UNPAID", opsStatus: "COMPLETED" }
+            );
+          }else if (
+            Array.from(payStat).length === 0 &&
+            Array.from(bookStat).length !== 0
+          ) {
+            const res = await axios.post(
+              `${API_URL}users/updatePayStat/?id=${tripId}`,
+              { paymentStatus: "FULL-PAID", opsStatus: "PENDING" }
+            );
+          } else{
+            const res = await axios.post(
+              `${API_URL}users/updatePayStat/?id=${tripId}`,
+              { paymentStatus: "UNPAID", opsStatus: "PENDING" }
+            );
+          }
+          Swal.fire({
+            title: "Vendor updated successfully",
+            timer: 2000,
+          });
+          console.log(response, "response");
+        })();
+      } else {
+        Swal.fire("Changes are not Updated", "", "info");
       }
-      Swal.fire({
-        title: "Vendor updated successfully",
-        timer: 2000,
-      });
-      console.log(response, "response");
-    })();
+    });
   };
+
+  const updateOrderVal = () => {
+    Swal.fire({
+      title: "Do you want to Update changes?",
+      showDenyButton: true,
+      confirmButtonText: "Update",
+      denyButtonText: `Don't Update`,
+    }).then((result) => {
+      /* Read more about isConfirmed, isDenied below */
+      if (result.isConfirmed) {
+        const res = axios.post(`${API_URL}users/updateOrderVal/?id=${tripId}`,{orderValue: orderValue})
+      } else {
+        Swal.fire("Order Value is not Updated", "", "info");
+      }
+  })
+}
 
   const splitIt = (str) => {
     const data = new String(str).split("/");
@@ -118,6 +178,7 @@ export default function VeiwAllBooking() {
         }
         refetchCom();
         refetch();
+        refetchVend();
         const sdata = await fetchSalesDocs(tripId);
         setSelectedExcel(sdata[sdata.length - 1]);
       })();
@@ -151,59 +212,80 @@ export default function VeiwAllBooking() {
   };
 
   const updateStatus = async (e) => {
-    const formData = {
-      status: e.target.value,
-    };
-    const response = axios.post(
-      `${API_URL}users/updateStatus/?id=${tripId}`,
-      formData,
-      {
-        withCredentials: true,
-        headers: {
-          "content-type": "application/json",
-        },
+    Swal.fire({
+      title: "Do you want to Update changes?",
+      showDenyButton: true,
+      confirmButtonText: "Update",
+      denyButtonText: `Don't Update`,
+    }).then(async (result) => {
+      /* Read more about isConfirmed, isDenied below */
+      if (result.isConfirmed) {
+        const formData = {
+          status: e.target.value,
+        };
+        const response = axios.post(
+          `${API_URL}users/updateStatus/?id=${tripId}`,
+          formData,
+          {
+            withCredentials: true,
+            headers: {
+              "content-type": "application/json",
+            },
+          }
+        );
+        if ((await response).status === 200) {
+          await refetch();
+          Swal.fire({
+            title: "Status updated successfully",
+            timer: 2000,
+          });
+        } else {
+          Swal.fire({
+            text: response.data.MESSAGE,
+            timer: 2000,
+          });
+        }
       }
-    );
-    if ((await response).status === 200) {
-      await refetch();
-      Swal.fire({
-        title: "Status updated successfully",
-        timer: 2000,
-      });
-    } else {
-      Swal.fire({
-        text: response.data.MESSAGE,
-        timer: 2000,
-      });
-    }
+    });
   };
 
   const updateOps = async (e) => {
-    const formData = {
-      opsSpoc: e.target.value,
-    };
-    const response = axios.post(
-      `${API_URL}users/updateOps/?id=${tripId}`,
-      formData,
-      {
-        withCredentials: true,
-        headers: {
-          "content-type": "application/json",
-        },
+    const value = e.target.value
+    Swal.fire({
+      title: "Do you want to Update changes?",
+      showDenyButton: true,
+      confirmButtonText: "Update",
+      denyButtonText: `Don't Update`,
+    }).then(async (result) => {
+      /* Read more about isConfirmed, isDenied below */
+      if (result.isConfirmed) {
+        const formData = {
+          opsSpoc: value,
+        };
+        const response = axios.post(
+          `${API_URL}users/updateOps/?id=${tripId}`,
+          formData,
+          {
+            withCredentials: true,
+            headers: {
+              "content-type": "application/json",
+            },
+          }
+        );
+        if ((await response).status === 200) {
+          await refetch();
+          Swal.fire({
+            title: "Ops updated successfully",
+            timer: 2000,
+          });
+        } else {
+          Swal.fire({
+            text: response.data.MESSAGE,
+            timer: 2000,
+          });
+        }
       }
-    );
-    if ((await response).status === 200) {
-      await refetch();
-      Swal.fire({
-        title: "Ops updated successfully",
-        timer: 2000,
-      });
-    } else {
-      Swal.fire({
-        text: response.data.MESSAGE,
-        timer: 2000,
-      });
-    }
+    });
   };
 
   const updateDocs = async () => {
@@ -251,14 +333,6 @@ export default function VeiwAllBooking() {
         <h1 className="text-2xl font-bold text-center mb-6">
           View Confirmed Booking
         </h1>
-        <div className="flex justify-end">
-          <button
-            onClick={updateDocs}
-            className="bg-blue-500 rounded-lg px-2 m-2 text-white py-1"
-          >
-            Save Changes
-          </button>
-        </div>
 
         {/* Booking Details */}
         <div className="mb-6">
@@ -349,6 +423,14 @@ export default function VeiwAllBooking() {
             </span>
           </h2>
           <div className={`p-4 ${active === 1 ? "block" : "hidden"}`}>
+            <div className="flex justify-end">
+              <button
+                onClick={updateDocs}
+                className="bg-blue-500 rounded-lg px-2 m-2 text-white py-1"
+              >
+                Save documents
+              </button>
+            </div>
             <div className="flex">
               {/* Document Upload List */}
               <div className="w-1/2 border-r border-gray-300 px-2 space-y-2">
@@ -431,8 +513,9 @@ export default function VeiwAllBooking() {
           <div className={`p-4 ${active === 2 ? "block" : "hidden"}`}>
             <div className="flex justify-between">
               <p className="font-semibold">
-                Order Value (USD): {item?.orderValue}
+                Order Value (USD): <input type="number" step="0.01" placeholder={item?.orderValue} onChange={(e) => setOrderValue(e.target.value)}/>
               </p>
+              <button className="p-2 m-1 text-white bg-blue-500" onClick={updateOrderVal}>Save Changes</button>
               <p className="font-semibold">
                 Transfer Price(USD): {parseFloat(transferPrice).toFixed(2)}
               </p>
@@ -476,10 +559,13 @@ export default function VeiwAllBooking() {
                     " " +
                     getTravelMonthRange(data?.date),
                   mode: data?.paymentMode,
-                  convertionRate: parseFloat(data?.convRate).toFixed(2) + " USD",
-                  amtinr: 
-                  ((parseFloat(data?.conFee) + parseFloat((data?.amount))) * data?.convRate).toFixed(2)
-                   + " INR",
+                  convertionRate:
+                    parseFloat(data?.convRate).toFixed(2) + " USD",
+                  amtinr:
+                    (
+                      (parseFloat(data?.conFee) + parseFloat(data?.amount)) *
+                      data?.convRate
+                    ).toFixed(2) + " INR",
                   convfee: parseFloat(data?.conFee).toFixed(2) + " USD",
                   remarks: data?.remarks,
                   action: (
@@ -561,9 +647,16 @@ export default function VeiwAllBooking() {
                       <button
                         className="text-blue-900"
                         onClick={() => {
-                          if (parseFloat(data?.online) + parseInt(data?.offline) + parseInt(data?.land) !== parseInt(item.orderValue)) {
-                            Swal.fire("Online + Offline + Land must be equal to Order Value");
-                          } else{
+                          if (
+                            parseFloat(data?.online) +
+                              parseInt(data?.offline) +
+                              parseInt(data?.land) !==
+                            parseInt(item.orderValue)
+                          ) {
+                            Swal.fire(
+                              "Online + Offline + Land must be equal to Order Value"
+                            );
+                          } else {
                             console.log("done");
                             // edit options are available in case we want to add edit functionality
                           }
@@ -595,7 +688,6 @@ export default function VeiwAllBooking() {
                 size={"text-md"}
                 hideFilter={true}
               />
-
             </div>
           </div>
         </div>
@@ -609,6 +701,14 @@ export default function VeiwAllBooking() {
             </span>
           </h2>
           <div className={`p-4 ${active === 3 ? "flex-col" : "hidden"} h-fit`}>
+            <div className="flex justify-end">
+              <button
+                onClick={updateDocs}
+                className="bg-blue-500 rounded-lg px-2 m-2 text-white py-1"
+              >
+                Save documents
+              </button>
+            </div>
             <div>
               <ExcelToTable url={selectedExcel} setPrice={setPrice} />
             </div>
@@ -673,16 +773,16 @@ export default function VeiwAllBooking() {
               refetch={refetch}
             />
             <CustomTable
-              dataa={vendorTable.map((item, index) => ({
-                name: item?.name,
-                destination: item?.destination,
-                currecy: item?.currency,
+              dataa={vendorTable.map((data, index) => ({
+                name: data?.name,
+                destination: data?.destination,
+                currecy: data?.currency,
                 bookingStatus: (
                   <select
-                    value={item?.booking_status}
-                    onChange={(e) => {
-                      editVendor(item, { booking_status: e.target.value });
-                      refetch();
+                    value={data?.booking_status}
+                    onChange={async(e) => {
+                      editVendor(data, { booking_status: e.target.value });
+                      await refetch();
                     }}
                   >
                     <option value={"PENDING"}>PENDING</option>
@@ -693,11 +793,10 @@ export default function VeiwAllBooking() {
                 paymentStatus: (
                   <>
                     <select
-                      onChange={(e) => {
-                        editVendor(item, { payment_status: e.target.value });
-                        refetch();
+                      onChange={async(e) => {
+                        editVendor(data, { payment_status: e.target.value });
                       }}
-                      value={item?.payment_status}
+                      value={data?.payment_status}
                     >
                       <option value={"UNPAID"}>UNPAID</option>
                       <option value={"PARTPAID"}>PARTPAID</option>
@@ -716,9 +815,9 @@ export default function VeiwAllBooking() {
                       <MdEdit />
                     </button> */}
                     <button
-                      onClick={() => {
-                        deleteVendor(item?.vendor_pay_id);
-                        refetch();
+                      onClick={async() => {
+                        await deleteVendor(data?.vendor_pay_id);
+                        refetchVend();
                       }}
                       className="text-red-600"
                     >
@@ -776,6 +875,14 @@ export default function VeiwAllBooking() {
             />
           </div>
           <div className="w-1/2">
+            <div className="flex justify-end">
+              <button
+                onClick={updateDocs}
+                className="bg-blue-500 rounded-lg px-2 m-2 text-white py-1"
+              >
+                Save documents
+              </button>
+            </div>
             <ul>
               {doc
                 ? doc.map(

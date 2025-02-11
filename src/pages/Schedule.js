@@ -60,7 +60,7 @@ const AllBookings = () => {
         orderValue: item.orderValue + " USD",
         apayment: (
           <div
-            className={`${
+            className={`font-bold ${
               parseFloat(item.orderValue) === parseFloat(item?.payment) ? "text-green-500" : "text-red-500"
             }`}
           >
@@ -100,8 +100,8 @@ const AllBookings = () => {
             } p-2 rounded-lg`}
           ></button>
         ),
-        validation: <button className={`${valid} p-2 rounded-lg`}></button>,
-        opsstatus: <button className={`${opsStat} p-2 rounded-lg`}></button>,
+        validation: <button className={`${'bg-red-400'} p-2 rounded-lg`}></button>,
+        opsstatus: <button className={`${item.opsStatus === "COMPLETED" ? 'bg-green-400' : 'bg-red-400'} p-2 rounded-lg`}></button>,
       }));
       setBookings(bookings);
     })();
