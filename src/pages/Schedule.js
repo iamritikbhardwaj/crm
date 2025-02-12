@@ -14,16 +14,12 @@ import {
 const AllBookings = () => {
   const [bookings, setBookings] = useState([]);
   const navigate = useNavigate();
-  const [valid, setValid] = useState("bg-red-400");
-  const [opsStat, setOpsStat] = useState("bg-red-400");
-  const [spStat, setSpStat] = useState(true);
 
   // Simulate fetching data
   useEffect(() => {
     (async () => {
       const data = await fetchTrips();
       console.log(data, "data")
-      
       const bookings = data.map((item) => ({
         tripID: item.tripId,
         destination: item.destination,
@@ -105,7 +101,7 @@ const AllBookings = () => {
       }));
       setBookings(bookings);
     })();
-  }, [setSpStat, spStat, valid, opsStat, navigate]);
+  }, []);
 
   const col = [
     { Header: "Trip ID", accessor: "tripID" },

@@ -4,7 +4,7 @@ import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { API_URL } from "../../AppConstant";
-import { fetchDestinations, fetchSuppliers } from "../apiCalls/fetchData";
+import { fetchDestinations, fetchSuppliers, fetchVendors } from "../apiCalls/fetchData";
 
 function VendorForm({ dest, refetch, tripId, setInputData }) {
   const [supplier, setSupplier] = React.useState([]);
@@ -73,6 +73,44 @@ function VendorForm({ dest, refetch, tripId, setInputData }) {
         },
       });
       if (response.status === 200) {
+          refetch();
+        }
+        const vend = await fetchVendors(tripId);
+        const payStat = vend.filter(
+          (item) => item.payment_status !== "FULL-PAID"
+        );
+        const bookStat = vend.filter(
+          (item) => item.booking_status !== "COMPLETED"
+        );
+        if (
+          Array.from(payStat).length === 0 &&
+          Array.from(bookStat).length === 0
+        ) {
+          const res = await axios.post(
+            `${API_URL}users/updatePayStat/?id=${tripId}`,
+            { paymentStatus: "FULL-PAID", opsStatus: "COMPLETED" }
+          );
+        } else if (
+          Array.from(payStat).length !== 0 &&
+          Array.from(bookStat).length === 0
+        ) {
+          const res = await axios.post(
+            `${API_URL}users/updatePayStat/?id=${tripId}`,
+            { paymentStatus: "UNPAID", opsStatus: "COMPLETED" }
+          );
+        } else if (
+          Array.from(payStat).length === 0 &&
+          Array.from(bookStat).length !== 0
+        ) {
+          const res = await axios.post(
+            `${API_URL}users/updatePayStat/?id=${tripId}`,
+            { paymentStatus: "FULL-PAID", opsStatus: "PENDING" }
+          );
+        } else {
+          const res = await axios.post(
+            `${API_URL}users/updatePayStat/?id=${tripId}`,
+            { paymentStatus: "UNPAID", opsStatus: "PENDING" }
+          );
         refetch();
         setInputData(null);
       }

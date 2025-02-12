@@ -26,6 +26,7 @@ import { API_URL } from "../AppConstant";
 import axios from "axios";
 import Swal from "sweetalert2";
 import ExcelToTable from "../components/customTable/ExcelToTable";
+import { set } from "mongoose";
 
 export default function VeiwAllBooking() {
   const location = useLocation();
@@ -50,6 +51,8 @@ export default function VeiwAllBooking() {
   const [recon, setRecon] = useState([]);
 
   const [selectedExcel, setSelectedExcel] = useState([]);
+  const [paymentStat, setPaymentStat] = useState();
+  const [bookingSta, setBookingStat] = useState();
 
   const refetch = async () => {
     const itemData = await fetchTrips(tripId);
@@ -79,7 +82,7 @@ export default function VeiwAllBooking() {
     }
   };
 
-  const editVendor = (item, vendor) => {
+  const editVendor = (id, vendor) => {
     Swal.fire({
       title: "Do you want to Update changes?",
       showDenyButton: true,
@@ -89,10 +92,12 @@ export default function VeiwAllBooking() {
       /* Read more about isConfirmed, isDenied below */
       if (result.isConfirmed) {
         (async () => {
+          console.log(vendor, "is confimed");
           const response = await axios.post(
-            `${API_URL}users/createVendor/?id=${item.vendor_pay_id}`,
+            `${API_URL}users/createVendor/?id=${id}`,
             vendor
           );
+          console.log(response, "response");
           if (response) {
             refetchVend();
           }
@@ -797,9 +802,9 @@ export default function VeiwAllBooking() {
                 bookingStatus: (
                   <select
                     value={data?.booking_status}
-                    onChange={async (e) => {
-                      editVendor(data, { booking_status: e.target.value });
-                      await refetch();
+                    onChange={ (e) => {
+                      setBookingStat(e.target.value)
+                      editVendor(data?.vendor_pay_id, { booking_status: e.target.value });
                     }}
                   >
                     <option value={"PENDING"}>PENDING</option>
@@ -810,8 +815,9 @@ export default function VeiwAllBooking() {
                 paymentStatus: (
                   <>
                     <select
-                      onChange={async (e) => {
-                        editVendor(data, { payment_status: e.target.value });
+                      onChange={(e) => {
+                        setPaymentStat(e.target.value)
+                        editVendor(data?.vendor_pay_id, { payment_status: e.target.value });
                       }}
                       value={data?.payment_status}
                     >
@@ -826,7 +832,6 @@ export default function VeiwAllBooking() {
                     {/* <button
                       className="text-blue-900"
                       onClick={() => {
-                        editVendor(item,inputData);
                       }}
                     >
                       <MdEdit />
