@@ -57,11 +57,11 @@ export default function VeiwAllBooking() {
     setDoc(itemData?.documents);
   };
 
-  const refetchVend = async() => {
+  const refetchVend = async () => {
     const vendorData = await fetchVendors(tripId);
     console.log(vendorData, "vendorData");
     setVendorTable(vendorData);
-  }
+  };
 
   const refetchCom = async () => {
     const reconData = await fetchRecon(tripId);
@@ -93,9 +93,9 @@ export default function VeiwAllBooking() {
             `${API_URL}users/createVendor/?id=${item.vendor_pay_id}`,
             vendor
           );
-          if(response){
+          if (response) {
             refetchVend();
-           }
+          }
           const vend = await fetchVendors(tripId);
           const payStat = vend.filter(
             (item) => item.payment_status !== "FULL-PAID"
@@ -103,10 +103,13 @@ export default function VeiwAllBooking() {
           const bookStat = vend.filter(
             (item) => item.booking_status !== "COMPLETED"
           );
-          if (Array.from(payStat).length === 0 && Array.from(bookStat).length === 0) {
+          if (
+            Array.from(payStat).length === 0 &&
+            Array.from(bookStat).length === 0
+          ) {
             const res = await axios.post(
               `${API_URL}users/updatePayStat/?id=${tripId}`,
-              { paymentStatus: "FULL-PAID", opsStatus: "COMPLETED"  }
+              { paymentStatus: "FULL-PAID", opsStatus: "COMPLETED" }
             );
           } else if (
             Array.from(payStat).length !== 0 &&
@@ -116,7 +119,7 @@ export default function VeiwAllBooking() {
               `${API_URL}users/updatePayStat/?id=${tripId}`,
               { paymentStatus: "UNPAID", opsStatus: "COMPLETED" }
             );
-          }else if (
+          } else if (
             Array.from(payStat).length === 0 &&
             Array.from(bookStat).length !== 0
           ) {
@@ -124,7 +127,7 @@ export default function VeiwAllBooking() {
               `${API_URL}users/updatePayStat/?id=${tripId}`,
               { paymentStatus: "FULL-PAID", opsStatus: "PENDING" }
             );
-          } else{
+          } else {
             const res = await axios.post(
               `${API_URL}users/updatePayStat/?id=${tripId}`,
               { paymentStatus: "UNPAID", opsStatus: "PENDING" }
@@ -151,12 +154,14 @@ export default function VeiwAllBooking() {
     }).then((result) => {
       /* Read more about isConfirmed, isDenied below */
       if (result.isConfirmed) {
-        const res = axios.post(`${API_URL}users/updateOrderVal/?id=${tripId}`,{orderValue: orderValue})
+        const res = axios.post(`${API_URL}users/updateOrderVal/?id=${tripId}`, {
+          orderValue: orderValue,
+        });
       } else {
         Swal.fire("Order Value is not Updated", "", "info");
       }
-  })
-}
+    });
+  };
 
   const splitIt = (str) => {
     const data = new String(str).split("/");
@@ -251,7 +256,7 @@ export default function VeiwAllBooking() {
   };
 
   const updateOps = async (e) => {
-    const value = e.target.value
+    const value = e.target.value;
     Swal.fire({
       title: "Do you want to Update changes?",
       showDenyButton: true,
@@ -514,9 +519,20 @@ export default function VeiwAllBooking() {
           <div className={`p-4 ${active === 2 ? "block" : "hidden"}`}>
             <div className="flex justify-between">
               <p className="font-semibold">
-                Order Value (USD): <input type="number" step="0.01" placeholder={item?.orderValue} onChange={(e) => setOrderValue(e.target.value)}/>
+                Order Value (USD):{" "}
+                <input
+                  type="number"
+                  step="0.01"
+                  placeholder={item?.orderValue}
+                  onChange={(e) => setOrderValue(e.target.value)}
+                />
               </p>
-              <button className="p-2 m-1 text-white bg-blue-500" onClick={updateOrderVal}>Save Changes</button>
+              <button
+                className="p-2 m-1 text-white bg-blue-500"
+                onClick={updateOrderVal}
+              >
+                Save Changes
+              </button>
               <p className="font-semibold">
                 Transfer Price(USD): {parseFloat(transferPrice).toFixed(2)}
               </p>
@@ -771,7 +787,7 @@ export default function VeiwAllBooking() {
             <VendorForm
               setInputData={setInputData}
               tripId={tripId}
-              refetch={refetch}
+              refetch={refetchVend}
             />
             <CustomTable
               dataa={vendorTable.map((data, index) => ({
@@ -781,7 +797,7 @@ export default function VeiwAllBooking() {
                 bookingStatus: (
                   <select
                     value={data?.booking_status}
-                    onChange={async(e) => {
+                    onChange={async (e) => {
                       editVendor(data, { booking_status: e.target.value });
                       await refetch();
                     }}
@@ -794,7 +810,7 @@ export default function VeiwAllBooking() {
                 paymentStatus: (
                   <>
                     <select
-                      onChange={async(e) => {
+                      onChange={async (e) => {
                         editVendor(data, { payment_status: e.target.value });
                       }}
                       value={data?.payment_status}
@@ -816,7 +832,7 @@ export default function VeiwAllBooking() {
                       <MdEdit />
                     </button> */}
                     <button
-                      onClick={async() => {
+                      onClick={async () => {
                         await deleteVendor(data?.vendor_pay_id);
                         refetchVend();
                       }}

@@ -125,7 +125,7 @@ const AllBookings = () => {
     { Header: "Action", accessor: "action" },
     { Header: "Supp.Pay", accessor: "paymentstat" },
     { Header: "Validation", accessor: "validation" },
-    { Header: "Ops Status", accessor: "opsstatus" },
+    { Header: "Booking Status", accessor: "opsstatus" },
   ];
 
   return (
