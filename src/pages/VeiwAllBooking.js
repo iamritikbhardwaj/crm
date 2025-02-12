@@ -13,6 +13,7 @@ import {
   fetchPayment,
   fetchRecon,
   fetchSalesDocs,
+  fetchSuppliers,
   fetchTrips,
   fetchUsers,
   fetchVendors,
@@ -26,7 +27,6 @@ import { API_URL } from "../AppConstant";
 import axios from "axios";
 import Swal from "sweetalert2";
 import ExcelToTable from "../components/customTable/ExcelToTable";
-import { set } from "mongoose";
 
 export default function VeiwAllBooking() {
   const location = useLocation();
@@ -91,6 +91,14 @@ export default function VeiwAllBooking() {
     }).then((result) => {
       /* Read more about isConfirmed, isDenied below */
       if (result.isConfirmed) {
+        Swal.fire({
+          title: "Submitting...",
+          text: "Please wait while we make updates.",
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading();
+          },
+        });
         (async () => {
           console.log(vendor, "is confimed");
           const response = await axios.post(
@@ -99,7 +107,8 @@ export default function VeiwAllBooking() {
           );
           console.log(response, "response");
           if (response) {
-            refetchVend();
+            await refetchVend();
+            Swal.close();
           }
           const vend = await fetchVendors(tripId);
           const payStat = vend.filter(
@@ -159,9 +168,18 @@ export default function VeiwAllBooking() {
     }).then((result) => {
       /* Read more about isConfirmed, isDenied below */
       if (result.isConfirmed) {
+        Swal.fire({
+          title: "Submitting...",
+          text: "Please wait while we make updates.",
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading();
+          },
+        });
         const res = axios.post(`${API_URL}users/updateOrderVal/?id=${tripId}`, {
           orderValue: orderValue,
         });
+        Swal.close();
       } else {
         Swal.fire("Order Value is not Updated", "", "info");
       }
@@ -231,6 +249,14 @@ export default function VeiwAllBooking() {
     }).then(async (result) => {
       /* Read more about isConfirmed, isDenied below */
       if (result.isConfirmed) {
+        Swal.fire({
+          title: "Submitting...",
+          text: "Please wait while we make updates.",
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading();
+          },
+        });
         const formData = {
           status: value,
         };
@@ -246,11 +272,13 @@ export default function VeiwAllBooking() {
         );
         if ((await response).status === 200) {
           await refetch();
+          Swal.close();
           Swal.fire({
             title: "Status updated successfully",
             timer: 2000,
           });
         } else {
+          Swal.close();
           Swal.fire({
             text: response.data.MESSAGE,
             timer: 2000,
@@ -270,6 +298,14 @@ export default function VeiwAllBooking() {
     }).then(async (result) => {
       /* Read more about isConfirmed, isDenied below */
       if (result.isConfirmed) {
+        Swal.fire({
+          title: "Submitting...",
+          text: "Please wait while we make updates.",
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading();
+          },
+        });
         const formData = {
           opsSpoc: value,
         };
@@ -285,11 +321,13 @@ export default function VeiwAllBooking() {
         );
         if ((await response).status === 200) {
           await refetch();
+          Swal.close();
           Swal.fire({
             title: "Ops updated successfully",
             timer: 2000,
           });
         } else {
+          Swal.close();
           Swal.fire({
             text: response.data.MESSAGE,
             timer: 2000,
@@ -802,9 +840,11 @@ export default function VeiwAllBooking() {
                 bookingStatus: (
                   <select
                     value={data?.booking_status}
-                    onChange={ (e) => {
-                      setBookingStat(e.target.value)
-                      editVendor(data?.vendor_pay_id, { booking_status: e.target.value });
+                    onChange={(e) => {
+                      setBookingStat(e.target.value);
+                      editVendor(data?.vendor_pay_id, {
+                        booking_status: e.target.value,
+                      });
                     }}
                   >
                     <option value={"PENDING"}>PENDING</option>
@@ -816,8 +856,10 @@ export default function VeiwAllBooking() {
                   <>
                     <select
                       onChange={(e) => {
-                        setPaymentStat(e.target.value)
-                        editVendor(data?.vendor_pay_id, { payment_status: e.target.value });
+                        setPaymentStat(e.target.value);
+                        editVendor(data?.vendor_pay_id, {
+                          payment_status: e.target.value,
+                        });
                       }}
                       value={data?.payment_status}
                     >

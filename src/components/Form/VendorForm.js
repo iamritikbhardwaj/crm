@@ -4,7 +4,12 @@ import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { API_URL } from "../../AppConstant";
-import { fetchDestinations, fetchSuppliers, fetchVendors } from "../apiCalls/fetchData";
+import {
+  fetchDestinations,
+  fetchSuppliers,
+  fetchVendors,
+} from "../apiCalls/fetchData";
+import Swal from "sweetalert2";
 
 function VendorForm({ dest, refetch, tripId, setInputData }) {
   const [supplier, setSupplier] = React.useState([]);
@@ -52,19 +57,38 @@ function VendorForm({ dest, refetch, tripId, setInputData }) {
   console.log(errors, "errors");
 
   const handleChange = async (e) => {
+    Swal.fire({
+      title: "Fetching...",
+      text: "Please wait while we fetch Data.",
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading();
+      },
+    });
     const desti = await fetchDestinations();
     console.log(desti, "desti");
     const target = supplier.filter((sup) => sup.name === e.target.value)[0];
     console.log(target, "target");
-    const dest = desti.filter((d) => d.destination_id === target.destination_id)[0];
+    const dest = desti.filter(
+      (d) => d.destination_id === target.destination_id
+    )[0];
     console.log(dest.destination, "dest");
     setInputData(target);
     setValue("destination", dest.destination);
     setValue("currency", dest.currency);
     setValue("tripId", tripId);
+    Swal.close();
   };
 
   const vendorSubmit = (data) => {
+    Swal.fire({
+      title: "Submitting...",
+      text: "Please wait while we process your request.",
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading();
+      },
+    });
     (async (data) => {
       const response = await axios.post(`${API_URL}users/createVendor`, data, {
         withCredentials: true,
@@ -73,49 +97,24 @@ function VendorForm({ dest, refetch, tripId, setInputData }) {
         },
       });
       if (response.status === 200) {
-          refetch();
-        }
-        const vend = await fetchVendors(tripId);
-        const payStat = vend.filter(
-          (item) => item.payment_status !== "FULL-PAID"
-        );
-        const bookStat = vend.filter(
-          (item) => item.booking_status !== "COMPLETED"
-        );
-        if (
-          Array.from(payStat).length === 0 &&
-          Array.from(bookStat).length === 0
-        ) {
-          const res = await axios.post(
-            `${API_URL}users/updatePayStat/?id=${tripId}`,
-            { paymentStatus: "FULL-PAID", opsStatus: "COMPLETED" }
-          );
-        } else if (
-          Array.from(payStat).length !== 0 &&
-          Array.from(bookStat).length === 0
-        ) {
-          const res = await axios.post(
-            `${API_URL}users/updatePayStat/?id=${tripId}`,
-            { paymentStatus: "UNPAID", opsStatus: "COMPLETED" }
-          );
-        } else if (
-          Array.from(payStat).length === 0 &&
-          Array.from(bookStat).length !== 0
-        ) {
-          const res = await axios.post(
-            `${API_URL}users/updatePayStat/?id=${tripId}`,
-            { paymentStatus: "FULL-PAID", opsStatus: "PENDING" }
-          );
-        } else {
-          const res = await axios.post(
-            `${API_URL}users/updatePayStat/?id=${tripId}`,
-            { paymentStatus: "UNPAID", opsStatus: "PENDING" }
-          );
-        refetch();
-        setInputData(null);
+        await refetch();
+        await validate();
+        Swal.close();
       }
     })(data);
   };
+ 
+  const validate = async() => {
+        const res = await axios.post(
+          `${API_URL}users/updatePayStat/?id=${tripId}`,
+          { paymentStatus: "UNPAID", opsStatus: "PENDING" }
+        );
+       if(res.status === 200){ Swal.close();
+        await refetch();
+        setInputData(null);
+      }
+  }
+
   return (
     <form onSubmit={handleSubmit(vendorSubmit)} className="mb-4">
       <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -133,18 +132,24 @@ function VendorForm({ dest, refetch, tripId, setInputData }) {
         {supplier &&
           Array.from(supplier).map((sup, index) => {
             return (
-              <option key={index} className={`${sup.status === "ACTIVE" ? "" : "hidden"}`} value={sup.name}>
+              <option
+                key={index}
+                className={`${sup.status === "ACTIVE" ? "" : "hidden"}`}
+                value={sup.name}
+              >
                 {sup.name}
               </option>
             );
           })}
       </select>
+      <div className="flex justify-between">
       <button
         type="submit"
         className="bg-blue-500 text-white px-4 py-2 mt-4 rounded-lg hover:bg-blue-700"
       >
         Add Vendor
       </button>
+      </div>
     </form>
   );
 }
