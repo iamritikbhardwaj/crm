@@ -1,19 +1,16 @@
 import './output.css';
 import Header from './header/Header';
 import { Outlet } from 'react-router-dom';
-import Login from './pages/Login';
-import { useState, useContext, createContext } from 'react';
+import { Provider, useSelector } from 'react-redux';
+import store from './components/redux/store';
 
 function App() {
-  const [user, setUser] = useState(null);
-  const userContext = createContext();
-  const UserProvider = userContext.Provider;
 
   return (
-    <UserProvider value={user}>
+   <>
         <Header />
       <Outlet />
-    </UserProvider>
+   </>
   );
 }
 

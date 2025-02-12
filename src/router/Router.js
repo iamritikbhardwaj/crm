@@ -1,6 +1,5 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import { lazy } from "react";
-import sampleFile from "../components/Form/sampleFile";
 
 const Home = lazy(() => import("../App"));
 const User = lazy(() => import("../pages/User"));

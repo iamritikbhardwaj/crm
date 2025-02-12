@@ -14,10 +14,13 @@ import TextField from '@mui/material/TextField';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import Swal from 'sweetalert2';
+import { useDispatch } from 'react-redux';
+import { login } from '../components/redux/slices/authSlice';
 function Login() {
 
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = React.useState(false);
+  const dispatch = useDispatch();
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
 
@@ -53,6 +56,7 @@ function Login() {
       if (response) {
         console.log((await response).data.STATUS, 'response');
         if ((await response).data.STATUS === 'SUCCESS') {
+          dispatch(login({user: (await response).data.user, token: (await response).data.token}))
           Swal.fire({
             icon: 'success',
             title: 'Login Successfull',

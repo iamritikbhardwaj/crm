@@ -112,6 +112,10 @@ const AddBooking = () => {
   console.log(errors, "errors");
 
   const bookingSubmit = async (data) => {
+    if(documents.length === 0){
+      Swal.fire("Please add atleast one document");
+      return
+    }
     Swal.fire({
       title: "Submitting...",
       text: "Please wait while we create your booking.",
