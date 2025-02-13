@@ -2,7 +2,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
-  user: null,
+  user: {},
   token: localStorage.getItem('jwt') || null, // Check if there's a saved token
   isAuthenticated: false,
 };

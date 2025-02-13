@@ -2,18 +2,18 @@ import "./output.css";
 import Header from "./header/Header";
 import { Outlet } from "react-router-dom";
 import { useSelector } from "react-redux";
+import Login from "./pages/Login";
 
 function App() {
-  const selector = useSelector((state) => state.auth || {});
-  const user = selector.user;
-  console.log(user, "user");
+  const auth = useSelector((state) => state.auth);
+  const isAuthenticated = auth.isAuthenticated;
 
-  return (
-    <>
-      <Header />
-      <Outlet />
-    </>
-  );
+    return (
+      <>
+        {isAuthenticated ? <Header /> : <Login />}
+        <Outlet />
+      </>
+    );
 }
 
 export default App;

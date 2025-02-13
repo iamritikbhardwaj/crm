@@ -1,5 +1,6 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import { lazy } from "react";
+import { useSelector } from "react-redux";
 
 const Home = lazy(() => import("../App"));
 const User = lazy(() => import("../pages/User"));
@@ -20,11 +21,13 @@ const DocForm = lazy(() => import("../components/Form/docForm"));
 
 // ProtectedRoute component
 const ProtectedRoute = ({ element }) => {
-    // Check if the token is present in cookies
-    const token = document.cookie
-        .split("; ")
-        .find((row) => row.startsWith("token="))
-        ?.split("=")[1];
+    const auth = useSelector((state) => state.auth);
+    const token = auth.token;
+    // Check if the token is present in cookiess
+    // const token = document.cookie
+    //     .split("; ")
+    //     .find((row) => row.startsWith("token="))
+    //     ?.split("=")[1];
 
     // Redirect to login if no token
     if (!token) {

@@ -9,11 +9,14 @@ import Swal from "sweetalert2";
 import FileUpload from "../components/Input/FileUpload";
 import { fetchUsers } from "../components/apiCalls/fetchData";
 import { deleteBooking } from "../components/apiCalls/deleteData";
+import { useSelector } from "react-redux";
 
 export default function VeiwBooking() {
   // data from table on previous page
   const location = useLocation();
   const data = location.state;
+  const auth = useSelector((state) => state.auth);
+  const profile = auth.user?.profile;
 
   console.log(data.docs, "data.docs");
 
@@ -404,12 +407,14 @@ export default function VeiwBooking() {
         <div className="p-4 flex justify-between">
           <button
             onClick={acceptValidation}
+            disabled={profile !== "Admin" || profile !== "Operations"}
             className="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600"
           >
             Accept Booking
           </button>
           <button
             onClick={rejectvalidation}
+            disabled={profile !== "Admin" || profile !== "Operations"}
             className="bg-red-500 text-white px-6 py-2 rounded hover:bg-red-600"
           >
             Reject Booking
