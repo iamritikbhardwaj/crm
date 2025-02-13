@@ -27,6 +27,8 @@ import { API_URL } from "../AppConstant";
 import axios from "axios";
 import Swal from "sweetalert2";
 import ExcelToTable from "../components/customTable/ExcelToTable";
+import { updateValidation } from "../components/apiCalls/updateData";
+import { useSelector } from "react-redux";
 
 export default function VeiwAllBooking() {
   const location = useLocation();
@@ -51,8 +53,9 @@ export default function VeiwAllBooking() {
   const [recon, setRecon] = useState([]);
 
   const [selectedExcel, setSelectedExcel] = useState([]);
-  const [paymentStat, setPaymentStat] = useState();
-  const [bookingSta, setBookingStat] = useState();
+  const auth = useSelector((state) => state.auth);
+  const user = auth.user;
+  console.log(user.profile , "profile");
 
   const refetch = async () => {
     const itemData = await fetchTrips(tripId);
@@ -707,7 +710,7 @@ export default function VeiwAllBooking() {
                     <div className="flex justify-around">
                       <button
                         className="text-blue-900"
-                        onClick={() => {
+                        onClick={async() => {
                           if (
                             parseFloat(data?.online) +
                               parseInt(data?.offline) +
@@ -718,7 +721,17 @@ export default function VeiwAllBooking() {
                               "Online + Offline + Land must be equal to Order Value"
                             );
                           } else {
-                            console.log("done");
+                            Swal.fire({
+                              title: "Updating validation...",
+                              text: "Please wait while we make updates.",
+                              allowOutsideClick: false,
+                              didOpen: () => {
+                                Swal.showLoading();
+                              },
+                            });
+                            const res = await updateValidation({validation : user?.profile}, tripId);
+                            console.log(res, "res");
+                            Swal.close()
                             // edit options are available in case we want to add edit functionality
                           }
                         }}
@@ -842,7 +855,6 @@ export default function VeiwAllBooking() {
                   <select
                     value={data?.booking_status}
                     onChange={(e) => {
-                      setBookingStat(e.target.value);
                       editVendor(data?.vendor_pay_id, {
                         booking_status: e.target.value,
                       });
@@ -857,7 +869,6 @@ export default function VeiwAllBooking() {
                   <>
                     <select
                       onChange={(e) => {
-                        setPaymentStat(e.target.value);
                         editVendor(data?.vendor_pay_id, {
                           payment_status: e.target.value,
                         });

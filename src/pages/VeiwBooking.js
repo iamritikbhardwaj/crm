@@ -407,14 +407,14 @@ export default function VeiwBooking() {
         <div className="p-4 flex justify-between">
           <button
             onClick={acceptValidation}
-            disabled={profile !== "Admin" || profile !== "Operations"}
+            disabled={profile !== "Admin" && profile !== "Operations" ? false : true }
             className="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600"
           >
             Accept Booking
           </button>
           <button
             onClick={rejectvalidation}
-            disabled={profile !== "Admin" || profile !== "Operations"}
+            disabled={profile !== "Admin" && profile !== "Operations" ? false : true }
             className="bg-red-500 text-white px-6 py-2 rounded hover:bg-red-600"
           >
             Reject Booking

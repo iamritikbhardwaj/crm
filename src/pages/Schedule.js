@@ -10,10 +10,13 @@ import {
   fetchTrips,
   fetchVendors,
 } from "../components/apiCalls/fetchData";
+import { useSelector } from "react-redux";
 
 const AllBookings = () => {
   const [bookings, setBookings] = useState([]);
   const navigate = useNavigate();
+  const auth = useSelector((state) => state.auth);
+  const user = auth.user;
 
   // Simulate fetching data
   useEffect(() => {
@@ -82,6 +85,7 @@ const AllBookings = () => {
         action: (
           <button
             className="text-3xl"
+            disabled={user?.profile === "Sales"}
             onClick={() => navigate("/viewAllBooking", { state: item })}
           >
             <GrFormView />
@@ -96,7 +100,7 @@ const AllBookings = () => {
             } p-2 rounded-lg`}
           ></button>
         ),
-        validation: <button className={`${'bg-red-400'} p-2 rounded-lg`}></button>,
+        validation: <button className={`${item.validation === "Finance" && 'bg-green-400'} ${item.validation === "Admin" && 'bg-green-400'} ${item.validation === "Operations" && 'bg-blue-400'} ${item.validation === "Sales" && 'bg-red-400'} p-2 rounded-lg`}></button>,
         opsstatus: <button className={`${item.opsStatus === "COMPLETED" ? 'bg-green-400' : 'bg-red-400'} p-2 rounded-lg`}></button>,
       }));
       setBookings(bookings);
@@ -125,7 +129,7 @@ const AllBookings = () => {
   ];
 
   return (
-    <div className="container mx-auto p-6">
+    <div className="flex justify-center mt-6 mx-auto p-4">
       <BackToHome />
       <CustomTable dataa={bookings} columnss={col} size="text-xs" />
     </div>

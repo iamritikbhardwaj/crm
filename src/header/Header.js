@@ -62,7 +62,10 @@ function Header() {
         <li>
           <button
             onClick={() => navigate("/booking")}
-            className="flex items-center w-4/5 text-xs font-bold bg-slate-100 p-2 rounded-lg text-center mx-2 my-4 hover:bg-slate-300 focus:bg-slate-300"
+            className={`${profile === "Finance" ? "hidden" : "flex"} items-center w-4/5 
+            text-xs font-bold bg-slate-100 p-2 rounded-lg 
+            text-center mx-2 my-4 hover:bg-slate-300 focus:bg-slate-300
+            `}
           >
             <TbBrandBooking className="mx-1" />
             New Booking
