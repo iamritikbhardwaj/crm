@@ -536,7 +536,7 @@ export default function VeiwAllBooking() {
                                   : file?.file?.name}
                               </a>
                               <button
-                                className="text-red-400 rounded-lg cursor-pointer hover:text-red-700"
+                                className={`text-red-400 rounded-lg cursor-pointer hover:text-red-700`}
                                 onClick={() => removeDoc(index)}
                               >
                                 Remove
@@ -567,11 +567,12 @@ export default function VeiwAllBooking() {
                   type="number"
                   step="0.01"
                   placeholder={item?.orderValue}
+                  className="w-full p-2 border rounded mt-2"
                   onChange={(e) => setOrderValue(e.target.value)}
                 />
               </p>
               <button
-                className="p-2 m-1 text-white bg-blue-500"
+                className="px-1 py-0 m-1 text-white bg-blue-500 rounded-lg"
                 onClick={updateOrderVal}
               >
                 Save Changes
@@ -641,7 +642,7 @@ export default function VeiwAllBooking() {
                       </button>
                       <button
                         onClick={() => {
-                          deletePayment(data?.payment_id);
+                          deletePayment(data?.payment_id, tripId);
                           refetchCom();
                         }}
                         className="text-red-600"

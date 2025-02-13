@@ -5,6 +5,7 @@ import { z } from "zod";
 import axios from "axios";
 import { API_URL } from "../../AppConstant.js";
 import { fetchPayment } from "../apiCalls/fetchData"
+import Swal from "sweetalert2";
 
 function PaymentForm({ handlehide, tripId, inputData, refetch }) {
   const paymentSchema = z.object({
@@ -57,11 +58,19 @@ function PaymentForm({ handlehide, tripId, inputData, refetch }) {
 
   const reconSubmit = (data) => {
     console.log(data, "data");
+    Swal.fire({
+      title: "Submitting...",
+      text: "Please wait while we create your payment.",
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading();
+      },
+    });
     (async (data) => {
       console.log(data, "data");
       const response = await axios.post(
         `${API_URL}users/createPayment${
-          inputData?.payment_id ? "/?id=" + inputData?.payment_id : ``
+          inputData?.payment_id ? "/?id=" + inputData.payment_id : ``
         }`,
         JSON.stringify(data),
         {
@@ -72,7 +81,17 @@ function PaymentForm({ handlehide, tripId, inputData, refetch }) {
         }
       );
       if (response.status === 200) {
+        reset();
         await refetch();
+        Swal.close();
+        Swal.fire({
+          title: "Calculating...",
+          text: "Please wait while we calculate agent payment.",
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading();
+          },
+        });
         const pay = await fetchPayment(tripId);
         console.log(pay, "response");
         const payment = pay.reduce((acc, item) => parseFloat(acc) + parseFloat(item.amount),0);
@@ -83,7 +102,11 @@ function PaymentForm({ handlehide, tripId, inputData, refetch }) {
           }
         })
         if(res){
-          console.log("Payment updated")
+          Swal.close();
+          Swal.fire("Payment updated")
+        }else{
+          Swal.close();
+          Swal.fire("Payment not updated")
         }
       }
     })(data);

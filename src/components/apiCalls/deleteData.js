@@ -1,6 +1,7 @@
 import axios from "axios";
 import { API_URL } from "../../AppConstant";
 import Swal from "sweetalert2";
+import { fetchPayment } from "./fetchData";
 
 export const deleteUser = async (id) => {
     Swal.fire({
@@ -72,7 +73,7 @@ export const deleteAgent = async (id) => {
     return response;
 };
 
-export const deletePayment = async (id) => {
+export const deletePayment = async (id, tripId) => {
     Swal.fire({
         title: "Deleting...",
         text: "Please wait while we delete Data.",
@@ -83,6 +84,22 @@ export const deletePayment = async (id) => {
       });
     const response = await axios.delete(`${API_URL}users/deletePayment/${id}`);
     Swal.close();
+    const pay = await fetchPayment(tripId);
+        console.log(pay, "response");
+        const payment = pay.reduce((acc, item) => parseFloat(acc) + parseFloat(item.amount),0);
+        const res = await axios.post(`${API_URL}users/updatePayment/?id=${tripId}`, {payment},{
+          withCredentials: true,
+          headers: {
+            "Content-type" : "application/json"
+          }
+        })
+        if(res){
+          Swal.close();
+          Swal.fire("Payment updated")
+        }else{
+          Swal.close();
+          Swal.fire("Payment not updated")
+        }
     return response;
 };
 

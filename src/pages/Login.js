@@ -54,9 +54,9 @@ function Login() {
       })
       console.log(response, 'response');
       if (response) {
-        console.log((await response).data.STATUS, 'response');
+        console.log((await response).data, 'response');
         if ((await response).data.STATUS === 'SUCCESS') {
-          dispatch(login({user: (await response).data.user, token: (await response).data.token}))
+        login({user: (await response).data.user, token: (await response).data.token});
           Swal.fire({
             icon: 'success',
             title: 'Login Successfull',

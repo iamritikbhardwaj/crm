@@ -48,7 +48,7 @@ function ExcelToTable({url, setPrice}) {
         }, {})
       );
   
-      setFilesData([{ fileName: <a href={url}>{url.split('/').pop()}</a>, columns: headers, data: rows }]);
+      setFilesData([{ fileName: <a className='text-blue-500' href={url}>Download Freeze Quotation :{url.split('/').pop()}</a>, columns: headers, data: rows }]);
       setSelectedFileIndex(0);
   
     } catch (error) {

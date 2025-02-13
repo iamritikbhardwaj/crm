@@ -335,9 +335,12 @@ export default function VeiwBooking() {
           <div className={`p-4 ${active === 2 ? "block" : "hidden"}`}>
             <label className="font-semibold">Order Value (USD):</label>
             <input
-              type="text"
-              value={data.orderValue}
-              onChange={(e) => console.log(e.target.value)}
+              type="number"
+              step={0.01}
+              value={inputData.orderValue}
+              onChange={(e) => {
+                setInputData({ ...inputData, orderValue: e.target.value });
+              }}
               className="w-full p-2 border rounded mt-2"
             />
           </div>
