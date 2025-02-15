@@ -13,8 +13,8 @@ function Header() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const auth = useSelector((state) => state.auth);
-  const profile = auth.user.profile; // Accessing user from auth
-  console.log(profile, "user");
+  const user = auth.user; // Accessing user from auth
+  console.log(user, "user");
 
   return (
     <div className="fixed w-1/6 flex flex-col text-center justify-between h-full  bg-slate-800 p-3">
@@ -38,9 +38,9 @@ function Header() {
         <li>
           <button
             onClick={() => navigate("/user")}
-            disabled={profile !== "Admin"}
+            disabled={user?.profile !== "Admin"}
             className={`w-4/5 ${
-              profile === "Admin" ? "flex" : "hidden"
+              user?.profile === "Admin" ? "flex" : "hidden"
             }  items-center text-xs font-bold bg-slate-100 p-2 rounded-lg text-center mx-2 my-4 hover:bg-slate-300 focus:bg-slate-300`}
           >
             <FaUser className="mx-1" />
@@ -50,9 +50,9 @@ function Header() {
         <li>
           <button
             onClick={() => navigate("/setting")}
-            disabled={profile !== "Admin"}
+            disabled={user?.profile !== "Admin"}
             className={`w-4/5 text-xs ${
-              profile === "Admin" ? "flex" : "hidden"
+              user?.profile === "Admin" ? "flex" : "hidden"
             } items-center font-bold bg-slate-100 p-2 rounded-lg text-center mx-2 my-4 hover:bg-slate-300 focus:bg-slate-300`}
           >
             <IoMdSettings className="mx-1" />
@@ -62,7 +62,7 @@ function Header() {
         <li>
           <button
             onClick={() => navigate("/booking")}
-            className={`${profile === "Finance" ? "hidden" : "flex"} items-center w-4/5 
+            className={`${user?.profile === "Finance" ? "hidden" : "flex"} items-center w-4/5 
             text-xs font-bold bg-slate-100 p-2 rounded-lg 
             text-center mx-2 my-4 hover:bg-slate-300 focus:bg-slate-300
             `}
