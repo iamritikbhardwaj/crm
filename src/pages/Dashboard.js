@@ -3,58 +3,20 @@ import { Bar, Pie } from "react-chartjs-2";
 import "chart.js/auto"; // Required for Chart.js v3+ compatibility
 import BackToHome from "../components/BackToHome";
 import UserActivityTable from "../components/charts/userVsActivity";
+import { fetchDashboard } from "../components/apiCalls/fetchData";
+import Swal from "sweetalert2";
+import { set } from "mongoose";
 
 const Dashboard = () => {
-  const [fromDate, setFromDate] = useState("");
-  const [toDate, setToDate] = useState("");
-
-  // Dummy Data
-  const data = {
+  const [fromDate, setFromDate] = useState(Date.now());
+  const [toDate, setToDate] = useState(Date.now() + 86400000);
+  const [data, setData] = useState({
     noOfBookings: 120,
     activeAgents: 25,
     totalGMV: 500000,
     totalGPV: 450000,
-  };
-
-  const statusChart = {
-    labels: ["Cancelled", "Confirmed", "In Progress", "Travelled"],
-    datasets: [
-      {
-        label: "Bookings Status",
-        data: [10, 50, 40, 20],
-        backgroundColor: ["#FF6384", "#4BC0C0", "#FFCE56", "#808080"],
-      },
-    ],
-  };
-
-  const opsStatusChart = {
-    labels: ["Red", "Orange", "Green"],
-    datasets: [
-      {
-        label: "Ops Status",
-        data: [30, 50, 40],
-        backgroundColor: ["#FF0000", "#FFA500", "#008000"],
-      },
-    ],
-  };
-
-  const bookingsComparison = {
-    labels: ["Sales SPOC 1", "Sales SPOC 2", "Sales SPOC 3"],
-    datasets: [
-      {
-        label: "Bookings vs Sales SPOC",
-        data: [15, 25, 30],
-        backgroundColor: "#36A2EB",
-      },
-      {
-        label: "Bookings vs Ops SPOC",
-        data: [20, 18, 25],
-        backgroundColor: "#FF6384",
-      },
-    ],
-  };
-
-  const bookingsVsSalesSPOC = {
+  });
+  const [bookingsVsSalesSPOC, setBookingsVsSalesSPOC] = useState({
     labels: ["Sales SPOC 1", "Sales SPOC 2", "Sales SPOC 3"],
     datasets: [
       {
@@ -63,9 +25,18 @@ const Dashboard = () => {
         backgroundColor: "#36A2EB",
       },
     ],
-  };
-
-  const bookingsVsOpsSPOC = {
+  });
+  const [statusChart, setStatusChart] = useState({
+    labels: ["Cancelled", "Confirmed", "In Progress", "Travelled"],
+    datasets: [
+      {
+        label: "Bookings Status",
+        data: [10, 50, 40, 20],
+        backgroundColor: ["#FF6384", "#4CAF50", "#FFCE56", "#808080"],
+      },
+    ],
+  });
+  const [bookingsVsOpsSPOC, setBookingsVsOpsSPOC] = useState({
     labels: ["Ops SPOC 1", "Ops SPOC 2", "Ops SPOC 3"],
     datasets: [
       {
@@ -74,31 +45,32 @@ const Dashboard = () => {
         backgroundColor: "#FF6384",
       },
     ],
-  };
+  });
+  const [users, setUsers] = useState([
+    {
+      name: "Yiorgos Avraamu",
+      status: "New",
+      registered: "Jan 1, 2023",
+      activity: "10 sec ago",
+      avatar: "https://i.pravatar.cc/40?img=1",
+    },
+    {
+      name: "Avram Tasarios",
+      status: "Recurring",
+      registered: "Jan 1, 2023",
+      activity: "5 minutes ago",
+      avatar: "https://i.pravatar.cc/40?img=2",
+    },
+    {
+      name: "Quintin Ed",
+      status: "New",
+      registered: "Jan 1, 2023",
+      activity: "1 hour ago",
+      avatar: "https://i.pravatar.cc/40?img=3",
+    },
+  ]);
 
-  const operationalStatus = {
-    labels: ["BNP","BO", "BC"],
-    datasets: [
-      {
-        label: "Bookings",
-        data: [20, 18, 25],
-        backgroundColor: ["#FF0000","#FFA500","#4CAF50"]
-      },
-    ],
-  };
-
-  const userVsActivity = {
-    labels: ["User 1", "User 2", "User 3", "User 4"],
-    datasets: [
-      {
-        label: "Activities Performed",
-        data: [5, 12, 8, 10],
-        backgroundColor: "#4BC0C0",
-      },
-    ],
-  };
-
-  const GMVData = {
+  const [GMVData, setGMVData] = useState({
     labels: ["SPOC A", "SPOC B", "SPOC C"],
     datasets: [
       {
@@ -107,10 +79,9 @@ const Dashboard = () => {
         backgroundColor: "#4CAF50", // Green
       },
     ],
-  };
+  });
 
-  // Data for GPV vs Sales SPOC
-  const GPVData = {
+  const [GPVData, setGPVData] = useState({
     labels: ["SPOC A", "SPOC B", "SPOC C"],
     datasets: [
       {
@@ -119,7 +90,69 @@ const Dashboard = () => {
         backgroundColor: "#F87171", // Red
       },
     ],
-  };
+  });
+
+
+  const search = async()=>{
+    Swal.fire({
+      title: "Fetching...",
+      text: "Please wait while we fetch Data.",
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading();
+      },
+    });
+    const res = await fetchDashboard(fromDate, toDate);
+    console.log(res, 'res');
+    setData({
+      noOfBookings: res.OUTPUT.noOfBookings || 0,
+      activeAgents: res.OUTPUT.activeAgents || 0,
+      totalGMV: res.OUTPUT.gmv || 0,
+      totalGPV: res.OUTPUT.gpv || 0,
+    });
+    setBookingsVsSalesSPOC({
+      labels: res.bvss.sales,
+      datasets: [{
+        label: "Bookings",
+        data: res.bvss.bookings,
+        backgroundColor: "#36A2EB",
+      }]
+    });
+    setBookingsVsOpsSPOC({
+      labels: res.bvso.ops,
+      datasets: [{
+        label: "Bookings",
+        data: res.bvso.bookings,
+        backgroundColor: "#FF6384",
+      }]
+    });
+    setStatusChart({
+      labels: ["Cancelled", "Confirmed", "In Progress", "Travelled"],
+      datasets: [{
+        label: "Bookings Status",
+        data: res.chart,
+        backgroundColor: ["#FF6384", "#4CAF50", "#FFCE56", "#808080"],
+      }]
+    });
+    setGMVData({
+      labels: res.sales,
+      datasets: [{
+        label: "GMV",
+        data: res.gvss,
+        backgroundColor: "#4CAF50", // Green
+      }]
+    });
+    setGPVData({
+      labels: res.sales,
+      datasets: [{
+        label: "GPV",
+        data: res.gpvs,
+        backgroundColor: "#4CAF50", // Green
+      }]
+    });
+    setUsers(res.user);
+    Swal.close();
+  }
 
   const options = {
     indexAxis: "y", // Horizontal Bars
@@ -134,7 +167,6 @@ const Dashboard = () => {
     },
   };
 
-
   return (
     <div className="container mx-auto p-6 bg-gray-100">
       <BackToHome />
@@ -146,7 +178,8 @@ const Dashboard = () => {
           <label className="block mb-1">From Date</label>
           <input
             type="date"
-            value={fromDate}
+            placeholder={Date(fromDate)}
+            // value={fromDate}
             onChange={(e) => setFromDate(e.target.value)}
             className="border rounded px-3 py-2"
           />
@@ -155,10 +188,16 @@ const Dashboard = () => {
           <label className="block mb-1">To Date</label>
           <input
             type="date"
-            value={toDate}
+            placeholder={toDate}
+            // value={toDate}
             onChange={(e) => setToDate(e.target.value)}
             className="border rounded px-3 py-2"
           />
+        </div>
+        <div>
+          <button onClick={search} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-8" type="button">
+            Filter
+          </button>
         </div>
       </div>
 
@@ -208,24 +247,14 @@ const Dashboard = () => {
           <Bar data={GMVData} options={options} />
         </div>
 
-        
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 m-8">
-         <div >
+        <div className="bg-white p-4 rounded shadow">
            {/* Bookings vs Ops SPOC */}
-        <div className="bg-white p-4 w-1/2 m-auto mb-8  rounded shadow">
           <h3 className="text-lg font-semibold mb-4 ">Bookings vs Ops SPOC</h3>
-          <Bar data={bookingsVsOpsSPOC} />
-        </div>
-        {/* Operational */}
-        <div className="bg-white p-4 w-1/2 m-auto rounded shadow">
-          <h3 className="text-lg font-semibold mb-4">Operational Status (Bookings)</h3>
-          <Bar data={operationalStatus} />
-        </div>
+          <Bar  data={bookingsVsOpsSPOC} />
          </div>
 
-        <UserActivityTable className="w-1/2" />
-        </div>
+        <UserActivityTable users={users} className="w-1/2" />
+      </div>
     </div>
   );
 };

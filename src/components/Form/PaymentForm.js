@@ -1,11 +1,12 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import axios from "axios";
 import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
-import axios from "axios";
-import { API_URL } from "../../AppConstant.js";
-import { fetchPayment } from "../apiCalls/fetchData"
 import Swal from "sweetalert2";
+import { z } from "zod";
+import { API_URL } from "../../AppConstant.js";
+import { fetchPayment } from "../apiCalls/fetchData";
+import { updateTrip } from "../apiCalls/updateData.js";
 
 function PaymentForm({ handlehide, tripId, inputData, refetch }) {
   const paymentSchema = z.object({
@@ -95,12 +96,7 @@ function PaymentForm({ handlehide, tripId, inputData, refetch }) {
         const pay = await fetchPayment(tripId);
         console.log(pay, "response");
         const payment = pay.reduce((acc, item) => parseFloat(acc) + parseFloat(item.amount),0);
-        const res = await axios.post(`${API_URL}users/updatePayment/?id=${tripId}`, {payment},{
-          withCredentials: true,
-          headers: {
-            "Content-type" : "application/json"
-          }
-        })
+        const res = await updateTrip({ payment: payment }, tripId);
         if(res){
           Swal.close();
           Swal.fire("Payment updated")

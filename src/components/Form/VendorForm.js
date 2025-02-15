@@ -7,13 +7,11 @@ import { API_URL } from "../../AppConstant";
 import {
   fetchDestinations,
   fetchSuppliers,
-  fetchVendors,
 } from "../apiCalls/fetchData";
 import Swal from "sweetalert2";
 
 function VendorForm({ dest, refetch, tripId, setInputData }) {
   const [supplier, setSupplier] = React.useState([]);
-
   const vendorSchema = z.object({
     name: z.string().min(1, { message: "vendor name is required" }),
     destination: z.string().min(1, { message: "destination is required" }),
@@ -98,22 +96,11 @@ function VendorForm({ dest, refetch, tripId, setInputData }) {
       });
       if (response.status === 200) {
         await refetch();
-        await validate();
+        setInputData(null);
         Swal.close();
       }
     })(data);
   };
- 
-  const validate = async() => {
-        const res = await axios.post(
-          `${API_URL}users/updatePayStat/?id=${tripId}`,
-          { paymentStatus: "UNPAID", opsStatus: "PENDING" }
-        );
-       if(res.status === 200){ Swal.close();
-        await refetch();
-        setInputData(null);
-      }
-  }
 
   return (
     <form onSubmit={handleSubmit(vendorSubmit)} className="mb-4">

@@ -166,3 +166,18 @@ export const fetchSalesDocs = async (id) => {
     return false;
   }
 }
+
+export const fetchDashboard = async (startDate, endDate) => {
+  const response = await axios.get(`${API_URL}users/getDashData/?startDate=${startDate}&endDate=${endDate}`, {
+    withCredentials: true,
+    headers: {
+      "content-type": "mutipart/form-data",
+    },
+  });
+  if (response.status === 200) {
+    return await response.data;
+  } else {
+    alert(await response.data.MESSAGE);
+    return false;
+  }
+}

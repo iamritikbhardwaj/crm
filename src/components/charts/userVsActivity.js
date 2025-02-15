@@ -1,51 +1,8 @@
 import { useState } from "react";
 
-const UserActivityTable = () => {
+const UserActivityTable = ({users}) => {
     // Dummy user activity data
-    const users = [
-      {
-        name: "Yiorgos Avraamu",
-        status: "New",
-        registered: "Jan 1, 2023",
-        activity: "10 sec ago",
-        avatar: "https://i.pravatar.cc/40?img=1",
-      },
-      {
-        name: "Avram Tasarios",
-        status: "Recurring",
-        registered: "Jan 1, 2023",
-        activity: "5 minutes ago",
-        avatar: "https://i.pravatar.cc/40?img=2",
-      },
-      {
-        name: "Quintin Ed",
-        status: "New",
-        registered: "Jan 1, 2023",
-        activity: "1 hour ago",
-        avatar: "https://i.pravatar.cc/40?img=3",
-      },
-      {
-        name: "Enéas Kwadwo",
-        status: "New",
-        registered: "Jan 1, 2023",
-        activity: "Last month",
-        avatar: "https://i.pravatar.cc/40?img=4",
-      },
-      {
-        name: "Agapetus Tadeáš",
-        status: "New",
-        registered: "Jan 1, 2023",
-        activity: "Last week",
-        avatar: "https://i.pravatar.cc/40?img=5",
-      },
-      {
-        name: "Friderik Dávid",
-        status: "New",
-        registered: "Jan 1, 2023",
-        activity: "Last week",
-        avatar: "https://i.pravatar.cc/40?img=6",
-      },
-    ];
+    
   
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 5; // Number of items per page

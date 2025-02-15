@@ -63,7 +63,7 @@ function User() {
             phone: item.phone,
             profile: item.profile,
             email: item.email,
-            status: <button className="m-1 p-1 rounded-lg bg-green-400">{item.status}</button>,
+            status: <button className={`m-1 p-1 rounded-lg ${item.status === 'Active' ? 'bg-green-400' : 'bg-red-400'}`}>{item.status}</button>,
             action: <><button className=" rounded-lg text-blue-400" onClick={() => {
               navigate('/userForm', { state: item });
             }}><MdModeEdit />

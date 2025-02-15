@@ -13,7 +13,6 @@ import {
   fetchPayment,
   fetchRecon,
   fetchSalesDocs,
-  fetchSuppliers,
   fetchTrips,
   fetchUsers,
   fetchVendors,
@@ -27,7 +26,7 @@ import { API_URL } from "../AppConstant";
 import axios from "axios";
 import Swal from "sweetalert2";
 import ExcelToTable from "../components/customTable/ExcelToTable";
-import { updateValidation } from "../components/apiCalls/updateData";
+import { updateTrip } from "../components/apiCalls/updateData";
 import { useSelector } from "react-redux";
 
 export default function VeiwAllBooking() {
@@ -91,7 +90,7 @@ export default function VeiwAllBooking() {
       showDenyButton: true,
       confirmButtonText: "Update",
       denyButtonText: `Don't Update`,
-    }).then((result) => {
+    }).then(async (result) => {
       /* Read more about isConfirmed, isDenied below */
       if (result.isConfirmed) {
         Swal.fire({
@@ -102,7 +101,6 @@ export default function VeiwAllBooking() {
             Swal.showLoading();
           },
         });
-        (async () => {
           console.log(vendor, "is confimed");
           const response = await axios.post(
             `${API_URL}users/createVendor/?id=${id}`,
@@ -113,49 +111,6 @@ export default function VeiwAllBooking() {
             await refetchVend();
             Swal.close();
           }
-          const vend = await fetchVendors(tripId);
-          const payStat = vend.filter(
-            (item) => item.payment_status !== "FULL-PAID"
-          );
-          const bookStat = vend.filter(
-            (item) => item.booking_status !== "COMPLETED"
-          );
-          if (
-            Array.from(payStat).length === 0 &&
-            Array.from(bookStat).length === 0
-          ) {
-            const res = await axios.post(
-              `${API_URL}users/updatePayStat/?id=${tripId}`,
-              { paymentStatus: "FULL-PAID", opsStatus: "COMPLETED" }
-            );
-          } else if (
-            Array.from(payStat).length !== 0 &&
-            Array.from(bookStat).length === 0
-          ) {
-            const res = await axios.post(
-              `${API_URL}users/updatePayStat/?id=${tripId}`,
-              { paymentStatus: "UNPAID", opsStatus: "COMPLETED" }
-            );
-          } else if (
-            Array.from(payStat).length === 0 &&
-            Array.from(bookStat).length !== 0
-          ) {
-            const res = await axios.post(
-              `${API_URL}users/updatePayStat/?id=${tripId}`,
-              { paymentStatus: "FULL-PAID", opsStatus: "PENDING" }
-            );
-          } else {
-            const res = await axios.post(
-              `${API_URL}users/updatePayStat/?id=${tripId}`,
-              { paymentStatus: "UNPAID", opsStatus: "PENDING" }
-            );
-          }
-          Swal.fire({
-            title: "Vendor updated successfully",
-            timer: 2000,
-          });
-          console.log(response, "response");
-        })();
       } else {
         Swal.fire("Changes are not Updated", "", "info");
       }
@@ -168,7 +123,7 @@ export default function VeiwAllBooking() {
       showDenyButton: true,
       confirmButtonText: "Update",
       denyButtonText: `Don't Update`,
-    }).then((result) => {
+    }).then(async (result) => {
       /* Read more about isConfirmed, isDenied below */
       if (result.isConfirmed) {
         Swal.fire({
@@ -179,9 +134,9 @@ export default function VeiwAllBooking() {
             Swal.showLoading();
           },
         });
-        const res = axios.post(`${API_URL}users/updateOrderVal/?id=${tripId}`, {
-          orderValue: orderValue,
-        });
+        const res = await updateTrip( 
+          {orderValue: orderValue}, tripId
+          );
         Swal.close();
       } else {
         Swal.fire("Order Value is not Updated", "", "info");
@@ -263,17 +218,11 @@ export default function VeiwAllBooking() {
         const formData = {
           status: value,
         };
-        const response = axios.post(
-          `${API_URL}users/updateStatus/?id=${tripId}`,
+        const response = updateTrip(
           formData,
-          {
-            withCredentials: true,
-            headers: {
-              "content-type": "application/json",
-            },
-          }
+          tripId
         );
-        if ((await response).status === 200) {
+        if (response) {
           await refetch();
           Swal.close();
           Swal.fire({
@@ -283,7 +232,7 @@ export default function VeiwAllBooking() {
         } else {
           Swal.close();
           Swal.fire({
-            text: response.data.MESSAGE,
+            text: "There was some problem while updating status",
             timer: 2000,
           });
         }
@@ -312,17 +261,11 @@ export default function VeiwAllBooking() {
         const formData = {
           opsSpoc: value,
         };
-        const response = axios.post(
-          `${API_URL}users/updateOps/?id=${tripId}`,
+        const response = await updateTrip(
           formData,
-          {
-            withCredentials: true,
-            headers: {
-              "content-type": "application/json",
-            },
-          }
+          tripId
         );
-        if ((await response).status === 200) {
+        if (response) {
           await refetch();
           Swal.close();
           Swal.fire({
@@ -729,7 +672,7 @@ export default function VeiwAllBooking() {
                                 Swal.showLoading();
                               },
                             });
-                            const res = await updateValidation({validation : user?.profile}, tripId);
+                            const res = await updateTrip({validation : user?.profile}, tripId);
                             console.log(res, "res");
                             Swal.close()
                             // edit options are available in case we want to add edit functionality
@@ -775,12 +718,20 @@ export default function VeiwAllBooking() {
             </span>
           </h2>
           <div className={`p-4 ${active === 3 ? "flex-col" : "hidden"} h-fit`}>
-            <div className="flex justify-end">
+            <div className="flex justify-between">
               <button
                 onClick={updateDocs}
                 className="bg-blue-500 rounded-lg px-2 m-2 text-white py-1"
               >
                 Save documents
+              </button>
+              <button
+                onClick={async() => {
+                  await updateTrip({transferPrice: transferPrice}, tripId)
+              }}
+              className="bg-blue-500 rounded-lg px-2 m-2 text-white py-1"
+              >
+                Save Transfer Price
               </button>
             </div>
             <div>

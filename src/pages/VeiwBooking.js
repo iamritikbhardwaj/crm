@@ -16,9 +16,11 @@ export default function VeiwBooking() {
   const location = useLocation();
   const data = location.state;
   const auth = useSelector((state) => state.auth);
-  const profile = auth.user?.profile;
+  const user = auth.user;
 
-  console.log(data.docs, "data.docs");
+  useEffect(() => {
+    console.log(user);
+  }, [user]);
 
   // to navigate b/w sections
   const [active, setActive] = useState(0); // Section toggle
@@ -407,14 +409,14 @@ export default function VeiwBooking() {
         <div className="p-4 flex justify-between">
           <button
             onClick={acceptValidation}
-            disabled={profile !== "Admin" && profile !== "Operations" ? false : true }
+            disabled={user?.profile !== "Admin" && user?.profile !== "Operations" ? false : true }
             className="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600"
           >
             Accept Booking
           </button>
           <button
             onClick={rejectvalidation}
-            disabled={profile !== "Admin" && profile !== "Operations" ? false : true }
+            disabled={user?.profile !== "Admin" && user?.profile !== "Operations" ? false : true }
             className="bg-red-500 text-white px-6 py-2 rounded hover:bg-red-600"
           >
             Reject Booking
