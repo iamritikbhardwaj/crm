@@ -117,7 +117,7 @@ export const deleteRecon = async (id) => {
     return response;
 }
 
-export const deleteBooking = async (id) => {
+export const deleteBooking = async (id, reject) => {
     Swal.fire({
         title: "Deleting...",
         text: "Please wait while we delete Data.",
@@ -126,9 +126,24 @@ export const deleteBooking = async (id) => {
           Swal.showLoading();
         },
       });
-    const response = await axios.delete(`${API_URL}users/deleteBooking/${id}`);
+    const response = await axios.delete(`${API_URL}users/deleteBooking/?id=${id}&reject=${reject}`);
     Swal.close();
     return response;
+}
+
+export const cancelBooking = async (id, reject) => {
+  Swal.fire({
+      title: "Rejecting...",
+      text: "Please wait while we delete Data.",
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading();
+      },
+    });
+  const response = await axios.delete(`${API_URL}users/cancelBooking/?id=${id}`);
+  
+  Swal.close();
+  return response;
 }
 
 export const deleteVendor= async (id) => {

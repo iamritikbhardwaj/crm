@@ -26,7 +26,7 @@ import { API_URL } from "../AppConstant";
 import axios from "axios";
 import Swal from "sweetalert2";
 import ExcelToTable from "../components/customTable/ExcelToTable";
-import { updateTrip } from "../components/apiCalls/updateData";
+import { updateTrip, updateVoucher } from "../components/apiCalls/updateData";
 import { useSelector } from "react-redux";
 
 export default function VeiwAllBooking() {
@@ -54,7 +54,7 @@ export default function VeiwAllBooking() {
   const [selectedExcel, setSelectedExcel] = useState([]);
   const auth = useSelector((state) => state.auth);
   const user = auth.user;
-  console.log(user.profile , "profile");
+  console.log(user.profile, "profile");
 
   const refetch = async () => {
     const itemData = await fetchTrips(tripId);
@@ -101,16 +101,16 @@ export default function VeiwAllBooking() {
             Swal.showLoading();
           },
         });
-          console.log(vendor, "is confimed");
-          const response = await axios.post(
-            `${API_URL}users/createVendor/?id=${id}`,
-            vendor
-          );
-          console.log(response, "response");
-          if (response) {
-            await refetchVend();
-            Swal.close();
-          }
+        console.log(vendor, "is confimed");
+        const response = await axios.post(
+          `${API_URL}users/createVendor/?id=${id}`,
+          vendor
+        );
+        console.log(response, "response");
+        if (response) {
+          await refetchVend();
+          Swal.close();
+        }
       } else {
         Swal.fire("Changes are not Updated", "", "info");
       }
@@ -134,9 +134,7 @@ export default function VeiwAllBooking() {
             Swal.showLoading();
           },
         });
-        const res = await updateTrip( 
-          {orderValue: orderValue}, tripId
-          );
+        const res = await updateTrip({ orderValue: orderValue }, tripId);
         Swal.close();
       } else {
         Swal.fire("Order Value is not Updated", "", "info");
@@ -218,10 +216,7 @@ export default function VeiwAllBooking() {
         const formData = {
           status: value,
         };
-        const response = updateTrip(
-          formData,
-          tripId
-        );
+        const response = updateTrip(formData, tripId);
         if (response) {
           await refetch();
           Swal.close();
@@ -261,10 +256,7 @@ export default function VeiwAllBooking() {
         const formData = {
           opsSpoc: value,
         };
-        const response = await updateTrip(
-          formData,
-          tripId
-        );
+        const response = await updateTrip(formData, tripId);
         if (response) {
           await refetch();
           Swal.close();
@@ -283,6 +275,10 @@ export default function VeiwAllBooking() {
     });
   };
 
+  const voucherUpdate = async () => {
+    await updateVoucher(tripId);
+    updateDocs();
+  }
   const updateDocs = async () => {
     Swal.fire({
       title: "Submitting...",
@@ -653,7 +649,7 @@ export default function VeiwAllBooking() {
                     <div className="flex justify-around">
                       <button
                         className="text-blue-900"
-                        onClick={async() => {
+                        onClick={async () => {
                           if (
                             parseFloat(data?.online) +
                               parseInt(data?.offline) +
@@ -672,9 +668,13 @@ export default function VeiwAllBooking() {
                                 Swal.showLoading();
                               },
                             });
-                            const res = await updateTrip({validation : user?.profile}, tripId);
+                            await updateVoucher(tripId);
+                            const res = await updateTrip(
+                              { validation: user?.profile },
+                              tripId
+                            );
                             console.log(res, "res");
-                            Swal.close()
+                            Swal.close();
                             // edit options are available in case we want to add edit functionality
                           }
                         }}
@@ -726,10 +726,10 @@ export default function VeiwAllBooking() {
                 Save documents
               </button>
               <button
-                onClick={async() => {
-                  await updateTrip({transferPrice: transferPrice}, tripId)
-              }}
-              className="bg-blue-500 rounded-lg px-2 m-2 text-white py-1"
+                onClick={async () => {
+                  await updateTrip({ transferPrice: transferPrice }, tripId);
+                }}
+                className="bg-blue-500 rounded-lg px-2 m-2 text-white py-1"
               >
                 Save Transfer Price
               </button>
@@ -904,7 +904,7 @@ export default function VeiwAllBooking() {
           <div className="w-1/2">
             <div className="flex justify-end">
               <button
-                onClick={updateDocs}
+                onClick={voucherUpdate}
                 className="bg-blue-500 rounded-lg px-2 m-2 text-white py-1"
               >
                 Save documents

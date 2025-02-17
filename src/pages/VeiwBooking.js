@@ -8,7 +8,7 @@ import { API_URL } from "../AppConstant";
 import Swal from "sweetalert2";
 import FileUpload from "../components/Input/FileUpload";
 import { fetchUsers } from "../components/apiCalls/fetchData";
-import { deleteBooking } from "../components/apiCalls/deleteData";
+import { cancelBooking, deleteBooking } from "../components/apiCalls/deleteData";
 import { useSelector } from "react-redux";
 
 export default function VeiwBooking() {
@@ -95,7 +95,7 @@ export default function VeiwBooking() {
   // Reject Booking is to delete the booking
   const rejectBooking = async () => {
     try {
-      const response = await deleteBooking(data.booking_id);
+      const response = await cancelBooking(data.booking_id, true);
       if (response.status === 200) {
         navigate("/booking");
         Swal.close();
@@ -409,14 +409,14 @@ export default function VeiwBooking() {
         <div className="p-4 flex justify-between">
           <button
             onClick={acceptValidation}
-            disabled={user?.profile !== "Admin" && user?.profile !== "Operations" ? false : true }
+            disabled={user?.profile !== "Admin" || user?.profile !== "Operations" ? false : true }
             className="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600"
           >
             Accept Booking
           </button>
           <button
             onClick={rejectvalidation}
-            disabled={user?.profile !== "Admin" && user?.profile !== "Operations" ? false : true }
+            disabled={user?.profile !== "Admin" || user?.profile !== "Operations" ? false : true }
             className="bg-red-500 text-white px-6 py-2 rounded hover:bg-red-600"
           >
             Reject Booking
