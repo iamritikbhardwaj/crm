@@ -28,3 +28,17 @@ export const updateVoucher = async (id) => {
         console.log(error);
     }
 }
+
+export const updateRecon = async (id) => {
+    try {
+        const response = await axios
+            .post(`${API_URL}users/recon/?id=${id}`,{
+                headers: {
+                    "Content-Type": "application/json",
+                }
+            })
+        return response;
+    } catch (error) {
+        console.log(error);
+    }
+}

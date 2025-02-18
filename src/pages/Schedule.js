@@ -11,7 +11,6 @@ import {
   fetchVendors,
 } from "../components/apiCalls/fetchData";
 import { useSelector } from "react-redux";
-import { transferPrice } from "../components/customTable/ExcelToTable";
 
 const AllBookings = () => {
   const [bookings, setBookings] = useState([]);
@@ -94,7 +93,6 @@ const AllBookings = () => {
             action: (
               <button
                 className="text-3xl"
-                disabled={user?.profile === "Sales"}
                 onClick={() => navigate("/viewAllBooking", { state: item })}
               >
                 <GrFormView />
@@ -103,21 +101,21 @@ const AllBookings = () => {
             paymentstat: (
               <button
                 className={`${
-                  item?.paymentStatus !== "FULL-PAID"
-                    ? "bg-red-400"
-                    : "bg-green-400"
+                  item.paymentStatus === "FULL-PAID" ? "bg-green-400" : "bg-red-400"
                 } p-2 rounded-lg`}
               ></button>
             ),
             validation: (
               <button
                 className={`${
-                  item.validation === "Finance" ? "bg-green-400" : "bg-red-400"
-                } ${item.validation === "Admin" && "bg-green-400"} ${
+                  item.validation === "Finance" && "bg-green-400"
+                } ${
                   item.validation === "Operations"
-                    ? "bg-blue-400"
-                    : "bg-red-400"
-                } 
+                    && "bg-blue-400"
+                } ${
+                  item.validation === "Finance" || item.validation === "Operations" || "bg-red-400"
+                    && "bg-red-400"
+                }
          p-2 rounded-lg`}
               ></button>
             ),

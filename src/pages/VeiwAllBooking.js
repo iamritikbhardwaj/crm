@@ -26,7 +26,11 @@ import { API_URL } from "../AppConstant";
 import axios from "axios";
 import Swal from "sweetalert2";
 import ExcelToTable from "../components/customTable/ExcelToTable";
-import { updateTrip, updateVoucher } from "../components/apiCalls/updateData";
+import {
+  updateRecon,
+  updateTrip,
+  updateVoucher,
+} from "../components/apiCalls/updateData";
 import { useSelector } from "react-redux";
 
 export default function VeiwAllBooking() {
@@ -54,7 +58,7 @@ export default function VeiwAllBooking() {
   const [selectedExcel, setSelectedExcel] = useState([]);
   const auth = useSelector((state) => state.auth);
   const user = auth.user;
-  console.log(user.profile, "profile");
+  console.log(user, "profile");
 
   const refetch = async () => {
     const itemData = await fetchTrips(tripId);
@@ -278,7 +282,7 @@ export default function VeiwAllBooking() {
   const voucherUpdate = async () => {
     await updateVoucher(tripId);
     updateDocs();
-  }
+  };
   const updateDocs = async () => {
     Swal.fire({
       title: "Submitting...",
@@ -378,7 +382,11 @@ export default function VeiwAllBooking() {
               ],
               [
                 "Ops Spoc",
-                <select value={item?.opsSpoc} onChange={updateOps}>
+                <select
+                  value={item?.opsSpoc}
+                  disabled={user.profile !== "Admin"}
+                  onChange={updateOps}
+                >
                   {opsSpoc.length > 0 &&
                     opsSpoc.map((user, index) => (
                       <option key={index} value={user.name}>
@@ -389,7 +397,13 @@ export default function VeiwAllBooking() {
               ],
               [
                 "Trip Status",
-                <select value={item?.status} onChange={updateStatus}>
+                <select
+                  value={item?.status}
+                  onChange={updateStatus}
+                  disabled={
+                    user.profile !== "Admin" && user.name !== item?.opsSpoc
+                  }
+                >
                   <option value="CONFIRMED">CONFIRMED</option>
                   <option value="CANCELLED">CANCELLED</option>
                   <option value="ON-TOUR">ON-TOUR</option>
@@ -417,6 +431,7 @@ export default function VeiwAllBooking() {
             <div className="flex justify-end">
               <button
                 onClick={updateDocs}
+                disabled={user.profile !== "Admin" && user.name !== item?.opsSpoc}
                 className="bg-blue-500 rounded-lg px-2 m-2 text-white py-1"
               >
                 Save documents
@@ -424,7 +439,11 @@ export default function VeiwAllBooking() {
             </div>
             <div className="flex">
               {/* Document Upload List */}
-              <div className="w-1/2 border-r border-gray-300 px-2 space-y-2">
+              <div
+                className={`w-1/2 ${
+                  user.profile !== "Admin" && user.name !== item?.opsSpoc && "hidden"
+                } border-r border-gray-300 px-2 space-y-2`}
+              >
                 <FileUpload
                   label={"Air Ticket"}
                   id={"airTicket"}
@@ -515,6 +534,7 @@ export default function VeiwAllBooking() {
               </p>
               <button
                 className="px-1 py-0 m-1 text-white bg-blue-500 rounded-lg"
+                disabled={user.profile !== "Admin" && user.name !== item?.opsSpoc}
                 onClick={updateOrderVal}
               >
                 Save Changes
@@ -546,6 +566,7 @@ export default function VeiwAllBooking() {
               </div>
               <button
                 className="text-blue-600 ml-[90%] text-3xl"
+                disabled={user.profile !== "Admin" && user.name !== item?.opsSpoc}
                 onClick={() => {
                   setInputData(null);
                   inpRef.current.style.display = "block";
@@ -575,6 +596,7 @@ export default function VeiwAllBooking() {
                     <div className="flex justify-around">
                       <button
                         className="text-blue-900"
+                        disabled={user.profile !== "Admin" && user.name !== item?.opsSpoc}
                         onClick={() => {
                           setInputData(data);
                           inpRef.current.style.display = "block";
@@ -587,6 +609,7 @@ export default function VeiwAllBooking() {
                           deletePayment(data?.payment_id, tripId);
                           refetchCom();
                         }}
+                        disabled={user.profile !== "Admin" && user.name !== item?.opsSpoc}
                         className="text-red-600"
                       >
                         <MdDelete />
@@ -636,6 +659,7 @@ export default function VeiwAllBooking() {
                   setInputData(null);
                   editForm.current.style.display = "block";
                 }}
+                disabled={user.profile !== "Admin" && user.name !== item?.opsSpoc}
               >
                 <MdAddCircle />
               </button>
@@ -649,12 +673,13 @@ export default function VeiwAllBooking() {
                     <div className="flex justify-around">
                       <button
                         className="text-blue-900"
+                        disabled={user.profile !== "Admin" && user.name !== item?.opsSpoc}
                         onClick={async () => {
                           if (
                             parseFloat(data?.online) +
-                              parseInt(data?.offline) +
-                              parseInt(data?.land) !==
-                            parseInt(item.orderValue)
+                            parseFloat(data?.offline) +
+                            parseFloat(data?.land) !==
+                            parseFloat(item.orderValue)
                           ) {
                             Swal.fire(
                               "Online + Offline + Land must be equal to Order Value"
@@ -668,11 +693,11 @@ export default function VeiwAllBooking() {
                                 Swal.showLoading();
                               },
                             });
-                            await updateVoucher(tripId);
                             const res = await updateTrip(
-                              { validation: user?.profile },
+                              { validation: user.profile },
                               tripId
                             );
+                            await updateRecon(tripId);
                             console.log(res, "res");
                             Swal.close();
                             // edit options are available in case we want to add edit functionality
@@ -686,6 +711,7 @@ export default function VeiwAllBooking() {
                           deleteRecon(data?.recon_id);
                           refetchCom();
                         }}
+                        disabled={user.profile !== "Admin" && user.name !== item?.opsSpoc}
                         className="text-red-600"
                       >
                         <MdDelete />
@@ -721,6 +747,7 @@ export default function VeiwAllBooking() {
             <div className="flex justify-between">
               <button
                 onClick={updateDocs}
+                disabled={user.profile !== "Admin" && user.name !== item?.opsSpoc}
                 className="bg-blue-500 rounded-lg px-2 m-2 text-white py-1"
               >
                 Save documents
@@ -729,6 +756,7 @@ export default function VeiwAllBooking() {
                 onClick={async () => {
                   await updateTrip({ transferPrice: transferPrice }, tripId);
                 }}
+                disabled={user.profile !== "Admin" && user.name !== item?.opsSpoc}
                 className="bg-blue-500 rounded-lg px-2 m-2 text-white py-1"
               >
                 Save Transfer Price
@@ -738,7 +766,7 @@ export default function VeiwAllBooking() {
               <ExcelToTable url={selectedExcel} setPrice={setPrice} />
             </div>
             <div className="flex gap-4">
-              <div className="w-1/2">
+              <div className={`w-1/2 ${user.profile !== "Admin" && user.name !== item?.opsSpoc ? "hidden" : ""}`}>
                 <FileUpload
                   label={"Sales Sheet"}
                   id={"salesSheet"}
@@ -784,7 +812,7 @@ export default function VeiwAllBooking() {
         </div>
 
         {/* vendor details */}
-        <div className="mb-6">
+        <div className={`mb-6 ${user.profile !== "Admin" && user.name !== item?.opsSpoc ? "hidden" : ""}`}>
           <h2 className="text-lg font-semibold bg-gray-200 p-2 rounded flex justify-between">
             Supplier Details
             <span onClick={() => setActive(active === 4 ? null : 4)}>
@@ -808,6 +836,7 @@ export default function VeiwAllBooking() {
                     onChange={(e) => {
                       editVendor(data?.vendor_pay_id, {
                         booking_status: e.target.value,
+                        tripId,
                       });
                     }}
                   >
@@ -822,6 +851,7 @@ export default function VeiwAllBooking() {
                       onChange={(e) => {
                         editVendor(data?.vendor_pay_id, {
                           payment_status: e.target.value,
+                          tripId,
                         });
                       }}
                       value={data?.payment_status}
@@ -846,6 +876,7 @@ export default function VeiwAllBooking() {
                         await deleteVendor(data?.vendor_pay_id);
                         refetchVend();
                       }}
+                      disabled={user.profile !== "Admin" && user.name !== item?.opsSpoc}
                       className="text-red-600"
                     >
                       <MdDelete />
@@ -875,7 +906,8 @@ export default function VeiwAllBooking() {
           </span>
         </h2>
         <div className={`p-4 ${active === 5 ? "flex" : "hidden"} min-h-36`}>
-          <div className="w-1/2 my-auto px-2 h-full border-r-[1px] space-y-2 border-slate-400">
+          <div className=
+          {`w-1/2 ${user.profile !== "Admin" && user.name !== item?.opsSpoc} my-auto px-2 h-full border-r-[1px] space-y-2 border-slate-400`}>
             <FileUpload
               label={"Hotel Voucher"}
               id={"hotelvoucher"}
@@ -905,6 +937,7 @@ export default function VeiwAllBooking() {
             <div className="flex justify-end">
               <button
                 onClick={voucherUpdate}
+                disabled={user.profile !== "Admin" && user.name !== item?.opsSpoc}
                 className="bg-blue-500 rounded-lg px-2 m-2 text-white py-1"
               >
                 Save documents

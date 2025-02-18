@@ -36,10 +36,13 @@ export default function VeiwBooking() {
   useEffect(() => {
     (async () => {
       const data = await fetchUsers();
-      if (data) {
+      if (data.profile !== "Operations") {
         setOpsSpoc(data.filter((user) => user.profile === "Operations"));
       }
     })();
+    if (user.profile === "Operations") {
+      setInputData({...inputData, opsSpoc: user.name});
+    }
   }, []);
 
   const addDoc = (e, catagory) => {
@@ -226,6 +229,8 @@ export default function VeiwBooking() {
               [
                 "Ops Spoc",
                 <select
+                value={inputData.opsSpoc}
+                disabled={user.profile === "Operations"}
                   onChange={(e) => {
                     setInputData({ ...inputData, opsSpoc: e.target.value });
                   }}
@@ -409,14 +414,14 @@ export default function VeiwBooking() {
         <div className="p-4 flex justify-between">
           <button
             onClick={acceptValidation}
-            disabled={user?.profile !== "Admin" || user?.profile !== "Operations" ? false : true }
+            disabled={user?.profile === "Sales" ? true : false }
             className="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600"
           >
             Accept Booking
           </button>
           <button
             onClick={rejectvalidation}
-            disabled={user?.profile !== "Admin" || user?.profile !== "Operations" ? false : true }
+            disabled={user?.profile === "Sales" ? true : false }
             className="bg-red-500 text-white px-6 py-2 rounded hover:bg-red-600"
           >
             Reject Booking

@@ -10,6 +10,7 @@ import BackToHome from "../components/BackToHome";
 import FileUpload from "../components/Input/FileUpload";
 import countryCodes from "../sampleData/sampleData";
 import { fetchAgents } from "../components/apiCalls/fetchData";
+import { useSelector } from "react-redux";
 
 const AddBooking = () => {
   const sections = [
@@ -24,6 +25,8 @@ const AddBooking = () => {
   const [destData, setDestData] = useState([]);
   const [salesSpoc, setSalesSpoc] = useState([]);
   const [agent, setAgent] = useState([]);
+  const auth = useSelector((state) => state.auth);
+  const user = auth.user;
   const navigate = useNavigate();
 
   const bookingSchema = z.object({
@@ -90,6 +93,9 @@ const AddBooking = () => {
       const agentData = await fetchAgents();
       setAgent(agentData);
     })();
+    if (user.profile === "Sales") {
+      setValue("salesSpoc", user.name);
+    }
   }, []);
 
   // Add New Document
@@ -258,6 +264,8 @@ const AddBooking = () => {
               <select
                 name="salesSpoc"
                 id="salesSpoc"
+                disabled={user.profile === "Sales"}
+                // value={user.profile === "Sales" ? user.name : ""}
                 {...register("salesSpoc")}
                 className="w-full border rounded px-3 py-2"
               >

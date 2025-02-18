@@ -104,6 +104,7 @@ function PaymentForm({ handlehide, tripId, inputData, refetch }) {
           Swal.close();
           Swal.fire("Payment not updated")
         }
+        Swal.close();
       }
     })(data);
     handlehide();
