@@ -5,9 +5,13 @@ import { z } from "zod";
 import axios from "axios";
 import { API_URL } from "../../AppConstant.js";
 import Swal from "sweetalert2";
+import { useSelector } from "react-redux";
 
 function DestForm({ editData, setEditData, refetch }) {
  
+  const auth = useSelector((state) => state.auth);
+  const user = auth.user;
+
   const destSchema = z.object({
     destination: z.string(),
     currency: z.string().toUpperCase(),
@@ -64,7 +68,7 @@ function DestForm({ editData, setEditData, refetch }) {
                 {...register("currency")}
               />
               {errors.currency && <p>{errors.currency.message}</p>}
-              <button type="submit" className="w-1/2 p-2 border-[1px] m-2 bg-slate-700 text-white rounded hover:bg-slate-600">
+              <button disabled={user.profile !== "Admin"} type="submit" className="w-1/2 p-2 border-[1px] m-2 bg-slate-700 text-white rounded hover:bg-slate-600">
                 Save
               </button>
             </form>

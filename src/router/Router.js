@@ -23,6 +23,7 @@ const DocForm = lazy(() => import("../components/Form/docForm"));
 const ProtectedRoute = ({ element }) => {
     const auth = useSelector((state) => state.auth);
     const token = auth.token;
+    const user = auth.user;
     // Check if the token is present in cookiess
     // const token = document.cookie
     //     .split("; ")
@@ -45,55 +46,55 @@ const router = createBrowserRouter([
     },
     {
         path: "/user",
-        element: <ProtectedRoute element={<User />} />,
+        element: <ProtectedRoute profile="Admin" element={<User />} />,
     },
     {
         path: "/setting",
-        element: <ProtectedRoute element={<Setting />} />,
+        element: <ProtectedRoute profile="Admin" element={<Setting />} />,
     },
     {
         path: "/booking",
-        element: <ProtectedRoute element={<Booking />} />,
+        element: <ProtectedRoute profile="" element={<Booking />} />,
     },
     {
         path: "/schedule",
-        element: <ProtectedRoute element={<Schedule />} />,
+        element: <ProtectedRoute profile="" element={<Schedule />} />,
     },
     {
         path: "/profile",
-        element: <ProtectedRoute element={<Profile />} />,
+        element: <ProtectedRoute profile="" element={<Profile />} />,
     },
     {
         path: "/dashboard",
-        element: <ProtectedRoute element={<Dashboard />} />,
+        element: <ProtectedRoute profile="" element={<Dashboard />} />,
     },
     {
         path: "/viewBooking",
-        element: <ProtectedRoute element={<VeiwBooking />} />,
+        element: <ProtectedRoute profile="" element={<VeiwBooking />} />,
     },
     {
         path: "/addBooking",
-        element: <ProtectedRoute element={<AddBooking />} />,
+        element: <ProtectedRoute profile="" element={<AddBooking />} />,
     },
     {
         path: "/viewAllBooking",
-        element: <ProtectedRoute element={<VeiwAllBooking />} />,
+        element: <ProtectedRoute profile="" element={<VeiwAllBooking />} />,
     },
     {
         path: "/excelToTable",
-        element: <ProtectedRoute element={<ExcelToTable />} />,
+        element: <ProtectedRoute profile="" element={<ExcelToTable />} />,
     },
     {
         path: "/userForm",
-        element: <ProtectedRoute element={<UserForm />} />,
+        element: <ProtectedRoute profile="" element={<UserForm />} />,
     },
     {
         path: "/destForm",
-        element: <ProtectedRoute element={<DestForm />} />,
+        element: <ProtectedRoute profile="" element={<DestForm />} />,
     },
     {
         path: "/docs",
-        element: <ProtectedRoute element={<DocForm />} />,
+        element: <ProtectedRoute profile="" element={<DocForm />} />,
     },
     // Public routes
     // {
@@ -107,10 +108,6 @@ const router = createBrowserRouter([
     {
         path: "*",
         element: <NotFound />,
-    },
-    {
-        path: "/sample",
-        element: <sampleFile />
     }
 ]);
 

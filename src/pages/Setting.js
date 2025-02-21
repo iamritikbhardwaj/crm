@@ -7,51 +7,53 @@ import AgentForm from "../components/Form/agentForm";
 import SupForm from "../components/Form/supForm";
 import axios from "axios";
 import { API_URL } from "../AppConstant";
-import { set } from "mongoose";
 import Swal from "sweetalert2";
+import { useSelector } from "react-redux";
 
 function Setting() {
+  const auth = useSelector((state) => state.auth);
+  const user = auth.user;
   const destfetch = async () => {
     const response = axios.get(`${API_URL}users/getAllDestinations`, {
       withCredentials: true,
       headers: {
-        "content-type": "application/json"
-      }
+        "content-type": "application/json",
+      },
     });
-    console.log((await response), 'destination response');
+    console.log(await response, "destination response");
     setDestData((await response).data.OUTPUT);
-    }
-    const agentfetch = async () => {
-      const response = axios.get(`${API_URL}users/getAllAgents`, {
-        withCredentials: true,
-        headers: {
-          "content-type": "application/json"
-        }
-      });
-      console.log((await response), 'agent response');
-      setAgentData((await response).data.OUTPUT);
-      }
+  };
+  const agentfetch = async () => {
+    const response = axios.get(`${API_URL}users/getAllAgents`, {
+      withCredentials: true,
+      headers: {
+        "content-type": "application/json",
+      },
+    });
+    console.log(await response, "agent response");
+    setAgentData((await response).data.OUTPUT);
+  };
   /**
    * Fetches all suppliers and stores them in the component state
    * via setSupData.
    */
-      const supplierfetch = async () => {
-        const response = axios.get(`${API_URL}users/getAllSuppliers`, {
-          withCredentials: true,
-          headers: {
-            "content-type": "application/json"
-          }
-        });
-        console.log((await response).data.OUTPUT, 'response');
-        setSupData((await response).data.OUTPUT);
-        }
+  const supplierfetch = async () => {
+    const response = axios.get(`${API_URL}users/getAllSuppliers`, {
+      withCredentials: true,
+      headers: {
+        "content-type": "application/json",
+      },
+    });
+    console.log((await response).data.OUTPUT, "response");
+    setSupData((await response).data.OUTPUT);
+  };
 
   const refetch = async () => {
     setEditData([]);
     destfetch();
     agentfetch();
     supplierfetch();
-  }
+  };
 
   const [activeTab, setActiveTab] = useState(1);
   const [dData, setDestData] = useState([]);
@@ -63,95 +65,167 @@ function Setting() {
   const destData = dData.map((item) => ({
     destination: item.destination,
     currency: item.currency,
-    status: <button className={`p-2 rounded-lg ${item.status === ("ACTIVE") ? "bg-green-400" : "bg-red-400"}`}>{item.status}</button>,
-    actions: <><button className="align-center text-blue-400" onClick={() => {setEditData(item)
-    console.log(editData);
-    }}><MdModeEdit /></button>
-    </>,
+    status: (
+      <button
+        className={`p-2 rounded-lg ${
+          item.status === "ACTIVE" ? "bg-green-400" : "bg-red-400"
+        }`}
+      >
+        {item.status}
+      </button>
+    ),
+    actions: (
+      <>
+        <button
+          disabled={user?.profile !== "Admin"}
+          className="align-center text-blue-400"
+          onClick={() => {
+            setEditData(item);
+            console.log(editData);
+          }}
+        >
+          <MdModeEdit />
+        </button>
+      </>
+    ),
   }));
 
   // agent data
 
   const agentData = aData.map((item) => ({
     agent: item.name,
-    status: <button className={`p-2 rounded-lg ${item.status === "ACTIVE" ? "bg-green-400" : "bg-red-400"}`}>{item.status}</button>,
-    actions: <><button onClick={() => {setEditData(item) 
-      console.log(editData);}}><MdModeEdit /></button><button className="align-center text-red-400" onClick={() => {
-        Swal.fire({
-          title: 'Are you sure?',
-          text: "You won't be able to revert this!",
-          icon: 'warning',
-          showDenyButton: true,
-          confirmButtonColor: '#3085d6',
-          cancelButtonColor: '#d33',
-          confirmButtonText: 'Yes, delete it!',
-          denyButtonText: 'No, cancel',
-        }).then((result) => {
-          if (result.isConfirmed) {
-            (async () => {
-              try {
-                await axios.delete(`${API_URL}users/deleteAgent/${item.agent_id}`, {
-                  withCredentials: true,
-                  headers: {
-                    "Content-Type": "application/json",
-                  },
-                });
-                refetch();
-              } catch (error) {
-                console.error("Error deleting destination:", error);
+    status: (
+      <button
+        className={`p-2 rounded-lg ${
+          item.status === "ACTIVE" ? "bg-green-400" : "bg-red-400"
+        }`}
+      >
+        {item.status}
+      </button>
+    ),
+    actions: (
+      <>
+        <button
+          disabled={user?.profile !== "Admin"}
+          onClick={() => {
+            setEditData(item);
+            console.log(editData);
+          }}
+        >
+          <MdModeEdit />
+        </button>
+        <button
+          disabled={user?.profile !== "Admin"}
+          className="align-center text-red-400"
+          onClick={() => {
+            Swal.fire({
+              title: "Are you sure?",
+              text: "You won't be able to revert this!",
+              icon: "warning",
+              showDenyButton: true,
+              confirmButtonColor: "#3085d6",
+              cancelButtonColor: "#d33",
+              confirmButtonText: "Yes, delete it!",
+              denyButtonText: "No, cancel",
+            }).then((result) => {
+              if (result.isConfirmed) {
+                (async () => {
+                  try {
+                    await axios.delete(
+                      `${API_URL}users/deleteAgent/${item.agent_id}`,
+                      {
+                        withCredentials: true,
+                        headers: {
+                          "Content-Type": "application/json",
+                        },
+                      }
+                    );
+                    refetch();
+                  } catch (error) {
+                    console.error("Error deleting destination:", error);
+                  }
+                })();
+              } else if (result.isDenied) {
+                Swal.fire("Changes are not deleted", "", "info");
               }
-            })();
-          } else if (result.isDenied) {
-            Swal.fire('Changes are not deleted', '', 'info')
-          }
-        
-        })
-  }}><MdDelete /></button></>,
+            });
+          }}
+        >
+          <MdDelete />
+        </button>
+      </>
+    ),
   }));
 
   // supplier data
 
   const supplierData = sData.map((item) => ({
     supplier: item.name,
-    status: <button className={`p-2 rounded-lg ${item.status === "ACTIVE" ? "bg-green-400" : "bg-red-400"}`}>{item.status}</button>,
-    destination: dData.filter((dest) => dest.destination_id === item.destination_id)[0]?.destination,
-    actions: <><button onClick={() => setEditData(item)}><MdModeEdit /></button><button 
-    className="align-center text-red-400" 
-    onClick={() => {
-      Swal.fire({
-        title: 'Are you sure?',
-        text: "You won't be able to revert this!",
-        icon: 'warning',
-        showDenyButton: true,
-        confirmButtonColor: '#3085d6',
-        denyButtonColor: '#d33',
-        confirmButtonText: 'Yes, delete it!',
-        denyButtonText: 'No, cancel',
-      }).then((result) => {
-        if (result.isConfirmed) {
-          (async () => {
-            try {
-              await axios.delete(`${API_URL}users/deleteSupplier/${item.supplier_id}`, {
-                withCredentials: true,
-                headers: {
-                  "Content-Type": "application/json",
-                },
-              });
-              refetch();
-            } catch (error) {
-              console.error("Error deleting destination:", error);
-            }
-          })();
-        } else if (result.isDenied) {
-          Swal.fire('Changes are not deleted', '', 'info')
-        }
-      })
-    }}
-  ><MdDelete /></button></>,
+    status: (
+      <button
+        className={`p-2 rounded-lg ${
+          item.status === "ACTIVE" ? "bg-green-400" : "bg-red-400"
+        }`}
+      >
+        {item.status}
+      </button>
+    ),
+    destination: dData.filter(
+      (dest) => dest.destination_id === item.destination_id
+    )[0]?.destination,
+    actions: (
+      <>
+        <button
+          disabled={user?.profile !== "Admin"}
+          onClick={() => setEditData(item)}
+        >
+          <MdModeEdit />
+        </button>
+        <button
+          disabled={user?.profile !== "Admin"}
+          className="align-center text-red-400"
+          onClick={() => {
+            Swal.fire({
+              title: "Are you sure?",
+              text: "You won't be able to revert this!",
+              icon: "warning",
+              showDenyButton: true,
+              confirmButtonColor: "#3085d6",
+              denyButtonColor: "#d33",
+              confirmButtonText: "Yes, delete it!",
+              denyButtonText: "No, cancel",
+            }).then((result) => {
+              if (result.isConfirmed) {
+                (async () => {
+                  try {
+                    await axios.delete(
+                      `${API_URL}users/deleteSupplier/${item.supplier_id}`,
+                      {
+                        withCredentials: true,
+                        headers: {
+                          "Content-Type": "application/json",
+                        },
+                      }
+                    );
+                    refetch();
+                  } catch (error) {
+                    console.error("Error deleting destination:", error);
+                  }
+                })();
+              } else if (result.isDenied) {
+                Swal.fire("Changes are not deleted", "", "info");
+              }
+            });
+          }}
+        >
+          <MdDelete />
+        </button>
+      </>
+    ),
   }));
 
   // Columns for Destinations, Agents, and Suppliers tables
-  
+
   const supplierColumns = [
     { Header: "Supplier Name", accessor: "supplier" },
     { Header: "Status", accessor: "status" },
@@ -227,49 +301,59 @@ function Setting() {
 
           {/* Forms for each tab */}
           {activeTab === 1 && (
-            <DestForm editData={editData} setEditData={setEditData} refetch={refetch} />
+            <DestForm
+              editData={editData}
+              setEditData={setEditData}
+              refetch={refetch}
+            />
           )}
           {activeTab === 2 && (
-            <AgentForm editData={editData} setEditData={setEditData} refetch={refetch} />
+            <AgentForm
+              editData={editData}
+              setEditData={setEditData}
+              refetch={refetch}
+            />
           )}
           {activeTab === 3 && (
-            <SupForm editData={editData} setEditData={setEditData} refetch={refetch} data={dData} />
+            <SupForm
+              editData={editData}
+              setEditData={setEditData}
+              refetch={refetch}
+              data={dData}
+            />
           )}
-        </div >
+        </div>
 
         {/* Right Section for Tables */}
         <div className="flex-col w-[45%] h-[80vh] p-4 bg-slate-100 shadow rounded-lg overflow-y-auto">
           {activeTab === 1 && (
             <>
-            
-            <CustomTable
-              dataa={destData}
-              columnss={destinationColumns}
-              button={false}
-              path={"/destForm"}
-            />
+              <CustomTable
+                dataa={destData}
+                columnss={destinationColumns}
+                button={false}
+                path={"/destForm"}
+              />
             </>
           )}
           {activeTab === 2 && (
             <>
-            
-            <CustomTable
-              dataa={agentData}
-              columnss={agentColumns}
-              button={false}
-              path={"/AgentForm"}
-            />
+              <CustomTable
+                dataa={agentData}
+                columnss={agentColumns}
+                button={false}
+                path={"/AgentForm"}
+              />
             </>
           )}
           {activeTab === 3 && (
             <>
-            
-            <CustomTable
-              dataa={supplierData}
-              columnss={supplierColumns}
-              button={false}
-              path={"/supForm"}
-            />
+              <CustomTable
+                dataa={supplierData}
+                columnss={supplierColumns}
+                button={false}
+                path={"/supForm"}
+              />
             </>
           )}
         </div>

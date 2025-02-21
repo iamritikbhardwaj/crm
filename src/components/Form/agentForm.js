@@ -1,81 +1,100 @@
-import { zodResolver } from '@hookform/resolvers/zod';
-import React, { useEffect } from 'react'
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-import { API_URL } from '../../AppConstant';
-import axios from 'axios';
-import Swal from 'sweetalert2';
+import { zodResolver } from "@hookform/resolvers/zod";
+import React, { useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { API_URL } from "../../AppConstant";
+import axios from "axios";
+import Swal from "sweetalert2";
+import { useSelector } from "react-redux";
 
-function AgentForm({editData, setEditData, refetch}) {
+function AgentForm({ editData, setEditData, refetch }) {
+  const auth = useSelector((state) => state.auth);
+  const user = auth.user;
 
-    const agentSchema = z.object({
-        name: z.string().nonempty(),
-        status: z.string().nonempty().toUpperCase(),
-    })
-    const { handleSubmit, register, setValue, formState: { errors } } = useForm({
-        resolver: zodResolver(agentSchema)
-    });
+  const agentSchema = z.object({
+    name: z.string().nonempty(),
+    status: z.string().nonempty().toUpperCase(),
+  });
+  const {
+    handleSubmit,
+    register,
+    setValue,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(agentSchema),
+  });
 
-    const agentSubmit = (data) => {
-      // console.log('data', data)
-        (async (data) => {
-          const response = await axios.post(`${API_URL}users/createAgent${editData.hasOwnProperty('agent_id') ? `/?id=${editData?.agent_id}` : ""}`, data,
-          {
-            withCredentials: true,
-            headers: {
-              "content-type": "application/json"
-            }
-          })
-          if (response.status === 201) {
-            Swal.fire({
-              icon: 'error',
-              title: 'User Creation Failed',
-              text: "Agent already exists",
-              showConfirmButton: true,
-            })
-          } else{
-            refetch();
-          }
-          console.log(response, 'agent response');
-        })(data);     
-    }
-
-    useEffect(() => {
-      console.log(editData, 'editData');
-      if (editData.hasOwnProperty('agent_id')) {
-        setValue("name", editData?.name);
-        setValue("status", editData?.status);
-      }else {
-        setValue("name", "");
-        setValue("status", "");
+  const agentSubmit = (data) => {
+    // console.log('data', data)
+    (async (data) => {
+      const response = await axios.post(
+        `${API_URL}users/createAgent${
+          editData.hasOwnProperty("agent_id")
+            ? `/?id=${editData?.agent_id}`
+            : ""
+        }`,
+        data,
+        {
+          withCredentials: true,
+          headers: {
+            "content-type": "application/json",
+          },
+        }
+      );
+      if (response.status === 201) {
+        Swal.fire({
+          icon: "error",
+          title: "User Creation Failed",
+          text: "Agent already exists",
+          showConfirmButton: true,
+        });
+      } else {
+        refetch();
       }
-    }, [editData, setEditData]);
+      console.log(response, "agent response");
+    })(data);
+  };
+
+  useEffect(() => {
+    console.log(editData, "editData");
+    if (editData.hasOwnProperty("agent_id")) {
+      setValue("name", editData?.name);
+      setValue("status", editData?.status);
+    } else {
+      setValue("name", "");
+      setValue("status", "");
+    }
+  }, [editData, setEditData]);
 
   return (
     <form onSubmit={handleSubmit(agentSubmit)}>
-              <input
-                className="w-full p-2 border-[1px] m-2 rounded"
-                type="text"
-                placeholder="Agent Name"
-                {...register("name")}
-              />
-              {errors.name && <p className="text-red-500">{errors.name.message}</p>}
-              <select
-                className="w-full p-2 border-[1px] m-2 rounded"
-                type="text"
-                placeholder="Status"
-                {...register("status")}
-              >
-                <option value="">Select Status</option>
-                <option value="ACTIVE">ACTIVE</option>
-                <option value="INACTIVE">INACTIVE</option>
-              </select>
-              {errors.status && <p className="text-red-500">{errors.status.message}</p>}
-              <button type="submit" className="w-1/2 p-2 border-[1px] m-2 bg-slate-700 text-white rounded hover:bg-slate-600">
-                Save
-              </button>
-            </form>
-  )
+      <input
+        className="w-full p-2 border-[1px] m-2 rounded"
+        type="text"
+        placeholder="Agent Name"
+        {...register("name")}
+      />
+      {errors.name && <p className="text-red-500">{errors.name.message}</p>}
+      <select
+        className="w-full p-2 border-[1px] m-2 rounded"
+        type="text"
+        placeholder="Status"
+        {...register("status")}
+      >
+        <option value="">Select Status</option>
+        <option value="ACTIVE">ACTIVE</option>
+        <option value="INACTIVE">INACTIVE</option>
+      </select>
+      {errors.status && <p className="text-red-500">{errors.status.message}</p>}
+      <button
+        disabled={user?.profile !== "Admin"}
+        type="submit"
+        className="w-1/2 p-2 border-[1px] m-2 bg-slate-700 text-white rounded hover:bg-slate-600"
+      >
+        Save
+      </button>
+    </form>
+  );
 }
 
 export default AgentForm;

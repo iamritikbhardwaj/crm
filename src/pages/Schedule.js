@@ -46,17 +46,9 @@ const AllBookings = () => {
             salesSPOC: item.salesSpoc,
             agent: item.agent,
             arrivalDate:
-              item.arrivalDate.slice(8, 10) +
-              "/" +
-              item.arrivalDate.slice(5, 7) +
-              "/" +
-              item.arrivalDate.slice(0, 4),
+              item.arrivalDate,
             departureDate:
-              item.departureDate.slice(8, 10) +
-              "/" +
-              item.departureDate.slice(5, 7) +
-              "/" +
-              item.departureDate.slice(0, 4),
+              item.departureDate,
             travelMonth: getTravelMonthRange(
               item.arrivalDate,
               item.departureDate

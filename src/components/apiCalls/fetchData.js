@@ -181,3 +181,18 @@ export const fetchDashboard = async (startDate, endDate) => {
     return false;
   }
 }
+
+export const userSpecificDashboard = async (startDate, endDate, sales) => {
+  const response = await axios.get(`${API_URL}users/userSpecificDashboard/?startDate=${startDate}&endDate=${endDate}&user=${JSON.stringify(sales)}`, {
+    withCredentials: true,
+    headers: {
+      "content-type": "mutipart/form-data",
+    },
+  });
+  if (response.status === 200) {
+    return await response.data;
+  } else {
+    alert(await response.data.MESSAGE);
+    return false;
+  }
+}

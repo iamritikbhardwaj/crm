@@ -3,11 +3,16 @@ import { Bar, Pie } from "react-chartjs-2";
 import "chart.js/auto"; // Required for Chart.js v3+ compatibility
 import BackToHome from "../components/BackToHome";
 import UserActivityTable from "../components/charts/userVsActivity";
-import { fetchDashboard } from "../components/apiCalls/fetchData";
+import { fetchDashboard, userSpecificDashboard } from "../components/apiCalls/fetchData";
 import Swal from "sweetalert2";
 import { set } from "mongoose";
+import { useSelector } from "react-redux";
 
 const Dashboard = () => {
+
+  const auth = useSelector((state) => state.auth);
+  const user = auth.user;
+  console.log(user, "user");
   const [fromDate, setFromDate] = useState(Date.now());
   const [toDate, setToDate] = useState(Date.now() + 86400000);
   const [data, setData] = useState({
@@ -102,15 +107,15 @@ const Dashboard = () => {
         Swal.showLoading();
       },
     });
-    const res = await fetchDashboard(fromDate, toDate);
+    const res = user.profile !== "Sales" ? await fetchDashboard(fromDate, toDate) : await userSpecificDashboard(fromDate, toDate, user);
     console.log(res, 'res');
     setData({
-      noOfBookings: res.OUTPUT.noOfBookings || 0,
-      activeAgents: res.OUTPUT.activeAgents || 0,
-      totalGMV: res.OUTPUT.gmv || 0,
-      totalGPV: res.OUTPUT.gpv || 0,
+      noOfBookings: res.OUTPUT?.noOfBookings || 0,
+      activeAgents: res.OUTPUT?.activeAgents || 0,
+      totalGMV: res.OUTPUT?.gmv || 0,
+      totalGPV: res.OUTPUT?.gpv || 0,
     });
-    setBookingsVsSalesSPOC({
+    user.profile !== "Sales" && setBookingsVsSalesSPOC({
       labels: res.bvss.sales,
       datasets: [{
         label: "Bookings",
@@ -118,7 +123,7 @@ const Dashboard = () => {
         backgroundColor: "#36A2EB",
       }]
     });
-    setBookingsVsOpsSPOC({
+    user.profile !== "Sales" && setBookingsVsOpsSPOC({
       labels: res.bvso.ops,
       datasets: [{
         label: "Bookings",
@@ -134,7 +139,7 @@ const Dashboard = () => {
         backgroundColor: ["#FF6384", "#4CAF50", "#FFCE56", "#808080"],
       }]
     });
-    setGMVData({
+    user.profile !== "Sales" && setGMVData({
       labels: res.sales,
       datasets: [{
         label: "GMV",
@@ -142,7 +147,7 @@ const Dashboard = () => {
         backgroundColor: "#4CAF50", // Green
       }]
     });
-    setGPVData({
+    user.profile !== "Sales" && setGPVData({
       labels: res.sales,
       datasets: [{
         label: "GPV",
@@ -150,7 +155,7 @@ const Dashboard = () => {
         backgroundColor: "#4CAF50", // Green
       }]
     });
-    setUsers(res.user);
+    user.profile !== "Sales" && setUsers(res.user);
     Swal.close();
   }
 
@@ -224,36 +229,38 @@ const Dashboard = () => {
       {/* Charts */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* Status Chart */}
-        <div className="bg-white p-4 rounded shadow">
+        <div className={`bg-white p-4 rounded shadow`}>
           <h3 className="text-lg font-semibold mb-4">Status Chart vs Number</h3>
           <Pie data={statusChart} />
         </div>
 
        {/* Bookings vs Sales SPOC */}
-       <div className="bg-white p-4 rounded shadow">
+       <div className={`${user.profile === "Sales" ? "hidden": ''} bg-white p-4 rounded shadow`}>
           <h3 className="text-lg font-semibold mb-4">Bookings vs Sales SPOC</h3>
           <Bar vertical data={bookingsVsSalesSPOC} options={options} />
         </div>
 
         {/* GPV vs Sales SPOC */}
-        <div className="bg-white p-4 rounded shadow">
+        <div className={`${user.profile === "Sales" ? "hidden": ''} bg-white p-4 rounded shadow`}>
           <h3 className="text-lg font-semibold mb-4 text-center">GPV vs Sales SPOC</h3>
           <Bar data={GPVData} options={options} />
         </div>
 
         {/* GMV vs Sales SPOC */}
-        <div className="bg-white p-4 rounded shadow">
+        <div className={`${user.profile === "Sales" ? "hidden": ''} bg-white p-4 rounded shadow`}>
           <h3 className="text-lg font-semibold mb-4 text-center">GMV vs Sales SPOC</h3>
           <Bar data={GMVData} options={options} />
         </div>
 
-        <div className="bg-white p-4 rounded shadow">
+        <div className={`${user.profile === "Sales" ? "hidden": ''} bg-white p-4 rounded shadow`}>
            {/* Bookings vs Ops SPOC */}
           <h3 className="text-lg font-semibold mb-4 ">Bookings vs Ops SPOC</h3>
           <Bar  data={bookingsVsOpsSPOC} />
          </div>
 
-        <UserActivityTable users={users} className="w-1/2" />
+        <div className={`${user.profile === "Sales" ? "hidden": ''}`} >
+        <UserActivityTable users={users} className={`${user.profile === "Sales" ? "hidden": ''} w-1/2`} />
+        </div>
       </div>
     </div>
   );
