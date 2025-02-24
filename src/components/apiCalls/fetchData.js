@@ -117,7 +117,6 @@ export const fetchPayment = async (id) => {
   if (response.status === 200) {
     return await response.data.OUTPUT;
 } else {
-    alert(response.data.MESSAGE);
     return false;
   }
 };

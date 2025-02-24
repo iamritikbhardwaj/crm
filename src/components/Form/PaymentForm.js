@@ -180,6 +180,7 @@ function PaymentForm({ handlehide, tripId, inputData, refetch }) {
           <option>CREDIT CARD</option>
           <option>REMITTANCE</option>
           <option>FLYREMIT</option>
+          <option>PAYMENT LINK</option>
         </select>
         {errors.paymentMode && (
           <span className="text-red-500">{errors.paymentMode.message}</span>

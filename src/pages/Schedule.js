@@ -1,6 +1,6 @@
 import React, { use, useEffect, useState } from "react";
 import BackToHome from "../components/BackToHome";
-import { CustomTable } from "../components/customTable/CustomTable";
+import { CustomTable, DefaultColumnFilter } from "../components/customTable/CustomTable";
 import { useNavigate } from "react-router-dom";
 import { GrFormView } from "react-icons/gr";
 import { getTravelMonthRange } from "./Booking";
@@ -27,6 +27,10 @@ const AllBookings = () => {
           (user &&
             user.profile === "Sales" &&
             user.name !== item.salesSpoc) || {
+              arrivalDate:
+              item.arrivalDate,
+            departureDate:
+              item.departureDate,
             tripID: item.tripId,
             destination: item.destination,
             bookingDate:
@@ -45,16 +49,12 @@ const AllBookings = () => {
             ),
             salesSPOC: item.salesSpoc,
             agent: item.agent,
-            arrivalDate:
-              item.arrivalDate,
-            departureDate:
-              item.departureDate,
             travelMonth: getTravelMonthRange(
               item.arrivalDate,
               item.departureDate
             ),
             contactDetails: `${item.countryCode} / ${item.whatsappNumber}`,
-            transferPrice: (parseFloat(item?.transferPrice) || 0) + " USD",
+            transferPrice: user.profile === "Sales" ? 'N/A' : (parseFloat(item?.transferPrice) || 0) + " USD",
             orderValue: item.orderValue + " USD",
             apayment: (
               <div
@@ -126,14 +126,14 @@ const AllBookings = () => {
   }, []);
 
   const col = [
+    { Header: "Arrival Dates", accessor: "arrivalDate", Filter: DefaultColumnFilter },
+    { Header: "Departure Dates", accessor: "departureDate" },
     { Header: "Trip ID", accessor: "tripID" },
     { Header: "Destination", accessor: "destination" },
     { Header: "Booking Date", accessor: "bookingDate" },
     { Header: "Sales SPOC", accessor: "salesSPOC" },
     { Header: "Agent", accessor: "agent" },
-    { Header: "Customer Name", accessor: "customerName" },
-    { Header: "Arrival Dates", accessor: "arrivalDate" },
-    { Header: "Departure Dates", accessor: "departureDate" },
+    { Header: "Customer Name", accessor: "customerName", Filter: DefaultColumnFilter  },
     { Header: "Travel Month", accessor: "travelMonth" },
     { Header: "Transfer Price", accessor: "transferPrice" },
     { Header: "Contact Details", accessor: "contactDetails" },

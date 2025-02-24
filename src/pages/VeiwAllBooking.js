@@ -9,6 +9,7 @@ import ReconForm from "../components/Form/ReconForm";
 import { MdAddCircle, MdDelete, MdEdit, MdSave } from "react-icons/md";
 import PaymentForm from "../components/Form/PaymentForm";
 import VendorForm from "../components/Form/VendorForm";
+import WhatsappNo from "../components/Input/whatsappNo";
 import {
   fetchPayment,
   fetchRecon,
@@ -43,6 +44,7 @@ export default function VeiwAllBooking() {
   const [vendorTable, setVendorTable] = useState([]);
   const [transferPrice, setTransferPrice] = useState(item?.transferPrice);
   const [orderValue, setOrderValue] = useState();
+  const [whatsForm, setWhatsForm] = useState(true);
 
   const setPrice = (price) => {
     setTransferPrice(price);
@@ -389,7 +391,7 @@ export default function VeiwAllBooking() {
               ],
               [
                 "WhatsApp Number",
-                item?.countryCode + " " + item?.whatsappNumber,
+                <button className={`flex ${user.profile === "Sales" || user.profile === "Finance" ? "hidden" : "flex"}`}>{item?.countryCode} {item?.whatsappNumber} <MdEdit onClick={() => setWhatsForm(!whatsForm)} className="ml-2"/></button>,
               ],
               [
                 "Ops Spoc",
@@ -429,6 +431,10 @@ export default function VeiwAllBooking() {
               </div>
             ))}
           </div>
+        </div>
+
+        <div className={`mb-6 ${whatsForm ? "hidden" : "block"}`}>
+          <WhatsappNo id={tripId} refetch={refetch} setHidden={setWhatsForm} />
         </div>
 
         {/* Document Upload */}
@@ -561,7 +567,15 @@ export default function VeiwAllBooking() {
               >
                 Save Changes
               </button>
-              <p className="font-semibold">
+              <p
+                className={`font-semibold ${
+                  user.profile !== "Admin" &&
+                  user.name !== item?.opsSpoc &&
+                  user.profile !== "Finance"
+                    ? "hidden"
+                    : ""
+                }`}
+              >
                 Transfer Price(USD): {parseFloat(transferPrice).toFixed(2)}
               </p>
             </div>
@@ -609,8 +623,7 @@ export default function VeiwAllBooking() {
                     " " +
                     getTravelMonthRange(data?.date),
                   mode: data?.paymentMode,
-                  convertionRate:
-                    parseFloat(data?.convRate).toFixed(2) + " USD",
+                  convertionRate: parseFloat(data?.convRate).toFixed(2),
                   amtinr:
                     (
                       (parseFloat(data?.conFee) + parseFloat(data?.amount)) *
@@ -635,8 +648,8 @@ export default function VeiwAllBooking() {
                         <MdEdit />
                       </button>
                       <button
-                        onClick={() => {
-                          deletePayment(data?.payment_id, tripId);
+                        onClick={async () => {
+                          await deletePayment(data?.payment_id, tripId);
                           refetchCom();
                         }}
                         disabled={
@@ -655,7 +668,7 @@ export default function VeiwAllBooking() {
                   { Header: " ", accessor: "installment" },
                   { Header: "Date/Payment", accessor: "date" },
                   { Header: "Mode", accessor: "mode" },
-                  { Header: "Conv. Rate", accessor: "convertionRate" },
+                  { Header: "XE", accessor: "convertionRate" },
                   { Header: "Amount (USD)", accessor: "amount" },
                   { Header: "CONV: Fee", accessor: "convfee" },
                   { Header: "Amount (INR)", accessor: "amtinr" },
@@ -668,7 +681,15 @@ export default function VeiwAllBooking() {
             </div>
 
             {/* Booking Reconciliation Table */}
-            <div className="mb-4">
+            <div
+              className={`mb-4 ${
+                user.profile !== "Admin" &&
+                user.name !== item?.opsSpoc &&
+                user.profile !== "Finance"
+                  ? "hidden"
+                  : ""
+              }`}
+            >
               <h3 className="font-semibold mb-2">Booking Reconciliation</h3>
               {/* Edit Form */}
               <div
@@ -750,7 +771,7 @@ export default function VeiwAllBooking() {
                       </button>
                       <button
                         onClick={() => {
-                          deleteRecon(data?.recon_id);
+                          deleteRecon(data?.recon_id, tripId);
                           refetchCom();
                         }}
                         disabled={
@@ -782,7 +803,15 @@ export default function VeiwAllBooking() {
         </div>
 
         {/* Freeze Quotation */}
-        <div className="mb-6">
+        <div
+          className={`mb-6 ${
+            user.profile !== "Admin" &&
+            user.name !== item?.opsSpoc &&
+            user.profile !== "Finance"
+              ? "hidden"
+              : ""
+          }`}
+        >
           <h2 className="text-lg font-semibold bg-gray-200 p-2 rounded flex justify-between">
             Freeze Quotation
             <span onClick={() => setActive(active === 3 ? null : 3)}>
