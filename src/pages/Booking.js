@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { API_URL } from "../AppConstant";
 import { useSelector } from "react-redux";
+import { MdEdit } from "react-icons/md";
 
 export function getTravelMonthRange(arrivalDate) {
   const arrival = new Date(arrivalDate); // Convert to Date object
@@ -108,12 +109,18 @@ const NewBooking = () => {
               travelMonth: getTravelMonthRange(item.arrivalDate),
               contactDetails: `${item.countryCode} / ${item.whatsappNumber}`,
               orderValue: item.orderValue + " USD",
-              action: (
-                <button
+              action: (<div className="flex justify-around">
+              <button
+                  onClick={() => navigate("/addBooking", { state: item })}
+                >
+                  <MdEdit />
+                </button>
+              <button
                   onClick={() => navigate("/viewBooking", { state: item })}
                 >
                   <FaInfoCircle />
                 </button>
+              </div>
               ),
             }
         ).filter((stuff) => stuff !== true);

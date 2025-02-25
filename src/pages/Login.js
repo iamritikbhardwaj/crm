@@ -15,7 +15,7 @@ import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import Swal from 'sweetalert2';
 import { useDispatch } from 'react-redux';
-import { login } from '../components/redux/slices/authSlice';
+import { login } from '../redux/slices/authSlice';
 function Login() {
 
   const navigate = useNavigate();

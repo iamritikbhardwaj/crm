@@ -107,6 +107,13 @@ export const fetchTrips = async (id) => {
   }
 };
 
+export const fetchFilteredTrips = async (from, to) => {
+  const response = await axios.get(`${API_URL}users/fetchFilteredTrip/?from=${from}&to=${to}`);
+  if(response.status === 200) {
+    return response.data.OUTPUT;
+  }
+}
+
 export const fetchPayment = async (id) => {
   const response = await axios.get(`${API_URL}users/getAllPayments/?id=${id}`, {
     withCredentials: true,

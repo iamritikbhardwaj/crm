@@ -2,7 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import { z } from "zod";
 import { API_URL } from "../AppConstant";
@@ -25,9 +25,18 @@ const AddBooking = () => {
   const [destData, setDestData] = useState([]);
   const [salesSpoc, setSalesSpoc] = useState([]);
   const [agent, setAgent] = useState([]);
+  const location = useLocation();
+  const trip = location.state;
+  console.log(trip, "trip");
   const auth = useSelector((state) => state.auth);
   const user = auth.user;
   const navigate = useNavigate();
+
+  const splitIt = (str) => {
+    const data = new String(str).split("/");
+    const result = data[data.length - 1];
+    return result;
+  };
 
   const bookingSchema = z.object({
     destination: z.string().min(1, { message: "Destination is required" }),
@@ -69,6 +78,18 @@ const AddBooking = () => {
   });
 
   useEffect(() => {
+
+    if(trip !== null){
+      setValue("destination", trip.destination);
+      setValue("agent", trip.agent);
+      setValue("customerName", trip.customerName);
+      setValue("arrivalDate", trip.arrivalDate);
+      setValue("departureDate", trip.departureDate);
+      setValue("pax", trip.pax);
+      setValue("countryCode", trip.countryCode);
+      setValue("whatsappNumber", trip.whatsappNumber);
+      setDocuments(trip.documents);
+    }
     (async () => {
       const destRes = await axios.get(`${API_URL}users/getAllDestinations`, {
         withCredentials: true,
@@ -142,7 +163,7 @@ const AddBooking = () => {
 
       // Sending POST request with FormData
       const response = await axios.post(
-        `${API_URL}users/createBooking/`,
+        `${API_URL}users/createBooking${trip !== null ? `/?id=${trip.booking_id}` : ""}`,
         formData,
         {
           withCredentials: true,
@@ -224,7 +245,7 @@ const AddBooking = () => {
     <div className="container mx-auto p-6 bg-gray-100">
       <BackToHome path="/booking" />
       <h1 className="text-3xl font-bold text-center mb-6">
-        Create New Booking
+       {trip !== null ? "Edit Booking" : "Create New Booking"}
       </h1>
 
       <form
@@ -505,25 +526,32 @@ const AddBooking = () => {
                 {/* Document Preview */}
                 <div className="w-1/2 pl-4">
                   <ul>
-                    {documents.length > 0
-                      ? documents.map((doc, index) => (
-                          <li className="space-x-2" key={index}>
-                            <a
-                              href={doc.url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                            >
-                              {doc.file.name}
-                            </a>
-                            <button
-                              className="text-red-400 hover:text-red-700"
-                              onClick={() => removeDocument(index)}
-                            >
-                              Remove
-                            </button>
-                          </li>
-                        ))
-                      : "No documents uploaded"}
+                  {documents
+                    ? documents.map(
+                        (file, index) =>
+                          !new String(file).includes("freezeQuotation") && (
+                            <li className="space-x-2" key={index}>
+                              <a
+                                href={
+                                  file.hasOwnProperty("file") ? file.url : file
+                                }
+                                target="_blank"
+                                rel="noopener noreferrer"
+                              >
+                                {file.hasOwnProperty("file")
+                                  ? file.file.name
+                                  : splitIt(file)}
+                              </a>
+                              <button
+                                className="text-red-400 rounded-lg cursor-pointer hover:text-red-700"
+                                onClick={() => removeDocument(index)}
+                              >
+                                Remove
+                              </button>
+                            </li>
+                          )
+                      )
+                    : "No documents uploaded"}
                   </ul>
                 </div>
               </div>

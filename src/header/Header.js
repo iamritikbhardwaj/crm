@@ -6,7 +6,7 @@ import { IoMdSettings } from "react-icons/io";
 import { TbBrandBooking } from "react-icons/tb";
 import { IoLogOut } from "react-icons/io5";
 import { GrSchedulePlay } from "react-icons/gr";
-import { logout } from "../components/redux/slices/authSlice";
+import { logout } from "../redux/slices/authSlice";
 import { useDispatch, useSelector } from "react-redux";
 
 function Header() {

@@ -391,7 +391,7 @@ export default function VeiwAllBooking() {
               ],
               [
                 "WhatsApp Number",
-                <button className={`flex ${user.profile === "Sales" || user.profile === "Finance" ? "hidden" : "flex"}`}>{item?.countryCode} {item?.whatsappNumber} <MdEdit onClick={() => setWhatsForm(!whatsForm)} className="ml-2"/></button>,
+                <button >{item?.countryCode} {item?.whatsappNumber} <MdEdit className={` ${user.profile === "Sales" || user.profile === "Finance" ? "hidden" : "flex"} ml-2`} onClick={() => setWhatsForm(!whatsForm)}/></button>,
               ],
               [
                 "Ops Spoc",

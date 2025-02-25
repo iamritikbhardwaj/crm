@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { GrFormView } from "react-icons/gr";
 import { getTravelMonthRange } from "./Booking";
 import {
+  fetchFilteredTrips,
   fetchPayment,
   fetchRecon,
   fetchTrips,
@@ -12,17 +13,21 @@ import {
 } from "../components/apiCalls/fetchData";
 import { useSelector } from "react-redux";
 
+// this includes dashboard for all the trips which has been created after accepting the booking
 const AllBookings = () => {
   const [bookings, setBookings] = useState([]);
   const navigate = useNavigate();
   const auth = useSelector((state) => state.auth);
-  const user = auth.user;
+  const user = auth.user; // this user is used to specify roles based on user profile
 
-  // Simulate fetching data
-  useEffect(() => {
-    (async () => {
-      const data = await fetchTrips();
-      const bookings = data.map(
+  const [fromDate, setFromDate] = useState(Date.now()); // this form data will be used to submit all the data required for trip creation
+  const [toDate, setToDate] = useState(Date.now() + new Date(86400000)); // filter related data
+
+  const search = async() => { // this function is for fetching trip data as per the date range
+    await fetchTrips();
+    const data = await fetchFilteredTrips(fromDate, toDate);
+      const bookings = data ? 
+      data.map(
         (item) =>
           (user &&
             user.profile === "Sales" &&
@@ -119,10 +124,13 @@ const AllBookings = () => {
               ></button>
             ),
           }
-      ).filter((stuff) => stuff !== true);
+      ).filter((stuff) => stuff !== true) : [];
       console.log(bookings, "bookings");
       setBookings(bookings);
-    })();
+  }
+
+  useEffect(() => {
+    search();
   }, []);
 
   const col = [
@@ -149,6 +157,33 @@ const AllBookings = () => {
 
   return (
     <div className="flex-col justify-center mt-6 mx-auto p-4">
+      <div className="flex justify-center gap-4 mb-6">
+        <div>
+          <label className="block mb-1">From Date</label>
+          <input
+            type="date"
+            placeholder={new Date(fromDate)}
+            value={new Date(fromDate)}
+            onChange={(e) => setFromDate(e.target.value)}
+            className="border rounded px-3 py-2"
+          />
+        </div>
+        <div>
+          <label className="block mb-1">To Date</label>
+          <input
+            type="date"
+            placeholder={toDate}
+            value={new Date(toDate)}
+            onChange={(e) => setToDate(e.target.value)}
+            className="border rounded px-3 py-2"
+          />
+        </div>
+        <div>
+          <button onClick={search} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-8" type="button">
+            Filter
+          </button>
+        </div>
+      </div>
       <BackToHome />
       <CustomTable dataa={bookings} columnss={col} size="text-xs" />
     </div>
