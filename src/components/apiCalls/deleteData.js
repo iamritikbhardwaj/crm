@@ -141,7 +141,7 @@ export const deleteBooking = async (id, reject) => {
     return response;
 }
 
-export const cancelBooking = async (id, reject) => {
+export const cancelBooking = async (id, remarks) => {
   Swal.fire({
       title: "Rejecting...",
       text: "Please wait while we delete Data.",
@@ -150,7 +150,7 @@ export const cancelBooking = async (id, reject) => {
         Swal.showLoading();
       },
     });
-  const response = await axios.delete(`${API_URL}users/cancelBooking/?id=${id}`);
+  const response = await axios.delete(`${API_URL}users/cancelBooking/?id=${id}&remarks=${remarks}`);
   Swal.close();
   return response;
 }

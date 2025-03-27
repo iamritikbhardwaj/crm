@@ -5,7 +5,6 @@ import BackToHome from "../components/BackToHome";
 import UserActivityTable from "../components/charts/userVsActivity";
 import { fetchDashboard, userSpecificDashboard } from "../components/apiCalls/fetchData";
 import Swal from "sweetalert2";
-import { set } from "mongoose";
 import { useSelector } from "react-redux";
 
 const Dashboard = () => {
