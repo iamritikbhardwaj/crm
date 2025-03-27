@@ -98,7 +98,17 @@ export default function VeiwBooking() {
   // Reject Booking is to delete the booking
   const rejectBooking = async () => {
     try {
-      const response = await cancelBooking(data.booking_id, true);
+       const { value: remarks } = await Swal.fire({
+      title: 'Enter Remarks',
+      input: 'text',  // Specify input type as text
+      inputLabel: 'Your remarks',
+      inputPlaceholder: 'Type your remarks here...',
+      showCancelButton: true,
+      confirmButtonText: 'Submit',
+      cancelButtonText: 'Cancel',
+    });
+    
+      const response = await cancelBooking(data.booking_id, remarks);
       if (response.status === 200) {
         navigate("/booking");
         Swal.close();
@@ -112,7 +122,7 @@ export default function VeiwBooking() {
   };
 
   const rejectvalidation = () => {
-    {Swal.fire({
+  Swal.fire({
       title: `Do you want to Reject Booking?`,
       showDenyButton: true,
       confirmButtonText: `reject`,
@@ -121,7 +131,7 @@ export default function VeiwBooking() {
       if (result.isConfirmed) {
         rejectBooking();
       }
-    })}
+    })
   }
 
   const acceptValidation = () => {

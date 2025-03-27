@@ -1,4 +1,3 @@
-import { set } from 'mongoose';
 import React, { useState, useEffect } from 'react';
 import * as XLSX from 'xlsx';
 
@@ -19,7 +18,7 @@ function ExcelToTable({url, setPrice}) {
       const response = await fetch(url);
       const arrayBuffer = await response.arrayBuffer();
       const workbook = XLSX.read(arrayBuffer, { type: 'array' });
-  
+
       const firstSheetName = workbook.SheetNames[0]; // Get the first sheet name
       const worksheet = workbook.Sheets[firstSheetName];
   
