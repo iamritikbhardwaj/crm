@@ -31,7 +31,7 @@ const Dashboard = () => {
     ],
   });
   const [statusChart, setStatusChart] = useState({
-    labels: ["Cancelled", "Confirmed", "In Progress", "Travelled"],
+    labels: ["Cancelled", "Confirmed", "On tour", "Travelled"],
     datasets: [
       {
         label: "Bookings Status",
@@ -131,7 +131,7 @@ const Dashboard = () => {
       }]
     });
     setStatusChart({
-      labels: ["Cancelled", "Confirmed", "In Progress", "Travelled"],
+      labels: ["Cancelled", "Confirmed", "On tour", "Travelled"],
       datasets: [{
         label: "Bookings Status",
         data: res.chart,

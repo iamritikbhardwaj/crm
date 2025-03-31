@@ -195,6 +195,7 @@ export default function VeiwAllBooking() {
     if (files.length > 0) {
       Array.from(files).forEach((file) => {
         const fileURL = URL.createObjectURL(file);
+        console.log(file, "file");
         if (doc) {
           setDoc((prevDoc) => [
             ...prevDoc,
@@ -307,7 +308,8 @@ export default function VeiwAllBooking() {
     });
     const formData = new FormData();
     doc.forEach((doc) => {
-      if (doc.file) {
+      if (doc?.file) {
+        console.log(doc.file);
         formData.append(`${doc.catagory}`, doc.file);
       } else {
         formData.append("docs", doc);
@@ -833,7 +835,16 @@ export default function VeiwAllBooking() {
               </button>
               <button
                 onClick={async () => {
+                  Swal.fire({
+                    title: "Updating Transfer Price...",
+                    text: "Please wait while we update your transfer price.",
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                      Swal.showLoading();
+                    },
+                  });
                   await updateTrip({ transferPrice: transferPrice }, tripId);
+                  Swal.close();
                 }}
                 disabled={
                   user.profile !== "Admin" &&

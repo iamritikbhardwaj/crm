@@ -4,19 +4,21 @@ import {
   CustomTable,
   DefaultColumnFilter,
 } from "../components/customTable/CustomTable";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { GrFormView } from "react-icons/gr";
 import { getTravelMonthRange } from "./Booking";
 import {
   fetchFilteredTrips,
   fetchTrips,
 } from "../components/apiCalls/fetchData";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { setTrip } from "../redux/slices/trip.slice";
 
 // this includes dashboard for all the trips which has been created after accepting the booking
 const AllBookings = () => {
   const [bookings, setBookings] = useState([]);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const auth = useSelector((state) => state.auth);
   const user = auth.user; // this user is used to specify roles based on user profile
 
@@ -90,12 +92,23 @@ const AllBookings = () => {
                 ),
                 opsSpoc: item.opsSpoc,
                 action: (
-                  <button
+                  <Link
                     className="text-3xl"
-                    onClick={() => navigate("/viewAllBooking", { state: item })}
+                    href="/viewAllBooking"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={(e) => {
+                      e.preventDefault(); // Prevent default Link behavior
+                      dispatch(
+                        setTrip({
+                          trip: item,
+                        })
+                      );
+                      window.open("/viewAllBooking", "_blank");
+                    }}
                   >
                     <GrFormView />
-                  </button>
+                  </Link>
                 ),
                 paymentstat: (
                   <button
@@ -110,10 +123,9 @@ const AllBookings = () => {
                   <button
                     className={`${
                       item.validation === "Finance" && "bg-green-400"
-                    } ${item.validation === "Operations" && "bg-blue-400"} ${
-                      item.validation === "Finance" ||
-                      item.validation === "Operations" ||
-                      ("bg-red-400" && "bg-red-400")
+                    } ${
+                      (item.validation === "Operations" && "bg-blue-400") ||
+                      "bg-red-400"
                     }
          p-2 rounded-lg`}
                   ></button>
@@ -277,21 +289,27 @@ const AllBookings = () => {
     <div className="flex-col justify-center mt-6 mx-auto p-4">
       <div className="flex justify-center gap-4 mb-6">
         <div>
-          <label className="block mb-1">From Date</label>
+          <label htmlFor="fromDate" className="block mb-1">
+            From Date
+          </label>
           <input
+            id="fromDate"
             type="date"
-            placeholder={new Date(fromDate)}
-            value={new Date(fromDate)}
+            // placeholder={new Date(fromDate)}
+            // value={new Date(fromDate)}
             onChange={(e) => setFromDate(e.target.value)}
             className="border rounded px-3 py-2"
           />
         </div>
         <div>
-          <label className="block mb-1">To Date</label>
+          <label htmlFor="toDate" className="block mb-1">
+            To Date
+          </label>
           <input
+            id="toDate"
             type="date"
-            placeholder={toDate}
-            value={new Date(toDate)}
+            // placeholder={toDate}
+            // value={new Date(toDate)}
             onChange={(e) => setToDate(e.target.value)}
             className="border rounded px-3 py-2"
           />
