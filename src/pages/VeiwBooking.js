@@ -8,7 +8,10 @@ import { API_URL } from "../AppConstant";
 import Swal from "sweetalert2";
 import FileUpload from "../components/Input/FileUpload";
 import { fetchUsers } from "../components/apiCalls/fetchData";
-import { cancelBooking, deleteBooking } from "../components/apiCalls/deleteData";
+import {
+  cancelBooking,
+  deleteBooking,
+} from "../components/apiCalls/deleteData";
 import { useSelector } from "react-redux";
 
 export default function VeiwBooking() {
@@ -41,7 +44,7 @@ export default function VeiwBooking() {
       }
     })();
     if (user.profile === "Operations") {
-      setInputData({...inputData, opsSpoc: user.name});
+      setInputData({ ...inputData, opsSpoc: user.name });
     }
   }, []);
 
@@ -73,7 +76,6 @@ export default function VeiwBooking() {
 
   // Accept Booking is to set booking status to confirmed also add salesSpoc
   const acceptBooking = async () => {
-    
     Swal.fire({
       title: "Submitting...",
       text: "Please wait while we move your booking.",
@@ -98,16 +100,16 @@ export default function VeiwBooking() {
   // Reject Booking is to delete the booking
   const rejectBooking = async () => {
     try {
-       const { value: remarks } = await Swal.fire({
-      title: 'Enter Remarks',
-      input: 'text',  // Specify input type as text
-      inputLabel: 'Your remarks',
-      inputPlaceholder: 'Type your remarks here...',
-      showCancelButton: true,
-      confirmButtonText: 'Submit',
-      cancelButtonText: 'Cancel',
-    });
-    
+      const { value: remarks } = await Swal.fire({
+        title: "Enter Remarks",
+        input: "text", // Specify input type as text
+        inputLabel: "Your remarks",
+        inputPlaceholder: "Type your remarks here...",
+        showCancelButton: true,
+        confirmButtonText: "Submit",
+        cancelButtonText: "Cancel",
+      });
+
       const response = await cancelBooking(data.booking_id, remarks);
       if (response.status === 200) {
         navigate("/booking");
@@ -122,7 +124,7 @@ export default function VeiwBooking() {
   };
 
   const rejectvalidation = () => {
-  Swal.fire({
+    Swal.fire({
       title: `Do you want to Reject Booking?`,
       showDenyButton: true,
       confirmButtonText: `reject`,
@@ -131,11 +133,11 @@ export default function VeiwBooking() {
       if (result.isConfirmed) {
         rejectBooking();
       }
-    })
-  }
+    });
+  };
 
   const acceptValidation = () => {
-    {Swal.fire({
+    Swal.fire({
       title: `Do you want to Accept Booking?`,
       showDenyButton: true,
       confirmButtonText: `Accept`,
@@ -144,40 +146,62 @@ export default function VeiwBooking() {
       if (result.isConfirmed) {
         acceptBooking();
       }
-    })}
-  }
+    });
+  };
 
   const splitIt = (str) => {
-    const data = new String(str).split("/");
+    const data = str.split("/");
     const result = data[data.length - 1];
     return result;
   };
 
   const submit = async () => {
     const formData = new FormData();
-    formData.append("data", JSON.stringify(inputData));
+    formData.append("bookingDate", inputData.bookingDate);
+    formData.append("destination", inputData.destination);
+    formData.append("salesSpoc", inputData.salesSpoc);
+    formData.append("agent", inputData.agent);
+    formData.append("customerName", inputData.customerName);
+    formData.append("arrivalDate", inputData.arrivalDate);
+    formData.append("departureDate", inputData.departureDate);
+    formData.append("pax", inputData.pax);
+    formData.append("orderValue", inputData.orderValue);
+    formData.append("countryCode", inputData.countryCode);
+    formData.append("whatsappNumber", inputData.whatsappNumber);
+    formData.append("opsSpoc", inputData.opsSpoc);
+    await doc.forEach((doc) => {
+      if (doc.catagory !== undefined) {
+        formData.append(`${doc.catagory}`, doc.file);
+      } else {
+        formData.append("docs", doc);
+      }
+  });
+    
+
     if (inputData.opsSpoc === "") {
       Swal.close();
       Swal.fire("Please select an ops spoc");
       return false;
-    } else {
-      doc.forEach((doc) => {
-        formData.append(`${doc.catagory}`, doc.file);
-      });
+    };
       console.log("still working");
-      const response = await axios.post(`${API_URL}users/createTrip`, formData, {
-        withCredentials: true,
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
-      if (response.status === 200) {
-       
-          await deleteBooking(data.booking_id);
-          return true;
+      for (let pair of formData.entries()) {
+        console.log(pair[0] + ": " + pair[1]);
       }
-  };
-}
+      const response = await axios.post(
+        `${API_URL}users/createTrip`,
+        formData,
+        {
+          withCredentials: true,
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      if (response.status === 200) {
+        await deleteBooking(data.booking_id);
+        return true;
+      }
+    }
 
   return (
     <div className="p-4">
@@ -239,8 +263,8 @@ export default function VeiwBooking() {
               [
                 "Ops Spoc",
                 <select
-                value={inputData.opsSpoc}
-                disabled={user.profile === "Operations"}
+                  value={inputData.opsSpoc}
+                  disabled={user.profile === "Operations"}
                   onChange={(e) => {
                     setInputData({ ...inputData, opsSpoc: e.target.value });
                   }}
@@ -424,14 +448,14 @@ export default function VeiwBooking() {
         <div className="p-4 flex justify-between">
           <button
             onClick={acceptValidation}
-            disabled={user?.profile === "Sales" ? true : false }
+            disabled={user?.profile === "Sales" ? true : false}
             className="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600"
           >
             Accept Booking
           </button>
           <button
             onClick={rejectvalidation}
-            disabled={user?.profile === "Sales" ? true : false }
+            disabled={user?.profile === "Sales" ? true : false}
             className="bg-red-500 text-white px-6 py-2 rounded hover:bg-red-600"
           >
             Reject Booking

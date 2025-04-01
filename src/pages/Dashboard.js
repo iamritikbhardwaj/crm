@@ -114,7 +114,7 @@ const Dashboard = () => {
       totalGMV: res.OUTPUT?.gmv || 0,
       totalGPV: res.OUTPUT?.gpv || 0,
     });
-    user.profile !== "Sales" && setBookingsVsSalesSPOC({
+    setBookingsVsSalesSPOC({
       labels: res.bvss.sales,
       datasets: [{
         label: "Bookings",
@@ -179,8 +179,9 @@ const Dashboard = () => {
       {/* Filters */}
       <div className="flex justify-center gap-4 mb-6">
         <div>
-          <label className="block mb-1">From Date</label>
+          <label htmlFor="fromDate" className="block mb-1">From Date</label>
           <input
+            name="fromDate"
             type="date"
             placeholder={Date(fromDate)}
             // value={fromDate}
@@ -189,8 +190,9 @@ const Dashboard = () => {
           />
         </div>
         <div>
-          <label className="block mb-1">To Date</label>
+          <label htmlFor="toDate" className="block mb-1">To Date</label>
           <input
+            name="toDate"
             type="date"
             placeholder={toDate}
             // value={toDate}

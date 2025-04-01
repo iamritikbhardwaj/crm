@@ -37,10 +37,12 @@ import { useSelector } from "react-redux";
 export default function VeiwAllBooking() {
   const location = useLocation();
   const trip = location.state;
+  console.log(trip, "trip");
   const tripId = trip.tripId;
   const [item, setItem] = useState();
   const [active, setActive] = useState(0); // Section toggle
   const [doc, setDoc] = useState(item?.documents);
+  console.log(doc, "doc");
   const [vendorTable, setVendorTable] = useState([]);
   const [transferPrice, setTransferPrice] = useState(item?.transferPrice);
   const [orderValue, setOrderValue] = useState();
@@ -510,17 +512,15 @@ export default function VeiwAllBooking() {
                   {doc
                     ? doc.map(
                         (file, index) =>
-                          !new String(file).includes("freezeQuotation") &&
-                          !new String(file).includes("voucher") && (
+                          (
                             <li className="space-x-2" key={index}>
                               <a
-                                href={file}
-                                target="_blank"
-                                rel="noopener noreferrer"
+                                href={file.url || file}
+                                // target="_blank"
+                                // rel="noopener noreferrer"
                               >
-                                {new String(file).includes("http" || "https")
-                                  ? splitIt(file)
-                                  : file?.file?.name}
+                                
+                                  {file?.file?.name || splitIt(file)}
                               </a>
                               <button
                                 className={`text-red-400 rounded-lg cursor-pointer hover:text-red-700`}
@@ -886,8 +886,7 @@ export default function VeiwAllBooking() {
                   {doc
                     ? doc.map(
                         (file, index) =>
-                          !new String(file).includes("doc") &&
-                          !new String(file).includes("voucher") && (
+                          new String(file).includes("xls")&& (
                             <li className="space-x-2" key={index}>
                               <a
                                 onClick={handleFreezeQuotationClick}

@@ -92,23 +92,14 @@ const AllBookings = () => {
                 ),
                 opsSpoc: item.opsSpoc,
                 action: (
-                  <Link
+                  <button
                     className="text-3xl"
-                    href="/viewAllBooking"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={(e) => {
-                      e.preventDefault(); // Prevent default Link behavior
-                      dispatch(
-                        setTrip({
-                          trip: item,
-                        })
-                      );
-                      window.open("/viewAllBooking", "_blank");
+                    onClick={() => { 
+                      navigate(`/viewAllBooking`, {state: { tripId: item.tripId }});
                     }}
                   >
                     <GrFormView />
-                  </Link>
+                  </button>
                 ),
                 paymentstat: (
                   <button

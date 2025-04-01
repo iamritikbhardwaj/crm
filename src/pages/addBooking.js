@@ -123,10 +123,19 @@ const AddBooking = () => {
 
   const addDocument = (e, catagory) => {
     const files = e.target.files;
+
     if (files.length > 0) {
       Array.from(files).forEach((file) => {
         const fileURL = URL.createObjectURL(file);
-        setDocuments((prevDocs) => [...prevDocs, { file, fileURL, catagory }]);
+        console.log(file, "file");
+        if (documents) {
+          setDocuments((prevDoc) => [
+            ...prevDoc,
+            { file, url: fileURL, catagory: catagory },
+          ]);
+        } else {
+          setDocuments([{ file, url: fileURL, catagory: catagory }]);
+        }
       });
     }
   };
