@@ -114,7 +114,7 @@ const Dashboard = () => {
       totalGMV: res.OUTPUT?.gmv || 0,
       totalGPV: res.OUTPUT?.gpv || 0,
     });
-    setBookingsVsSalesSPOC({
+    user.profile !== "Sales" && setBookingsVsSalesSPOC({
       labels: res.bvss.sales,
       datasets: [{
         label: "Bookings",

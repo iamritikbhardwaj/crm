@@ -509,10 +509,10 @@ export default function VeiwAllBooking() {
               {/* Document Preview */}
               <div className="w-1/2 pl-4">
                 <ul>
-                  {doc
+                  {doc 
                     ? doc.map(
                         (file, index) =>
-                          (
+                          String(file).includes("xls", "xlsx", "doc", "docx") || (
                             <li className="space-x-2" key={index}>
                               <a
                                 href={file.url || file}
@@ -886,7 +886,7 @@ export default function VeiwAllBooking() {
                   {doc
                     ? doc.map(
                         (file, index) =>
-                          new String(file).includes("xls")&& (
+                          String(file).includes("xls") && (
                             <li className="space-x-2" key={index}>
                               <a
                                 onClick={handleFreezeQuotationClick}
@@ -1031,6 +1031,7 @@ export default function VeiwAllBooking() {
               id={"hotelvoucher"}
               onChange={addDoc}
               onRemove={removeDoc}
+              toAccept="application/pdf, image/*,.docs,.docx,.doc,application/vnd.ms-excel"
               files={doc}
               catagory={"hotelvoucher"}
             />
@@ -1039,6 +1040,7 @@ export default function VeiwAllBooking() {
               id={"activitiesvoucher"}
               onChange={addDoc}
               onRemove={removeDoc}
+              toAccept="application/pdf, image/*,.docs,.docx,.doc,application/vnd.ms-excel"
               files={doc}
               catagory={"activitiesvoucher"}
             />
@@ -1047,6 +1049,7 @@ export default function VeiwAllBooking() {
               id={"miscvoucher"}
               onChange={addDoc}
               onRemove={removeDoc}
+              toAccept="application/pdf, image/*,.docs,.docx,.doc,application/vnd.ms-excel"
               files={doc}
               catagory={"miscvoucher"}
             />
@@ -1069,8 +1072,7 @@ export default function VeiwAllBooking() {
               {doc
                 ? doc.map(
                     (file, index) =>
-                      !new String(file).includes("freezeQuotation") &&
-                      !new String(file).includes("doc") && (
+                      String(file).includes( "voucher","doc", "docx") && (
                         <li className="space-x-2" key={index}>
                           <a
                             href={file}

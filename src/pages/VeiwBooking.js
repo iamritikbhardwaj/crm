@@ -100,7 +100,7 @@ export default function VeiwBooking() {
   // Reject Booking is to delete the booking
   const rejectBooking = async () => {
     try {
-      const { value: remarks } = await Swal.fire({
+      Swal.fire({
         title: "Enter Remarks",
         input: "text", // Specify input type as text
         inputLabel: "Your remarks",
@@ -108,32 +108,21 @@ export default function VeiwBooking() {
         showCancelButton: true,
         confirmButtonText: "Submit",
         cancelButtonText: "Cancel",
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          const response = await cancelBooking(data.booking_id, result.value);
+          if (response.status === 200) {
+            navigate("/booking");
+            Swal.close();
+          } else {
+            Swal.fire("Error deleting booking. Please try again later.");
+            navigate("/booking");
+          }
+        }
       });
-
-      const response = await cancelBooking(data.booking_id, remarks);
-      if (response.status === 200) {
-        navigate("/booking");
-        Swal.close();
-      } else {
-        Swal.fire("Error deleting booking. Please try again later.");
-        navigate("/booking");
-      }
     } catch (error) {
       console.log(error);
     }
-  };
-
-  const rejectvalidation = () => {
-    Swal.fire({
-      title: `Do you want to Reject Booking?`,
-      showDenyButton: true,
-      confirmButtonText: `reject`,
-      denyButtonText: `Don't reject`,
-    }).then((result) => {
-      if (result.isConfirmed) {
-        rejectBooking();
-      }
-    });
   };
 
   const acceptValidation = () => {
@@ -175,33 +164,28 @@ export default function VeiwBooking() {
       } else {
         formData.append("docs", doc);
       }
-  });
-    
+    });
 
     if (inputData.opsSpoc === "") {
       Swal.close();
       Swal.fire("Please select an ops spoc");
       return false;
-    };
-      console.log("still working");
-      for (let pair of formData.entries()) {
-        console.log(pair[0] + ": " + pair[1]);
-      }
-      const response = await axios.post(
-        `${API_URL}users/createTrip`,
-        formData,
-        {
-          withCredentials: true,
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-      if (response.status === 200) {
-        await deleteBooking(data.booking_id);
-        return true;
-      }
     }
+    console.log("still working");
+    for (let pair of formData.entries()) {
+      console.log(pair[0] + ": " + pair[1]);
+    }
+    const response = await axios.post(`${API_URL}users/createTrip`, formData, {
+      withCredentials: true,
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    if (response.status === 200) {
+      await deleteBooking(data.booking_id);
+      return true;
+    }
+  };
 
   return (
     <div className="p-4">
@@ -448,14 +432,14 @@ export default function VeiwBooking() {
         <div className="p-4 flex justify-between">
           <button
             onClick={acceptValidation}
-            disabled={user?.profile === "Sales" ? true : false}
+            disabled={user?.profile === "Sales"}
             className="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600"
           >
             Accept Booking
           </button>
           <button
-            onClick={rejectvalidation}
-            disabled={user?.profile === "Sales" ? true : false}
+            onClick={rejectBooking}
+            disabled={user?.profile === "Sales"}
             className="bg-red-500 text-white px-6 py-2 rounded hover:bg-red-600"
           >
             Reject Booking

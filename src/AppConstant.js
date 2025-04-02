@@ -5,13 +5,13 @@ export const HOME_PATH = "/";
 export const SIGNUP_PATH = "signup";
 
 // LOCAL ENVIRONMENT
-export const FRONTEND_URL = "http://localhost:3000/";
-export const API_URL = "http://localhost:5001/api/";
+// export const FRONTEND_URL = "http://localhost:3000/";
+// export const API_URL = "http://localhost:5001/api/";
 
 // PRODUCTION ENVIRONMENT
-// export const FRONTEND_URL = "http://91.205.105.35:63193/";
-// export const API_URL = "http://91.205.105.35:63193/api/";
+export const FRONTEND_URL = "https://91.205.105.35:63193/";
+export const API_URL = "https://91.205.105.35:63193/api/";
 
 // TEST ENVIRONMENT 
-// export const FRONTEND_URL =  "http://localhost:5001";
+// export const FRONTEND_URL = "http://localhost:5001";
 // export const API_URL = "http://localhost:5001/api/";

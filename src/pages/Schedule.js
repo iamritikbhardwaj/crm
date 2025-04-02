@@ -174,9 +174,7 @@ const AllBookings = () => {
                   ),
                   contactDetails: `${item.countryCode} / ${item.whatsappNumber}`,
                   transferPrice:
-                    user.profile === "Sales"
-                      ? "N/A"
-                      : (parseFloat(item?.transferPrice) || 0) + " USD",
+                    parseFloat(item?.transferPrice) || 0 + " USD",
                   orderValue: item.orderValue + " USD",
                   apayment: (
                     <div
