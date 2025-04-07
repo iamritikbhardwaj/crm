@@ -843,7 +843,10 @@ export default function VeiwAllBooking() {
                       Swal.showLoading();
                     },
                   });
-                  await updateTrip({ transferPrice: transferPrice }, tripId);
+                  const match = transferPrice.match(/[\d\.]+/);
+                  await updateTrip({ transferPrice: match[0] }, tripId);
+                  console.log(match[0], "transferPrice");
+
                   Swal.close();
                 }}
                 disabled={

@@ -23,7 +23,7 @@ function ExcelToTable({url, setPrice}) {
       const worksheet = workbook.Sheets[firstSheetName];
   
       // Convert sheet to JSON (array format, keeping all data intact)
-      const sheetData = XLSX.utils.sheet_to_json(worksheet, { header: 1, raw: true });
+      const sheetData = XLSX.utils.sheet_to_json(worksheet, { header: 1, raw: false });
       console.log(sheetData, "Sheet Data")
 
       if (!sheetData || sheetData.length === 0) {

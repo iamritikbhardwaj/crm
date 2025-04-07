@@ -9,8 +9,8 @@ export const SIGNUP_PATH = "signup";
 // export const API_URL = "http://localhost:5001/api/";
 
 // PRODUCTION ENVIRONMENT
-export const FRONTEND_URL = "https://91.205.105.35:63193/";
-export const API_URL = "https://91.205.105.35:63193/api/";
+export const FRONTEND_URL = "https://crm.tomatotrails.com/";
+export const API_URL = "https://crm.tomatotrails.com/api/";
 
 // TEST ENVIRONMENT 
 // export const FRONTEND_URL = "http://localhost:5001";

@@ -109,7 +109,7 @@ export default function VeiwBooking() {
         confirmButtonText: "Submit",
         cancelButtonText: "Cancel",
       }).then(async (result) => {
-        if (result.isConfirmed) {
+        if (result.isConfirmed && result.value !== "") {
           const response = await cancelBooking(data.booking_id, result.value);
           if (response.status === 200) {
             navigate("/booking");

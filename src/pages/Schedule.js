@@ -174,7 +174,7 @@ const AllBookings = () => {
                   ),
                   contactDetails: `${item.countryCode} / ${item.whatsappNumber}`,
                   transferPrice:
-                    parseFloat(item?.transferPrice) || 0 + " USD",
+                    (item?.transferPrice) + " USD",
                   orderValue: item.orderValue + " USD",
                   apayment: (
                     <div
@@ -247,7 +247,7 @@ const AllBookings = () => {
             )
             .filter((stuff) => stuff !== true)
         : [];
-      console.log(bookings, "bookings");
+      console.log(data, "bookings");
       setBookings(bookings);
     })();
   }, []);
