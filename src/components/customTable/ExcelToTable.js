@@ -8,10 +8,15 @@ function ExcelToTable({url, setPrice}) {
   const [selectedFileIndex, setSelectedFileIndex] = useState(null); // Index of the currently displayed file
   // Fetch the Excel file from the URL and convert it to data
   useEffect(() => {
+    // Reset data when URL changes
+    setFilesData([]);
+    setSelectedFileIndex(null);
+  
     if (new String(url).includes('http')) {
       fetchExcelData(url);
     }
   }, [url]);
+  
 
   const fetchExcelData = async (url) => {
     try {
