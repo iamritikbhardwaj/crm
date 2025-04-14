@@ -69,6 +69,7 @@ function ReconForm({ handleHide, inputData, tripId, refetch }) {
         <label className="block text-sm font-medium mb-1">Online Booking</label>
         <input
           type="number"
+          step={0.01}
           {...register("online")}
           className="w-full border rounded p-2"
         />
@@ -82,6 +83,7 @@ function ReconForm({ handleHide, inputData, tripId, refetch }) {
         </label>
         <input
           type="number"
+          step={0.01}
           {...register("offline")}
           className="w-full border rounded p-2"
         />
@@ -93,6 +95,7 @@ function ReconForm({ handleHide, inputData, tripId, refetch }) {
         <label className="block text-sm font-medium mb-1">Land Combo</label>
         <input
           type="number"
+          step={0.01}
           {...register("land")}
           className="w-full border rounded p-2"
         />

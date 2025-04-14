@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import * as XLSX from 'xlsx';
 
-let transferPrice = 0;
 function ExcelToTable({url, setPrice}) {
   console.log(url, "url");
   const [filesData, setFilesData] = useState([]); // Array to store data of multiple files
   const [selectedFileIndex, setSelectedFileIndex] = useState(null); // Index of the currently displayed file
+  
   // Fetch the Excel file from the URL and convert it to data
   useEffect(() => {
     // Reset data when URL changes
@@ -17,7 +17,6 @@ function ExcelToTable({url, setPrice}) {
     }
   }, [url]);
   
-
   const fetchExcelData = async (url) => {
     try {
       const response = await fetch(url);
@@ -29,7 +28,7 @@ function ExcelToTable({url, setPrice}) {
   
       // Convert sheet to JSON (array format, keeping all data intact)
       const sheetData = XLSX.utils.sheet_to_json(worksheet, { header: 1, raw: false });
-      console.log(sheetData, "Sheet Data")
+      console.log(sheetData, "Sheet Data");
 
       if (!sheetData || sheetData.length === 0) {
         console.error('Empty sheet or unreadable data');
@@ -44,22 +43,50 @@ function ExcelToTable({url, setPrice}) {
         accessor: header ? String(header).toLowerCase().replace(/\s+/g, '_') : `column_${index}`,
       }));
   
-      // Extract data (from row 1 onward)
-      const rows = sheetData.slice(1).map((row) =>
+      // Filter out completely empty rows (rows with all cells empty)
+      const filteredData = sheetData.slice(1).filter(row => {
+        return row.some(cell => cell !== undefined && cell !== null && cell !== '');
+      });
+      
+      // Extract data from filtered rows
+      const rows = filteredData.map((row) =>
         headers.reduce((acc, column, index) => {
           acc[column.accessor] = row[index] !== undefined ? row[index] : ''; // Handle empty cells
           return acc;
         }, {})
       );
   
-      setFilesData([{ fileName: <a className='text-blue-500' href={url}>Download Freeze Quotation :{url.split('/').pop()}</a>, columns: headers, data: rows }]);
+      setFilesData([{ 
+        fileName: <a className='text-blue-500' href={url}>Download Freeze Quotation :{url.split('/').pop()}</a>, 
+        columns: headers, 
+        data: rows 
+      }]);
       setSelectedFileIndex(0);
   
     } catch (error) {
       console.error('Error fetching or parsing Excel file:', error);
     }
   };
+  
+  // Find the last non-empty row for price calculation
   const ExcelLikeTable = ({ data, columns }) => {
+    // Ensure we set the price from the actual last row with data
+    useEffect(() => {
+      if (data.length > 0) {
+        // Find the last non-empty row (from bottom to top)
+        for (let i = data.length - 1; i >= 0; i--) {
+          // Check if this is a total/summary row by examining content
+          const row = data[i];
+          const priceColumnIndex = columns.length - 2;
+          
+          if (priceColumnIndex >= 0 && row[columns[priceColumnIndex].accessor]) {
+            setPrice(row[columns[priceColumnIndex].accessor]);
+            break;
+          }
+        }
+      }
+    }, [data, columns]);
+
     return (
       <div className="overflow-x-auto">
         <table className="min-w-full table-auto text-sm border-collapse border">
@@ -77,15 +104,26 @@ function ExcelToTable({url, setPrice}) {
               data.map((row, rowIndex) => (
                 <tr key={rowIndex} className="border-b">
                   {columns.map((column, colIndex) => {
-                    if(data.length - 1 === rowIndex && columns.length - 2 === colIndex){
-                      setPrice(row[column.accessor]);
-                    }
-                    return(
-                    <td key={colIndex} className={`px-4 py-2 border ${data.length - 1 === rowIndex ? 'font-extrabold' : ''}`}> 
-                    {/* {row[column.accessor] ? row[column.accessor] : ' '} */}
-                      {row[column.accessor] ? (new String(row[column.accessor]).includes('.') ? new String(row[column.accessor]).split('.')[0] + '.' + new String(row[column.accessor]).split('.')[1].slice(0, 2) : row[column.accessor] ) : ' '}
+                    // Format cell value for display
+                    const cellValue = row[column.accessor];
+                    const formattedValue = cellValue ? 
+                      (String(cellValue).includes('.') ? 
+                        String(cellValue).split('.')[0] + '.' + String(cellValue).split('.')[1].slice(0, 2) : 
+                        cellValue) : 
+                      ' ';
+                    
+                    // Determine total row styling
+                    const isLikelyTotalRow = rowIndex === data.length - 1;
+                    
+                    return (
+                      <td 
+                        key={colIndex} 
+                        className={`px-4 py-2 border ${isLikelyTotalRow ? 'font-extrabold' : ''}`}
+                      >
+                        {formattedValue}
                       </td>
-                  )})}
+                    );
+                  })}
                 </tr>
               ))
             ) : (
@@ -121,5 +159,5 @@ function ExcelToTable({url, setPrice}) {
     </div>
   );
 }
-export {transferPrice};
+
 export default ExcelToTable;
