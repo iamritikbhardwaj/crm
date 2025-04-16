@@ -19,7 +19,19 @@ function ExcelToTable({url, setPrice}) {
   
   const fetchExcelData = async (url) => {
     try {
-      const response = await fetch(url);
+      // Add cache busting parameter to URL
+      const cacheBustUrl = new URL(url);
+      cacheBustUrl.searchParams.append('_t', new Date().getTime());
+      
+      // Use cache: 'no-store' to bypass browser cache
+      const response = await fetch(cacheBustUrl.toString(), {
+        cache: 'no-store',
+        headers: {
+          'Pragma': 'no-cache',
+          'Cache-Control': 'no-cache'
+        }
+      });
+      
       const arrayBuffer = await response.arrayBuffer();
       const workbook = XLSX.read(arrayBuffer, { type: 'array' });
 
@@ -56,8 +68,12 @@ function ExcelToTable({url, setPrice}) {
         }, {})
       );
   
+      // Update displayed filename without the cache busting parameter
+      const displayUrl = url.split('?')[0]; // Remove any existing query parameters
+      const filename = displayUrl.split('/').pop();
+      
       setFilesData([{ 
-        fileName: <a className='text-blue-500' href={url}>Download Freeze Quotation :{url.split('/').pop()}</a>, 
+        fileName: <a className='text-blue-500' href={url}>Download Freeze Quotation: {filename}</a>, 
         columns: headers, 
         data: rows 
       }]);
@@ -85,7 +101,7 @@ function ExcelToTable({url, setPrice}) {
           }
         }
       }
-    }, [data, columns]);
+    }, [data, columns, setPrice]);
 
     return (
       <div className="overflow-x-auto">
