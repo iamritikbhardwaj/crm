@@ -28,7 +28,8 @@ function ExcelToTable({url, setPrice}) {
         cache: 'no-store',
         headers: {
           'Pragma': 'no-cache',
-          'Cache-Control': 'no-cache'
+          'Cache-Control': 'no-cache',
+          'Expires': '0'
         }
       });
       
@@ -37,8 +38,11 @@ function ExcelToTable({url, setPrice}) {
 
       const firstSheetName = workbook.SheetNames[0]; // Get the first sheet name
       const worksheet = workbook.Sheets[firstSheetName];
-  
-      // Convert sheet to JSON (array format, keeping all data intact)
+      
+      // IMPORTANT: Get direct access to the worksheet
+      // This allows us to access cells directly using their addresses
+      
+      // Convert sheet to JSON with raw: false as requested
       const sheetData = XLSX.utils.sheet_to_json(worksheet, { header: 1, raw: false });
       console.log(sheetData, "Sheet Data");
 
@@ -79,72 +83,119 @@ function ExcelToTable({url, setPrice}) {
       }]);
       setSelectedFileIndex(0);
   
+      // CRITICAL FIX: Direct access to the price cell using its address in the worksheet
+      try {
+        // Find the cell address for the price (second-to-last column of the last row)
+        if (filteredData.length > 0) {
+          const lastRowIndex = filteredData.length - 1; // Last row in filtered data
+          const priceColumnIndex = headers.length - 2; // Second to last column
+          
+          // Access the raw value directly from the sheet data
+          const priceValue = filteredData[lastRowIndex][priceColumnIndex];
+          console.log("Raw price cell value:", priceValue);
+          
+          // Important: Because we're getting the price directly from the sheet data as a string,
+          // we need to make sure we don't process it any further
+          if (priceValue && typeof priceValue === 'string') {
+            // Keep the full string value without any parsing/splitting
+            const fullPrice = priceValue;
+            console.log("Setting full price:", fullPrice);
+            
+            // Ensure we're passing the entire string without modifications
+            setPrice(fullPrice);
+          }
+        }
+      } catch (err) {
+        console.error("Error extracting price:", err);
+      }
     } catch (error) {
       console.error('Error fetching or parsing Excel file:', error);
     }
   };
   
-  // Find the last non-empty row for price calculation
+  // Excel-like table with improved styling
   const ExcelLikeTable = ({ data, columns }) => {
-    // Ensure we set the price from the actual last row with data
-    useEffect(() => {
-      if (data.length > 0) {
-        // Find the last non-empty row (from bottom to top)
-        for (let i = data.length - 1; i >= 0; i--) {
-          // Check if this is a total/summary row by examining content
-          const row = data[i];
-          const priceColumnIndex = columns.length - 2;
-          
-          if (priceColumnIndex >= 0 && row[columns[priceColumnIndex].accessor]) {
-            setPrice(row[columns[priceColumnIndex].accessor]);
-            break;
-          }
-        }
-      }
-    }, [data, columns, setPrice]);
-
     return (
-      <div className="overflow-x-auto">
-        <table className="min-w-full table-auto text-sm border-collapse border">
-          <thead className="bg-gray-200 border-b">
-            <tr>
+      <div className="overflow-x-auto border border-gray-300 rounded shadow">
+        <table className="min-w-full table-auto text-sm border-collapse">
+          <thead>
+            <tr className="bg-gray-100 border-b border-gray-300">
               {columns.map((column, index) => (
-                <th key={index} className="px-2 py-1 text-center font-medium text-gray-700 border">
+                <th 
+                  key={index} 
+                  className="px-4 py-2 text-left font-semibold text-gray-700 border-r border-gray-300 last:border-r-0"
+                  style={{ 
+                    backgroundColor: '#f3f4f6', 
+                    position: 'sticky', 
+                    top: 0,
+                    boxShadow: '0 2px 2px -1px rgba(0, 0, 0, 0.1)'
+                  }}
+                >
                   {column.Header}
                 </th>
               ))}
             </tr>
           </thead>
-          <tbody>
+          <tbody className="bg-white divide-y divide-gray-200">
             {data.length > 0 ? (
-              data.map((row, rowIndex) => (
-                <tr key={rowIndex} className="border-b">
-                  {columns.map((column, colIndex) => {
-                    // Format cell value for display
-                    const cellValue = row[column.accessor];
-                    const formattedValue = cellValue ? 
-                      (String(cellValue).includes('.') ? 
-                        String(cellValue).split('.')[0] + '.' + String(cellValue).split('.')[1].slice(0, 2) : 
-                        cellValue) : 
-                      ' ';
-                    
-                    // Determine total row styling
-                    const isLikelyTotalRow = rowIndex === data.length - 1;
-                    
-                    return (
-                      <td 
-                        key={colIndex} 
-                        className={`px-4 py-2 border ${isLikelyTotalRow ? 'font-extrabold' : ''}`}
-                      >
-                        {formattedValue}
-                      </td>
-                    );
-                  })}
-                </tr>
-              ))
+              data.map((row, rowIndex) => {
+                // Determine if this is likely a header or total row
+                const isLastRow = rowIndex === data.length - 1;
+                
+                // Alternate row colors for better readability
+                const rowColor = rowIndex % 2 === 0 ? 'bg-white' : 'bg-gray-50';
+                
+                return (
+                  <tr 
+                    key={rowIndex} 
+                    className={`${rowColor} hover:bg-blue-50 transition-colors ${isLastRow ? 'font-semibold' : ''}`}
+                  >
+                    {columns.map((column, colIndex) => {
+                      // Get cell value
+                      const cellValue = row[column.accessor];
+                      
+                      // Determine if this looks like a currency value
+                      const isCurrency = typeof cellValue === 'string' && 
+                        (cellValue.includes('$') || 
+                         cellValue.includes('USD') || 
+                         cellValue.includes('EUR') || 
+                         cellValue.includes('£') || 
+                         cellValue.includes('€'));
+                      
+                      // Determine if this looks like a number
+                      const isNumber = !isNaN(parseFloat(cellValue)) && isFinite(cellValue);
+                      
+                      // Apply appropriate alignment and formatting
+                      const cellAlignment = isCurrency || isNumber ? 'text-right' : 'text-left';
+                      
+                      // Additional styling for cells based on content or position
+                      let cellStyle = {};
+                      if (isLastRow && colIndex === columns.length - 2) {
+                        console.log("Price cell value in table:", cellValue);
+                        // Highlight the price cell
+                        cellStyle = { 
+                          backgroundColor: '#f0f9ff', 
+                          fontWeight: 'bold',
+                          color: '#0369a1'
+                        };
+                      }
+                      
+                      return (
+                        <td 
+                          key={colIndex} 
+                          className={`px-4 py-2 border-r border-gray-200 last:border-r-0 ${cellAlignment} ${isLastRow ? 'font-semibold' : ''}`}
+                          style={cellStyle}
+                        >
+                          {cellValue !== undefined && cellValue !== null && cellValue !== '' ? cellValue : ' '}
+                        </td>
+                      );
+                    })}
+                  </tr>
+                );
+              })
             ) : (
               <tr>
-                <td colSpan={columns.length} className="px-4 py-2 text-center text-gray-500">
+                <td colSpan={columns.length} className="px-4 py-3 text-center text-gray-500 italic">
                   No data available
                 </td>
               </tr>
@@ -157,14 +208,14 @@ function ExcelToTable({url, setPrice}) {
 
   return (
     <div className="p-4">
-      <h1 className="text-lg font-bold mb-4">Sales Sheet Preview</h1>
+      <h1 className="text-xl font-bold mb-4 text-gray-800">Excel Sales Sheet Preview</h1>
 
       {selectedFileIndex !== null && filesData[selectedFileIndex] && (
-        <div>
-          <h2 className="text-md font-semibold mb-2">
-            Displaying: {filesData[selectedFileIndex].fileName}
+        <div className="bg-white rounded-lg shadow p-4">
+          <h2 className="text-md font-semibold mb-3 text-gray-700">
+            {filesData[selectedFileIndex].fileName}
           </h2>
-          <div>
+          <div className="mt-2">
             <ExcelLikeTable
               data={filesData[selectedFileIndex].data}
               columns={filesData[selectedFileIndex].columns}

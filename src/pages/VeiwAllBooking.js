@@ -50,6 +50,7 @@ export default function VeiwAllBooking() {
 
   const setPrice = (price) => {
     setTransferPrice(price);
+    console.log(transferPrice, "price");
   };
   const inpRef = useRef(null);
   const editForm = useRef(null);
@@ -295,6 +296,20 @@ export default function VeiwAllBooking() {
     });
   };
 
+  const renderPax = (pax) => {
+    try {
+      // Check if pax is a string, if so parse it
+      const paxData = typeof pax === "string" ? JSON.parse(pax) : pax;
+      
+      // Now safely access the properties
+      return `${paxData?.A || 0} A / ${paxData?.C || 0} C / ${paxData?.Ca || 0} Ca`;
+    } catch (err) {
+      // Handle parsing errors
+      console.error("Error parsing pax data:", err);
+      return "0 A / 0 C"; // Fallback values
+    }
+  };
+
   const voucherUpdate = async () => {
     await updateVoucher(tripId);
     updateDocs();
@@ -366,13 +381,7 @@ export default function VeiwAllBooking() {
               ["Customer Name", item?.customerName],
               [
                 "Number of Pax",
-                item?.pax.A +
-                  " A " +
-                  " / " +
-                  item?.pax.C +
-                  " C " +
-                  "- " +
-                  (item?.pax?.Ca === undefined ? "" : item?.pax.Ca),
+                renderPax(item?.pax),
               ],
               ["Travel Month", getTravelMonthRange(item?.arrivalDate)],
               [
@@ -395,7 +404,17 @@ export default function VeiwAllBooking() {
               ],
               [
                 "WhatsApp Number",
-                <button >{item?.countryCode} {item?.whatsappNumber} <MdEdit className={` ${user.profile === "Sales" || user.profile === "Finance" ? "hidden" : "flex"} ml-2`} onClick={() => setWhatsForm(!whatsForm)}/></button>,
+                <button>
+                  {item?.countryCode} {item?.whatsappNumber}{" "}
+                  <MdEdit
+                    className={` ${
+                      user.profile === "Sales" || user.profile === "Finance"
+                        ? "hidden"
+                        : "flex"
+                    } ml-2`}
+                    onClick={() => setWhatsForm(!whatsForm)}
+                  />
+                </button>,
               ],
               [
                 "Ops Spoc",
@@ -509,18 +528,22 @@ export default function VeiwAllBooking() {
               {/* Document Preview */}
               <div className="w-1/2 pl-4">
                 <ul>
-                  {doc 
+                  {doc
                     ? doc.map(
                         (file, index) =>
-                          String(file).includes("xls", "xlsx", "doc", "docx") || (
+                          String(file).includes(
+                            "xls",
+                            "xlsx",
+                            "doc",
+                            "docx"
+                          ) || (
                             <li className="space-x-2" key={index}>
                               <a
                                 href={file.url || file}
                                 // target="_blank"
                                 // rel="noopener noreferrer"
                               >
-                                
-                                  {file?.file?.name || splitIt(file)}
+                                {file?.file?.name || splitIt(file)}
                               </a>
                               <button
                                 className={`text-red-400 rounded-lg cursor-pointer hover:text-red-700`}
@@ -578,7 +601,7 @@ export default function VeiwAllBooking() {
                     : ""
                 }`}
               >
-                Transfer Price(USD): {parseFloat(transferPrice).toFixed(2)}
+                Transfer Price(USD): {transferPrice}
               </p>
             </div>
             {/* Payment Details Table */}
@@ -843,9 +866,14 @@ export default function VeiwAllBooking() {
                       Swal.showLoading();
                     },
                   });
-                  const match = transferPrice.match(/[\d\.]+/);
-                  await updateTrip({ transferPrice: match[0] }, tripId);
-                  console.log(match[0], "transferPrice");
+                  const match = transferPrice.match(/[\d\.]+/g); // Add comma to the pattern and use global flag
+                  if (match) {
+                    // Join all matched numeric parts to handle values like "1,433.02"
+                    const fullNumericValue = match.join("");
+                    await updateTrip({ transferPrice: fullNumericValue }, tripId);
+                    console.log(transferPrice, "transferPrice");
+                    console.log(fullNumericValue, "extracted numeric value");
+                  }
 
                   Swal.close();
                 }}
@@ -1075,7 +1103,7 @@ export default function VeiwAllBooking() {
               {doc
                 ? doc.map(
                     (file, index) =>
-                      String(file).includes( "voucher","doc", "docx") && (
+                      String(file).includes("voucher", "doc", "docx") && (
                         <li className="space-x-2" key={index}>
                           <a
                             href={file}

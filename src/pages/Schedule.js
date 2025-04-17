@@ -25,6 +25,19 @@ const AllBookings = () => {
   const [fromDate, setFromDate] = useState(Date.now()); // this form data will be used to submit all the data required for trip creation
   const [toDate, setToDate] = useState(Date.now() + new Date(86400000)); // filter related data
 
+  const renderPax = (pax) => {
+    try {
+      // Check if pax is a string, if so parse it
+      const paxData = typeof pax === "string" ? JSON.parse(pax) : pax;
+      
+      // Now safely access the properties
+      return `${paxData?.A || 0} A / ${paxData?.C || 0} C / ${paxData?.Ca || 0} Ca`;
+    } catch (err) {
+      // Handle parsing errors
+      console.error("Error parsing pax data:", err);
+      return "0 A / 0 C"; // Fallback values
+    }
+  };
   const search = async () => {
     // this function is for fetching trip data as per the date range
     const data = await fetchFilteredTrips(fromDate, toDate);
@@ -49,7 +62,7 @@ const AllBookings = () => {
                   <div className="leading-[0.7]">
                     <p>{item.customerName}</p> <br />
                     <p>
-                      {item.pax?.A} A / {item.pax?.C} C
+                      {renderPax(item.pax)}
                     </p>
                   </div>
                 ),
@@ -94,8 +107,10 @@ const AllBookings = () => {
                 action: (
                   <button
                     className="text-3xl"
-                    onClick={() => { 
-                      navigate(`/viewAllBooking`, {state: { tripId: item.tripId }});
+                    onClick={() => {
+                      navigate(`/viewAllBooking`, {
+                        state: { tripId: item.tripId },
+                      });
                     }}
                   >
                     <GrFormView />
@@ -162,7 +177,7 @@ const AllBookings = () => {
                     <div className="leading-[0.7]">
                       <p>{item.customerName}</p> <br />
                       <p>
-                        {item.pax?.A} A / {item.pax?.C} C
+                        {renderPax(item.pax)}
                       </p>
                     </div>
                   ),
@@ -173,8 +188,7 @@ const AllBookings = () => {
                     item.departureDate
                   ),
                   contactDetails: `${item.countryCode} / ${item.whatsappNumber}`,
-                  transferPrice:
-                    (item?.transferPrice) + " USD",
+                  transferPrice: item?.transferPrice + " USD",
                   orderValue: item.orderValue + " USD",
                   apayment: (
                     <div

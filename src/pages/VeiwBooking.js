@@ -153,7 +153,7 @@ export default function VeiwBooking() {
     formData.append("customerName", inputData.customerName);
     formData.append("arrivalDate", inputData.arrivalDate);
     formData.append("departureDate", inputData.departureDate);
-    formData.append("pax", inputData.pax);
+    formData.append("pax", JSON.stringify(inputData.pax));
     formData.append("orderValue", inputData.orderValue);
     formData.append("countryCode", inputData.countryCode);
     formData.append("whatsappNumber", inputData.whatsappNumber);

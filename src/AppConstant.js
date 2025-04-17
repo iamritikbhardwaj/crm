@@ -12,6 +12,6 @@ export const SIGNUP_PATH = "signup";
 export const FRONTEND_URL = "https://crm.tomatotrails.com/";
 export const API_URL = "https://crm.tomatotrails.com/api/";
 
-// TEST ENVIRONMENT 
+// TEST ENVIRONMENT
 // export const FRONTEND_URL = "http://localhost:5001";
 // export const API_URL = "http://localhost:5001/api/";
