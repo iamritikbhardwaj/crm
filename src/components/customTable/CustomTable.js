@@ -18,11 +18,9 @@ function CustomTable({ dataa, columnss, button, path, size, hideFilter }) {
     canPreviousPage,
     nextPage,
     previousPage,
-    pageCount,
-    pageIndex,
-    pageSize,
     gotoPage,
     setPageSize,
+    state: { pageIndex, pageSize, pageCount }
   } = useTable(
     {
       columns,
@@ -36,6 +34,8 @@ function CustomTable({ dataa, columnss, button, path, size, hideFilter }) {
     useSortBy,
     usePagination
   );  
+
+  console.log("Pagination state:", { pageIndex, pageCount });
 
   return (
     <div
@@ -126,8 +126,8 @@ function CustomTable({ dataa, columnss, button, path, size, hideFilter }) {
           >
             {"<"}
           </button>
-          <span className="mx-2">{` ${pageIndex + 1} of ${pageCount}`}</span>
-          <span>
+          <span className="mx-2 text-lg">{`Page ${pageIndex + 1} of ${Math.ceil(data.length / pageSize)}`}</span>
+          <span className="text-lg">
             Page Size:{" "}
             <select
               value={pageSize}
