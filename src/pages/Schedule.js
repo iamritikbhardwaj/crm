@@ -12,7 +12,7 @@ import {
   fetchTrips,
 } from "../components/apiCalls/fetchData";
 import { useDispatch, useSelector } from "react-redux";
-import { setTrip } from "../redux/slices/trip.slice";
+import JsonToExcel from "../components/ExcelJson/JsonToExcel.js";
 
 // this includes dashboard for all the trips which has been created after accepting the booking
 const AllBookings = () => {
@@ -156,6 +156,7 @@ const AllBookings = () => {
   useEffect(() => {
     (async () => {
       const data = await fetchTrips();
+      console.log(data, "data");
       const bookings = data
         ? data
             .map(
@@ -325,6 +326,9 @@ const AllBookings = () => {
           >
             Filter
           </button>
+        </div>
+        <div className="mt-8">
+          <JsonToExcel />
         </div>
       </div>
       <BackToHome />
