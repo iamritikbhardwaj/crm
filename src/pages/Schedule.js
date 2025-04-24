@@ -4,7 +4,7 @@ import {
   CustomTable,
   DefaultColumnFilter,
 } from "../components/customTable/CustomTable";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { GrFormView } from "react-icons/gr";
 import { getTravelMonthRange } from "./Booking";
 import {
@@ -24,6 +24,7 @@ const AllBookings = () => {
 
   const [fromDate, setFromDate] = useState(Date.now()); // this form data will be used to submit all the data required for trip creation
   const [toDate, setToDate] = useState(Date.now() + new Date(86400000)); // filter related data
+  const [download, setDownload] = useState({});
 
   const renderPax = (pax) => {
     try {
@@ -41,6 +42,7 @@ const AllBookings = () => {
   const search = async () => {
     // this function is for fetching trip data as per the date range
     const data = await fetchFilteredTrips(fromDate, toDate);
+    setDownload(data);
     const bookings = data
       ? data
           .map(
@@ -156,6 +158,7 @@ const AllBookings = () => {
   useEffect(() => {
     (async () => {
       const data = await fetchTrips();
+      setDownload(data)
       console.log(data, "data");
       const bookings = data
         ? data
@@ -299,8 +302,6 @@ const AllBookings = () => {
           <input
             id="fromDate"
             type="date"
-            // placeholder={new Date(fromDate)}
-            // value={new Date(fromDate)}
             onChange={(e) => setFromDate(e.target.value)}
             className="border rounded px-3 py-2"
           />
@@ -312,8 +313,6 @@ const AllBookings = () => {
           <input
             id="toDate"
             type="date"
-            // placeholder={toDate}
-            // value={new Date(toDate)}
             onChange={(e) => setToDate(e.target.value)}
             className="border rounded px-3 py-2"
           />
@@ -328,7 +327,7 @@ const AllBookings = () => {
           </button>
         </div>
         <div className="mt-8">
-          <JsonToExcel />
+          <JsonToExcel data={download}/>
         </div>
       </div>
       <BackToHome />

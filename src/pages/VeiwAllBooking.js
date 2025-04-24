@@ -33,6 +33,7 @@ import {
   updateVoucher,
 } from "../components/apiCalls/updateData";
 import { useSelector } from "react-redux";
+import IssuesAccordian from "../components/Accordians/IssuesAccordian";
 
 export default function VeiwAllBooking() {
   const location = useLocation();
@@ -404,7 +405,7 @@ export default function VeiwAllBooking() {
               ],
               [
                 "WhatsApp Number",
-                <button>
+                <button key={item?.tripId}>
                   {item?.countryCode} {item?.whatsappNumber}{" "}
                   <MdEdit
                     className={` ${
@@ -419,6 +420,7 @@ export default function VeiwAllBooking() {
               [
                 "Ops Spoc",
                 <select
+                  key={item?.tripId}
                   value={item?.opsSpoc}
                   disabled={user.profile !== "Admin"}
                   onChange={updateOps}
@@ -434,6 +436,7 @@ export default function VeiwAllBooking() {
               [
                 "Trip Status",
                 <select
+                key={item?.tripId}
                   value={item?.status}
                   onChange={updateStatus}
                   disabled={
@@ -1044,7 +1047,7 @@ export default function VeiwAllBooking() {
           </div>
         </div>
         {/* Voucher details */}
-        <div className="mb-6"></div>
+        <div className="mb-6">
         <h2 className="text-lg font-semibold bg-gray-200 p-2 rounded flex justify-between">
           Voucher Details
           <span onClick={() => setActive(active === 5 ? null : 5)}>
@@ -1127,6 +1130,9 @@ export default function VeiwAllBooking() {
             </ul>
           </div>
         </div>
+        </div>
+        {/* Issues details */}
+        <IssuesAccordian active={active} setActive={setActive} tripId={tripId}/>
       </div>
     </div>
   );

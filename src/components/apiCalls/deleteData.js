@@ -168,3 +168,24 @@ export const deleteVendor= async (id) => {
     Swal.close();
     return response;
 }
+
+export const deleteIssue = async (issue_id)=> {
+  const response = await axios.delete(`${API_URL}users/deleteIssue?issue_id=${issue_id}`);
+  if(response.status === 200) {
+    Swal.fire({
+      title: "Hurray!",
+      text: "Your issue is no more",
+      icon: 'success',
+      showCloseButton: true
+    }).then(()=>{
+      return true
+    })
+  } else {
+    Swal.fire({
+      title: "Opps!",
+      text: "Your issue is not deleted yet",
+      icon: 'error',
+      showCloseButton: true
+    })
+  }
+}

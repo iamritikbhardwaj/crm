@@ -202,3 +202,17 @@ export const userSpecificDashboard = async (startDate, endDate, sales) => {
     return false;
   }
 }
+
+export const fetchIssues = async (tripId) => {
+  const response = await axios.get(`${API_URL}users/getAllIssues?tripId=${tripId}`)
+  if(response.status === 200) {
+    return response.data.OUTPUT
+  } else{
+    Swal.fire({
+      title: "Opps!",
+      text: response.data.MESSAGE,
+      icon: "error",
+      showConfirmButton: true,
+    })
+  }
+}
