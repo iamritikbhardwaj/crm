@@ -38,11 +38,8 @@ function ReconForm({ handleHide, inputData, tripId, refetch }) {
     setValue("land", "");
   };
 
-  console.log(errors, "errors");
-  console.log(tripId, "tripId");
 
   const reconSubmit = (data) => {
-    console.log(data, "data");
     (async (data) => {
       const response = await axios.post(
         `${API_URL}users/createRecon${inputData?.recon_id ? "/?id=" + inputData.recon_id : ""}`,
@@ -54,7 +51,6 @@ function ReconForm({ handleHide, inputData, tripId, refetch }) {
           withCredentials: true,
         }
       );
-      console.log(response, "response");
       if (response.status === 200) {
         await refetch();
         reset();
@@ -113,7 +109,6 @@ function ReconForm({ handleHide, inputData, tripId, refetch }) {
         </button>
         <button
           type="submit"
-          onClick={() => console.log("clicked")}
           className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
         >
           Save Changes

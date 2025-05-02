@@ -9,7 +9,6 @@ function FileUpload({ label, id, onChange, catagory, toAccept }) {
       setFileSelected(true);
       onChange(e, catagory);
     }
-    console.log("files");
   };
 
 
@@ -33,7 +32,7 @@ function FileUpload({ label, id, onChange, catagory, toAccept }) {
         onClick={() => document.querySelector(`#${id}`).click()}
         className='cursor-pointer bg-blue-500 px-2 py-1 rounded text-white'
       >
-        {fileSelected ?  "Add more files" : "Upload"}
+        {fileSelected ? "Add more files" : "Upload"}
       </button>
     </div>
   );

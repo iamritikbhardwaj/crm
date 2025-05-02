@@ -34,16 +34,15 @@ import {
 } from "../components/apiCalls/updateData";
 import { useSelector } from "react-redux";
 import IssuesAccordian from "../components/Accordians/IssuesAccordian";
+import PaymentAccordian from "../components/Accordians/PaymentAccordian";
 
 export default function VeiwAllBooking() {
   const location = useLocation();
   const trip = location.state;
-  console.log(trip, "trip");
   const tripId = trip.tripId;
   const [item, setItem] = useState();
   const [active, setActive] = useState(0); // Section toggle
   const [doc, setDoc] = useState(item?.documents);
-  console.log(doc, "doc");
   const [vendorTable, setVendorTable] = useState([]);
   const [transferPrice, setTransferPrice] = useState(item?.transferPrice);
   const [orderValue, setOrderValue] = useState();
@@ -51,7 +50,6 @@ export default function VeiwAllBooking() {
 
   const setPrice = (price) => {
     setTransferPrice(price);
-    console.log(transferPrice, "price");
   };
   const inpRef = useRef(null);
   const editForm = useRef(null);
@@ -64,7 +62,6 @@ export default function VeiwAllBooking() {
   const [selectedExcel, setSelectedExcel] = useState([]);
   const auth = useSelector((state) => state.auth);
   const user = auth.user;
-  console.log(user, "profile");
 
   const refetch = async () => {
     const itemData = await fetchTrips(tripId);
@@ -74,7 +71,6 @@ export default function VeiwAllBooking() {
 
   const refetchVend = async () => {
     const vendorData = await fetchVendors(tripId);
-    console.log(vendorData, "vendorData");
     setVendorTable(vendorData);
   };
 
@@ -111,12 +107,10 @@ export default function VeiwAllBooking() {
             Swal.showLoading();
           },
         });
-        console.log(vendor, "is confimed");
         const response = await axios.post(
           `${API_URL}users/createVendor/?id=${id}`,
           vendor
         );
-        console.log(response, "response");
         if (response) {
           await refetchVend();
           Swal.close();
@@ -199,7 +193,6 @@ export default function VeiwAllBooking() {
     if (files.length > 0) {
       Array.from(files).forEach((file) => {
         const fileURL = URL.createObjectURL(file);
-        console.log(file, "file");
         if (doc) {
           setDoc((prevDoc) => [
             ...prevDoc,
@@ -327,7 +320,6 @@ export default function VeiwAllBooking() {
     const formData = new FormData();
     doc.forEach((doc) => {
       if (doc?.file) {
-        console.log(doc.file);
         formData.append(`${doc.catagory}`, doc.file);
       } else {
         formData.append("docs", doc);
@@ -366,9 +358,9 @@ export default function VeiwAllBooking() {
         <div className="mb-6">
           <h2 className="text-lg font-semibold bg-gray-200 p-2 rounded flex justify-between">
             Booking Details
-            <span onClick={() => setActive(active === 0 ? null : 0)}>
+            <button onClick={() => setActive(active === 0 ? null : 0)}>
               <IoIosArrowDropdownCircle />
-            </span>
+            </button>
           </h2>
           <div
             className={`${
@@ -467,9 +459,9 @@ export default function VeiwAllBooking() {
         <div className="mb-6">
           <h2 className="text-lg font-semibold bg-gray-200 p-2 rounded flex justify-between">
             Document Upload
-            <span onClick={() => setActive(active === 1 ? null : 1)}>
+            <button onClick={() => setActive(active === 1 ? null : 1)}>
               <IoIosArrowDropdownCircle />
-            </span>
+            </button>
           </h2>
           <div className={`p-4 ${active === 1 ? "block" : "hidden"}`}>
             <div className="flex justify-end">
@@ -568,9 +560,9 @@ export default function VeiwAllBooking() {
         <div className="mb-6">
           <h2 className="text-lg font-semibold bg-gray-200 p-2 rounded flex justify-between">
             Commercials
-            <span onClick={() => setActive(active === 2 ? null : 2)}>
+            <button onClick={() => setActive(active === 2 ? null : 2)}>
               <IoIosArrowDropdownCircle />
-            </span>
+            </button>
           </h2>
           <div className={`p-4 ${active === 2 ? "block" : "hidden"}`}>
             <div className="flex justify-between">
@@ -789,7 +781,6 @@ export default function VeiwAllBooking() {
                               tripId
                             );
                             await updateRecon(tripId);
-                            console.log(res, "res");
                             Swal.close();
                             // edit options are available in case we want to add edit functionality
                           }
@@ -842,9 +833,9 @@ export default function VeiwAllBooking() {
         >
           <h2 className="text-lg font-semibold bg-gray-200 p-2 rounded flex justify-between">
             Freeze Quotation
-            <span onClick={() => setActive(active === 3 ? null : 3)}>
+            <button onClick={() => setActive(active === 3 ? null : 3)}>
               <IoIosArrowDropdownCircle />
-            </span>
+            </button>
           </h2>
           <div className={`p-4 ${active === 3 ? "flex-col" : "hidden"} h-fit`}>
             <div className="flex justify-between">
@@ -874,8 +865,6 @@ export default function VeiwAllBooking() {
                     // Join all matched numeric parts to handle values like "1,433.02"
                     const fullNumericValue = match.join("");
                     await updateTrip({ transferPrice: fullNumericValue }, tripId);
-                    console.log(transferPrice, "transferPrice");
-                    console.log(fullNumericValue, "extracted numeric value");
                   }
 
                   Swal.close();
@@ -960,9 +949,9 @@ export default function VeiwAllBooking() {
         >
           <h2 className="text-lg font-semibold bg-gray-200 p-2 rounded flex justify-between">
             Supplier Details
-            <span onClick={() => setActive(active === 4 ? null : 4)}>
+            <button onClick={() => setActive(active === 4 ? null : 4)}>
               <IoIosArrowDropdownCircle />
-            </span>
+            </button>
           </h2>
           <div className={`p-4 ${active === 4 ? "block" : "hidden"}`}>
             <VendorForm
@@ -1050,9 +1039,8 @@ export default function VeiwAllBooking() {
         <div className="mb-6">
         <h2 className="text-lg font-semibold bg-gray-200 p-2 rounded flex justify-between">
           Voucher Details
-          <span onClick={() => setActive(active === 5 ? null : 5)}>
-            <IoIosArrowDropdownCircle />
-          </span>
+          <button
+          onClick={() => setActive(active === 5 ? null : 5)}><IoIosArrowDropdownCircle /></button>
         </h2>
         <div className={`p-4 ${active === 5 ? "flex" : "hidden"} min-h-36`}>
           <div
@@ -1133,6 +1121,8 @@ export default function VeiwAllBooking() {
         </div>
         {/* Issues details */}
         <IssuesAccordian active={active} setActive={setActive} tripId={tripId}/>
+        {/* Payment details */}
+        <PaymentAccordian active={active} setActive={setActive} tripId={tripId}/>
       </div>
     </div>
   );

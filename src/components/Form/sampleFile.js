@@ -21,7 +21,6 @@ function SampleFile() {
           'Content-Type': 'multipart/form-data', // This is required for file uploads
         },
       });
-      console.log(res, 'res');
     } catch (error) {
       console.error('Error uploading file', error);
     }
@@ -32,18 +31,18 @@ function SampleFile() {
       <form onSubmit={handleSubmit(upload)}>
         <label htmlFor='file'>Upload File</label>
         <Controller
-        name="file"
-        control={control}
-        defaultValue=""
-        render={({ field }) => (
-          <input
-            type="file"
-            id="file"
-            {...field}
-            onChange={(e) => setValue(e.target.files[0])} // Set the file directly
-            name="file"
-          />
-        )}
+          name="file"
+          control={control}
+          defaultValue=""
+          render={({ field }) => (
+            <input
+              type="file"
+              id="file"
+              {...field}
+              onChange={(e) => setValue(e.target.files[0])} // Set the file directly
+              name="file"
+            />
+          )}
         />
         <input type="submit" value="Upload" />
       </form>

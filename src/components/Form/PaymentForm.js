@@ -30,7 +30,6 @@ function PaymentForm({ handlehide, tripId, inputData, refetch }) {
     resolver: zodResolver(paymentSchema),
   });
 
-  console.log(inputData, "inputData");
 
   useEffect(() => {
     if (tripId) {
@@ -38,7 +37,6 @@ function PaymentForm({ handlehide, tripId, inputData, refetch }) {
       setValue("tripId", tripId);
     }
     if (inputData) {
-      console.log(inputData, "inputData");
       setValue("date", inputData.date);
       setValue("amount", inputData.amount);
       setValue("conFee", inputData.conFee);
@@ -58,7 +56,6 @@ function PaymentForm({ handlehide, tripId, inputData, refetch }) {
   };
 
   const reconSubmit = (data) => {
-    console.log(data, "data");
     Swal.fire({
       title: "Submitting...",
       text: "Please wait while we create your payment.",
@@ -68,10 +65,8 @@ function PaymentForm({ handlehide, tripId, inputData, refetch }) {
       },
     });
     (async (data) => {
-      console.log(data, "data");
       const response = await axios.post(
-        `${API_URL}users/createPayment${
-          inputData?.payment_id ? "/?id=" + inputData.payment_id : ``
+        `${API_URL}users/createPayment${inputData?.payment_id ? "/?id=" + inputData.payment_id : ``
         }`,
         JSON.stringify(data),
         {
@@ -94,13 +89,12 @@ function PaymentForm({ handlehide, tripId, inputData, refetch }) {
           },
         });
         const pay = await fetchPayment(tripId);
-        console.log(pay, "response");
-        const payment = pay.reduce((acc, item) => parseFloat(acc) + parseFloat(item.amount),0);
+        const payment = pay.reduce((acc, item) => parseFloat(acc) + parseFloat(item.amount), 0);
         const res = await updateTrip({ payment: payment }, tripId);
-        if(res){
+        if (res) {
           Swal.close();
           Swal.fire("Payment updated")
-        }else{
+        } else {
           Swal.close();
           Swal.fire("Payment not updated")
         }
@@ -109,8 +103,6 @@ function PaymentForm({ handlehide, tripId, inputData, refetch }) {
     })(data);
     handlehide();
   };
-
-  console.log(errors, "errors");
 
   return (
     <form onSubmit={handleSubmit(reconSubmit)} className="space-y-4">
@@ -206,7 +198,6 @@ function PaymentForm({ handlehide, tripId, inputData, refetch }) {
         </button>
         <button
           type="submit"
-          onClick={console.log("Submitted")}
           className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
         >
           Save Changes

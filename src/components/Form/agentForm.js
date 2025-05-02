@@ -25,7 +25,6 @@ function AgentForm({ editData, setEditData, refetch }) {
   });
 
   const agentSubmit = (data) => {
-    // console.log('data', data)
     (async (data) => {
       const response = await axios.post(
         `${API_URL}users/createAgent${
@@ -51,12 +50,10 @@ function AgentForm({ editData, setEditData, refetch }) {
       } else {
         refetch();
       }
-      console.log(response, "agent response");
     })(data);
   };
 
   useEffect(() => {
-    console.log(editData, "editData");
     if (editData.hasOwnProperty("agent_id")) {
       setValue("name", editData?.name);
       setValue("status", editData?.status);

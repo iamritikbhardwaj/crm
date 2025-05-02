@@ -20,7 +20,6 @@ function Setting() {
         "content-type": "application/json",
       },
     });
-    console.log(await response, "destination response");
     setDestData((await response).data.OUTPUT);
   };
   const agentfetch = async () => {
@@ -30,7 +29,6 @@ function Setting() {
         "content-type": "application/json",
       },
     });
-    console.log(await response, "agent response");
     setAgentData((await response).data.OUTPUT);
   };
   /**
@@ -67,9 +65,8 @@ function Setting() {
     currency: item.currency,
     status: (
       <button
-        className={`p-2 rounded-lg ${
-          item.status === "ACTIVE" ? "bg-green-400" : "bg-red-400"
-        }`}
+        className={`p-2 rounded-lg ${item.status === "ACTIVE" ? "bg-green-400" : "bg-red-400"
+          }`}
       >
         {item.status}
       </button>
@@ -81,7 +78,6 @@ function Setting() {
           className="align-center text-blue-400"
           onClick={() => {
             setEditData(item);
-            console.log(editData);
           }}
         >
           <MdModeEdit />
@@ -96,9 +92,8 @@ function Setting() {
     agent: item.name,
     status: (
       <button
-        className={`p-2 rounded-lg ${
-          item.status === "ACTIVE" ? "bg-green-400" : "bg-red-400"
-        }`}
+        className={`p-2 rounded-lg ${item.status === "ACTIVE" ? "bg-green-400" : "bg-red-400"
+          }`}
       >
         {item.status}
       </button>
@@ -163,9 +158,8 @@ function Setting() {
     supplier: item.name,
     status: (
       <button
-        className={`p-2 rounded-lg ${
-          item.status === "ACTIVE" ? "bg-green-400" : "bg-red-400"
-        }`}
+        className={`p-2 rounded-lg ${item.status === "ACTIVE" ? "bg-green-400" : "bg-red-400"
+          }`}
       >
         {item.status}
       </button>
@@ -273,25 +267,22 @@ function Setting() {
             {/* Tabs */}
             <ul className="flex justify-start">
               <li
-                className={`border-x-[1px] p-2 cursor-pointer ${
-                  activeTab === 1 && "bg-slate-700 text-white"
-                }`}
+                className={`border-x-[1px] p-2 cursor-pointer ${activeTab === 1 && "bg-slate-700 text-white"
+                  }`}
                 onClick={() => setActiveTab(1)}
               >
                 Destinations
               </li>
               <li
-                className={`border-x-[1px] p-2 cursor-pointer ${
-                  activeTab === 2 && "bg-slate-700 text-white"
-                }`}
+                className={`border-x-[1px] p-2 cursor-pointer ${activeTab === 2 && "bg-slate-700 text-white"
+                  }`}
                 onClick={() => setActiveTab(2)}
               >
                 Agents
               </li>
               <li
-                className={`border-x-[1px] p-2 cursor-pointer ${
-                  activeTab === 3 && "bg-slate-700 text-white"
-                }`}
+                className={`border-x-[1px] p-2 cursor-pointer ${activeTab === 3 && "bg-slate-700 text-white"
+                  }`}
                 onClick={() => setActiveTab(3)}
               >
                 Suppliers

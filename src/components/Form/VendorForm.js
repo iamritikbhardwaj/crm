@@ -52,7 +52,6 @@ function VendorForm({ dest, refetch, tripId, setInputData }) {
     setValue("tripId", tripId);
   }, []);
 
-  console.log(errors, "errors");
 
   const handleChange = async (e) => {
     Swal.fire({
@@ -64,13 +63,10 @@ function VendorForm({ dest, refetch, tripId, setInputData }) {
       },
     });
     const desti = await fetchDestinations();
-    console.log(desti, "desti");
     const target = supplier.filter((sup) => sup.name === e.target.value)[0];
-    console.log(target, "target");
     const dest = desti.filter(
       (d) => d.destination_id === target.destination_id
     )[0];
-    console.log(dest.destination, "dest");
     setInputData(target);
     setValue("destination", dest.destination);
     setValue("currency", dest.currency);
@@ -130,12 +126,12 @@ function VendorForm({ dest, refetch, tripId, setInputData }) {
           })}
       </select>
       <div className="flex justify-between">
-      <button
-        type="submit"
-        className="bg-blue-500 text-white px-4 py-2 mt-4 rounded-lg hover:bg-blue-700"
-      >
-        Add Vendor
-      </button>
+        <button
+          type="submit"
+          className="bg-blue-500 text-white px-4 py-2 mt-4 rounded-lg hover:bg-blue-700"
+        >
+          Add Vendor
+        </button>
       </div>
     </form>
   );

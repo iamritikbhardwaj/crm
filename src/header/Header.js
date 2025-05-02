@@ -13,8 +13,7 @@ function Header() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const auth = useSelector((state) => state.auth);
-  const user = auth.user; // Accessing user from auth
-  console.log(user, "user");
+  const user = auth.user; // Accessing user from auth 
 
   return (
     <div className="fixed w-1/6 flex flex-col text-center justify-between h-full  bg-slate-800 p-3">
@@ -39,9 +38,8 @@ function Header() {
           <button
             onClick={() => navigate("/user")}
             disabled={user?.profile !== "Admin"}
-            className={`w-4/5 ${
-              user?.profile === "Admin" ? "flex" : "hidden"
-            }  items-center text-xs font-bold bg-slate-100 p-2 rounded-lg text-center mx-2 my-4 hover:bg-slate-300 focus:bg-slate-300`}
+            className={`w-4/5 ${user?.profile === "Admin" ? "flex" : "hidden"
+              }  items-center text-xs font-bold bg-slate-100 p-2 rounded-lg text-center mx-2 my-4 hover:bg-slate-300 focus:bg-slate-300`}
           >
             <FaUser className="mx-1" />
             User
@@ -51,9 +49,8 @@ function Header() {
           <button
             onClick={() => navigate("/setting")}
             disabled={user?.profile !== "Admin"}
-            className={`w-4/5 text-xs ${
-              user?.profile === "Admin" ? "flex" : "hidden"
-            } items-center font-bold bg-slate-100 p-2 rounded-lg text-center mx-2 my-4 hover:bg-slate-300 focus:bg-slate-300`}
+            className={`w-4/5 text-xs ${user?.profile === "Admin" ? "flex" : "hidden"
+              } items-center font-bold bg-slate-100 p-2 rounded-lg text-center mx-2 my-4 hover:bg-slate-300 focus:bg-slate-300`}
           >
             <IoMdSettings className="mx-1" />
             Setting

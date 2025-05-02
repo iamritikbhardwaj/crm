@@ -68,8 +68,7 @@ const NewBooking = () => {
           },
         });
 
-        const bookings = response.data.OUTPUT; // Assuming response is structured this way
-        console.log(bookings, "Bookings data");
+        const bookings = response.data.OUTPUT; // Assuming response is structured this way 
         // Map the bookings data to your desired structure
         const processedData = bookings
           .map(

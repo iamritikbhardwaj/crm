@@ -11,7 +11,6 @@ const Dashboard = () => {
 
   const auth = useSelector((state) => state.auth);
   const user = auth.user;
-  console.log(user, "user");
   const [fromDate, setFromDate] = useState(Date.now());
   const [toDate, setToDate] = useState(Date.now() + 86400000);
   const [data, setData] = useState({
@@ -97,7 +96,7 @@ const Dashboard = () => {
   });
 
 
-  const search = async()=>{
+  const search = async () => {
     Swal.fire({
       title: "Fetching...",
       text: "Please wait while we fetch Data.",
@@ -107,7 +106,7 @@ const Dashboard = () => {
       },
     });
     const res = user.profile !== "Sales" ? await fetchDashboard(fromDate, toDate) : await userSpecificDashboard(fromDate, toDate, user);
-    console.log(res, 'res');
+
     setData({
       noOfBookings: res.OUTPUT?.noOfBookings || 0,
       activeAgents: res.OUTPUT?.activeAgents || 0,
@@ -235,32 +234,32 @@ const Dashboard = () => {
           <Pie data={statusChart} />
         </div>
 
-       {/* Bookings vs Sales SPOC */}
-       <div className={`${user.profile === "Sales" ? "hidden": ''} bg-white p-4 rounded shadow`}>
+        {/* Bookings vs Sales SPOC */}
+        <div className={`${user.profile === "Sales" ? "hidden" : ''} bg-white p-4 rounded shadow`}>
           <h3 className="text-lg font-semibold mb-4">Bookings vs Sales SPOC</h3>
           <Bar vertical data={bookingsVsSalesSPOC} options={options} />
         </div>
 
         {/* GPV vs Sales SPOC */}
-        <div className={`${user.profile === "Sales" ? "hidden": ''} bg-white p-4 rounded shadow`}>
+        <div className={`${user.profile === "Sales" ? "hidden" : ''} bg-white p-4 rounded shadow`}>
           <h3 className="text-lg font-semibold mb-4 text-center">GPV vs Sales SPOC</h3>
           <Bar data={GPVData} options={options} />
         </div>
 
         {/* GMV vs Sales SPOC */}
-        <div className={`${user.profile === "Sales" ? "hidden": ''} bg-white p-4 rounded shadow`}>
+        <div className={`${user.profile === "Sales" ? "hidden" : ''} bg-white p-4 rounded shadow`}>
           <h3 className="text-lg font-semibold mb-4 text-center">GMV vs Sales SPOC</h3>
           <Bar data={GMVData} options={options} />
         </div>
 
-        <div className={`${user.profile === "Sales" ? "hidden": ''} bg-white p-4 rounded shadow`}>
-           {/* Bookings vs Ops SPOC */}
+        <div className={`${user.profile === "Sales" ? "hidden" : ''} bg-white p-4 rounded shadow`}>
+          {/* Bookings vs Ops SPOC */}
           <h3 className="text-lg font-semibold mb-4 ">Bookings vs Ops SPOC</h3>
-          <Bar  data={bookingsVsOpsSPOC} />
-         </div>
+          <Bar data={bookingsVsOpsSPOC} />
+        </div>
 
-        <div className={`${user.profile === "Sales" ? "hidden": ''}`} >
-        <UserActivityTable users={users} className={`${user.profile === "Sales" ? "hidden": ''} w-1/2`} />
+        <div className={`${user.profile === "Sales" ? "hidden" : ''}`} >
+          <UserActivityTable users={users} className={`${user.profile === "Sales" ? "hidden" : ''} w-1/2`} />
         </div>
       </div>
     </div>

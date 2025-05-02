@@ -28,11 +28,9 @@ function SupForm({ editData, setEditData, refetch, data }) {
   });
 
   const supplierSubmit = (data) => {
-    console.log(data, "data");
     (async (data) => {
       const response = await axios.post(
-        `${API_URL}users/createSupplier${
-          editData.hasOwnProperty("name") ? `/?id=${editData?.supplier_id}` : ""
+        `${API_URL}users/createSupplier${editData.hasOwnProperty("name") ? `/?id=${editData?.supplier_id}` : ""
         }`,
         data,
         {
@@ -52,7 +50,6 @@ function SupForm({ editData, setEditData, refetch, data }) {
       } else {
         refetch();
       }
-      console.log(response, "response");
     })(data);
   };
 

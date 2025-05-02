@@ -30,7 +30,7 @@ const AllBookings = () => {
     try {
       // Check if pax is a string, if so parse it
       const paxData = typeof pax === "string" ? JSON.parse(pax) : pax;
-      
+
       // Now safely access the properties
       return `${paxData?.A || 0} A / ${paxData?.C || 0} C / ${paxData?.Ca || 0} Ca`;
     } catch (err) {
@@ -45,6 +45,114 @@ const AllBookings = () => {
     setDownload(data);
     const bookings = data
       ? data
+        .map(
+          (item) =>
+            (user &&
+              user.profile === "Sales" &&
+              user.name !== item.salesSpoc) || {
+              arrivalDate: item.arrivalDate,
+              departureDate: item.departureDate,
+              tripID: item.tripId,
+              destination: item.destination,
+              bookingDate:
+                item.bookingDate.slice(8, 10) +
+                "/" +
+                item.bookingDate.slice(5, 7) +
+                "/" +
+                item.bookingDate.slice(0, 4),
+              customerName: (
+                <div className="leading-[0.7]">
+                  <p>{item.customerName}</p> <br />
+                  <p>
+                    {renderPax(item.pax)}
+                  </p>
+                </div>
+              ),
+              salesSPOC: item.salesSpoc,
+              agent: item.agent,
+              travelMonth: getTravelMonthRange(
+                item.arrivalDate,
+                item.departureDate
+              ),
+              contactDetails: `${item.countryCode} / ${item.whatsappNumber}`,
+              transferPrice:
+                user.profile === "Sales"
+                  ? "N/A"
+                  : (parseFloat(item?.transferPrice) || 0) + " USD",
+              orderValue: item.orderValue + " USD",
+              apayment: (
+                <div
+                  className={`font-bold ${parseFloat(item.orderValue) === parseFloat(item?.payment)
+                      ? "text-green-500"
+                      : "text-red-500"
+                    }`}
+                >
+                  {item?.payment + " USD"}
+                </div>
+              ),
+              status: (
+                <button
+                  className={`${(item.status === "CANCELLED" && "bg-red-500") ||
+                    (item.status === "ON-TOUR" && "bg-yellow-500") ||
+                    (item.status === "CONFIRMED" && "bg-green-500") ||
+                    (item.status === "TRAVELLED" && "bg-gray-500")
+                    } ${item.status === "IN-PROGRESS" ? "bg-blue-500" : ""
+                    } text-white p-1 m-1 rounded-full`}
+                >
+                  {!item.status ? "CONFIRMED" : item.status}
+                </button>
+              ),
+              opsSpoc: item.opsSpoc,
+              action: (
+                <button
+                  className="text-3xl"
+                  onClick={() => {
+                    navigate(`/viewAllBooking`, {
+                      state: { tripId: item.tripId },
+                    });
+                  }}
+                >
+                  <GrFormView />
+                </button>
+              ),
+              paymentstat: (
+                <button
+                  className={`${item.paymentStatus === "FULL-PAID"
+                      ? "bg-green-400"
+                      : "bg-red-400"
+                    } p-2 rounded-lg`}
+                ></button>
+              ),
+              validation: (
+                <button
+                  className={`${item.validation === "Finance" && "bg-green-400"
+                    } ${(item.validation === "Operations" && "bg-blue-400") ||
+                    "bg-red-400"
+                    }
+         p-2 rounded-lg`}
+                ></button>
+              ),
+              opsstatus: (
+                <button
+                  className={`${item.opsStatus === "COMPLETED"
+                      ? "bg-green-400"
+                      : "bg-red-400"
+                    } p-2 rounded-lg`}
+                ></button>
+              ),
+            }
+        )
+        .filter((stuff) => stuff !== true)
+      : [];
+    setBookings(bookings);
+  };
+
+  useEffect(() => {
+    (async () => {
+      const data = await fetchTrips();
+      setDownload(data)
+      const bookings = data
+        ? data
           .map(
             (item) =>
               (user &&
@@ -75,32 +183,27 @@ const AllBookings = () => {
                   item.departureDate
                 ),
                 contactDetails: `${item.countryCode} / ${item.whatsappNumber}`,
-                transferPrice:
-                  user.profile === "Sales"
-                    ? "N/A"
-                    : (parseFloat(item?.transferPrice) || 0) + " USD",
+                transferPrice: item?.transferPrice + " USD",
                 orderValue: item.orderValue + " USD",
                 apayment: (
                   <div
-                    className={`font-bold ${
-                      parseFloat(item.orderValue) === parseFloat(item?.payment)
+                    className={`font-bold ${parseFloat(item.orderValue) ===
+                        parseFloat(item?.payment)
                         ? "text-green-500"
                         : "text-red-500"
-                    }`}
+                      }`}
                   >
                     {item?.payment + " USD"}
                   </div>
                 ),
                 status: (
                   <button
-                    className={`${
-                      (item.status === "CANCELLED" && "bg-red-500") ||
+                    className={`${(item.status === "CANCELLED" && "bg-red-500") ||
                       (item.status === "ON-TOUR" && "bg-yellow-500") ||
                       (item.status === "CONFIRMED" && "bg-green-500") ||
                       (item.status === "TRAVELLED" && "bg-gray-500")
-                    } ${
-                      item.status === "IN-PROGRESS" ? "bg-blue-500" : ""
-                    } text-white p-1 m-1 rounded-full`}
+                      } ${item.status === "IN-PROGRESS" ? "bg-blue-500" : ""
+                      } text-white p-1 m-1 rounded-full`}
                   >
                     {!item.status ? "CONFIRMED" : item.status}
                   </button>
@@ -109,163 +212,43 @@ const AllBookings = () => {
                 action: (
                   <button
                     className="text-3xl"
-                    onClick={() => {
-                      navigate(`/viewAllBooking`, {
-                        state: { tripId: item.tripId },
-                      });
-                    }}
+                    onClick={() =>
+                      navigate("/viewAllBooking", { state: item })
+                    }
                   >
                     <GrFormView />
                   </button>
                 ),
                 paymentstat: (
                   <button
-                    className={`${
-                      item.paymentStatus === "FULL-PAID"
+                    className={`${item.paymentStatus === "FULL-PAID"
                         ? "bg-green-400"
                         : "bg-red-400"
-                    } p-2 rounded-lg`}
+                      } p-2 rounded-lg`}
                   ></button>
                 ),
                 validation: (
                   <button
-                    className={`${
-                      item.validation === "Finance" && "bg-green-400"
-                    } ${
-                      (item.validation === "Operations" && "bg-blue-400") ||
-                      "bg-red-400"
-                    }
+                    className={`${item.validation === "Finance" && "bg-green-400"
+                      } ${item.validation === "Operations" && "bg-blue-400"} ${item.validation === "Finance" ||
+                      item.validation === "Operations" ||
+                      ("bg-red-400" && "bg-red-400")
+                      }
          p-2 rounded-lg`}
                   ></button>
                 ),
                 opsstatus: (
                   <button
-                    className={`${
-                      item.opsStatus === "COMPLETED"
+                    className={`${item.opsStatus === "COMPLETED"
                         ? "bg-green-400"
                         : "bg-red-400"
-                    } p-2 rounded-lg`}
+                      } p-2 rounded-lg`}
                   ></button>
                 ),
               }
           )
           .filter((stuff) => stuff !== true)
-      : [];
-    console.log(bookings, "bookings");
-    setBookings(bookings);
-  };
-
-  useEffect(() => {
-    (async () => {
-      const data = await fetchTrips();
-      setDownload(data)
-      console.log(data, "data");
-      const bookings = data
-        ? data
-            .map(
-              (item) =>
-                (user &&
-                  user.profile === "Sales" &&
-                  user.name !== item.salesSpoc) || {
-                  arrivalDate: item.arrivalDate,
-                  departureDate: item.departureDate,
-                  tripID: item.tripId,
-                  destination: item.destination,
-                  bookingDate:
-                    item.bookingDate.slice(8, 10) +
-                    "/" +
-                    item.bookingDate.slice(5, 7) +
-                    "/" +
-                    item.bookingDate.slice(0, 4),
-                  customerName: (
-                    <div className="leading-[0.7]">
-                      <p>{item.customerName}</p> <br />
-                      <p>
-                        {renderPax(item.pax)}
-                      </p>
-                    </div>
-                  ),
-                  salesSPOC: item.salesSpoc,
-                  agent: item.agent,
-                  travelMonth: getTravelMonthRange(
-                    item.arrivalDate,
-                    item.departureDate
-                  ),
-                  contactDetails: `${item.countryCode} / ${item.whatsappNumber}`,
-                  transferPrice: item?.transferPrice + " USD",
-                  orderValue: item.orderValue + " USD",
-                  apayment: (
-                    <div
-                      className={`font-bold ${
-                        parseFloat(item.orderValue) ===
-                        parseFloat(item?.payment)
-                          ? "text-green-500"
-                          : "text-red-500"
-                      }`}
-                    >
-                      {item?.payment + " USD"}
-                    </div>
-                  ),
-                  status: (
-                    <button
-                      className={`${
-                        (item.status === "CANCELLED" && "bg-red-500") ||
-                        (item.status === "ON-TOUR" && "bg-yellow-500") ||
-                        (item.status === "CONFIRMED" && "bg-green-500") ||
-                        (item.status === "TRAVELLED" && "bg-gray-500")
-                      } ${
-                        item.status === "IN-PROGRESS" ? "bg-blue-500" : ""
-                      } text-white p-1 m-1 rounded-full`}
-                    >
-                      {!item.status ? "CONFIRMED" : item.status}
-                    </button>
-                  ),
-                  opsSpoc: item.opsSpoc,
-                  action: (
-                    <button
-                      className="text-3xl"
-                      onClick={() =>
-                        navigate("/viewAllBooking", { state: item })
-                      }
-                    >
-                      <GrFormView />
-                    </button>
-                  ),
-                  paymentstat: (
-                    <button
-                      className={`${
-                        item.paymentStatus === "FULL-PAID"
-                          ? "bg-green-400"
-                          : "bg-red-400"
-                      } p-2 rounded-lg`}
-                    ></button>
-                  ),
-                  validation: (
-                    <button
-                      className={`${
-                        item.validation === "Finance" && "bg-green-400"
-                      } ${item.validation === "Operations" && "bg-blue-400"} ${
-                        item.validation === "Finance" ||
-                        item.validation === "Operations" ||
-                        ("bg-red-400" && "bg-red-400")
-                      }
-         p-2 rounded-lg`}
-                    ></button>
-                  ),
-                  opsstatus: (
-                    <button
-                      className={`${
-                        item.opsStatus === "COMPLETED"
-                          ? "bg-green-400"
-                          : "bg-red-400"
-                      } p-2 rounded-lg`}
-                    ></button>
-                  ),
-                }
-            )
-            .filter((stuff) => stuff !== true)
         : [];
-      console.log(data, "bookings");
       setBookings(bookings);
     })();
   }, []);
@@ -327,7 +310,7 @@ const AllBookings = () => {
           </button>
         </div>
         <div className="mt-8">
-          <JsonToExcel data={download}/>
+          <JsonToExcel data={download} />
         </div>
       </div>
       <BackToHome />

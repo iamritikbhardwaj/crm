@@ -3,7 +3,6 @@ import { API_URL } from "../../AppConstant";
 import Swal from "sweetalert2";
 
 export const createIssue = async ( issue, tripId) => {
-    console.log(issue, "data from issue form in api call")
   const response = await axios.post(
     `${API_URL}users/createIssues?tripId=${tripId}`,
     issue,

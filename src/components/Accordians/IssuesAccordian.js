@@ -66,7 +66,6 @@ function IssuesAccordian({ active, setActive, tripId }) {
 
   const refetch = async () => {
     const data = await fetchIssues(tripId);
-    console.log(data, "issues from request");
     const rows = data.map((row) => ({
       date:
         Date(row.date).split(" ")[2] +
@@ -101,14 +100,17 @@ function IssuesAccordian({ active, setActive, tripId }) {
   }, [tripId]);
 
   return (
-    <div className="mb-2 relative">
-      <h2 className="text-lg font-semibold bg-gray-200 p-2 rounded flex justify-between">
+    <div className="mb-6 relative">
+    <div className="bg-gray-200 p-2 rounded flex justify-between">
+    <h2 className="text-lg font-semibold">
         Issues Overview
-        <span onClick={() => setActive(active === 6 ? null : 6)}>
-          <IoIosArrowDropdownCircle />
-        </span>
-      </h2>
-      <div className={`p-4 ${active === 6 ? "block" : "hidden"}`}>
+        </h2>
+        <button
+          onClick={() => setActive(active === 7 ? null : 7)}><IoIosArrowDropdownCircle />
+        </button>
+    </div>
+      
+      <div className={`p-4 ${active === 7 ? "block" : "hidden"}`}>
         <IssueForm hidden={showForm} tripId={tripId} refetch={refetch} />
         <div className="overflow-x-auto h-48">
           <CustomTable columnss={columns} dataa={issues} hideFilter={true} />

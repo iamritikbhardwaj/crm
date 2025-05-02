@@ -18,7 +18,6 @@ function DocForm() {
           ...prevDocs,
           { file: file, fileURL, catagory },
         ]);
-        console.log(documents, "documents");
       });
     }
   };
@@ -104,22 +103,22 @@ function DocForm() {
             <ul>
               {documents.length > 0
                 ? documents.map((doc, index) => (
-                    <li className="space-x-2" key={index}>
-                      <a
-                        href={doc.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        {doc.file.name}
-                      </a>
-                      <button
-                        className="text-red-400 hover:text-red-700"
-                        onClick={() => removeDocument(index)}
-                      >
-                        Remove
-                      </button>
-                    </li>
-                  ))
+                  <li className="space-x-2" key={index}>
+                    <a
+                      href={doc.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {doc.file.name}
+                    </a>
+                    <button
+                      className="text-red-400 hover:text-red-700"
+                      onClick={() => removeDocument(index)}
+                    >
+                      Remove
+                    </button>
+                  </li>
+                ))
                 : "No documents uploaded"}
             </ul>
           </div>

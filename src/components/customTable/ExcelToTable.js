@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import * as XLSX from 'xlsx';
 
 function ExcelToTable({url, setPrice}) {
-  console.log(url, "url");
   const [filesData, setFilesData] = useState([]); // Array to store data of multiple files
   const [selectedFileIndex, setSelectedFileIndex] = useState(null); // Index of the currently displayed file
   
@@ -44,14 +43,11 @@ function ExcelToTable({url, setPrice}) {
       
       // Convert sheet to JSON with raw: false as requested
       const sheetData = XLSX.utils.sheet_to_json(worksheet, { header: 1, raw: false });
-      console.log(sheetData, "Sheet Data");
 
       if (!sheetData || sheetData.length === 0) {
         console.error('Empty sheet or unreadable data');
         return;
       }
-  
-      console.log(sheetData, "Extracted Sheet Data");
   
       // Extract headers (row 0), ensuring no null headers
       const headers = sheetData[0].map((header, index) => ({
@@ -92,14 +88,12 @@ function ExcelToTable({url, setPrice}) {
           
           // Access the raw value directly from the sheet data
           const priceValue = filteredData[lastRowIndex][priceColumnIndex];
-          console.log("Raw price cell value:", priceValue);
           
           // Important: Because we're getting the price directly from the sheet data as a string,
           // we need to make sure we don't process it any further
           if (priceValue && typeof priceValue === 'string') {
             // Keep the full string value without any parsing/splitting
             const fullPrice = priceValue;
-            console.log("Setting full price:", fullPrice);
             
             // Ensure we're passing the entire string without modifications
             setPrice(fullPrice);
@@ -171,7 +165,6 @@ function ExcelToTable({url, setPrice}) {
                       // Additional styling for cells based on content or position
                       let cellStyle = {};
                       if (isLastRow && colIndex === columns.length - 2) {
-                        console.log("Price cell value in table:", cellValue);
                         // Highlight the price cell
                         cellStyle = { 
                           backgroundColor: '#f0f9ff', 

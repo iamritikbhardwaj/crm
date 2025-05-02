@@ -85,7 +85,6 @@ export const deletePayment = async (id, tripId) => {
       });
     const response = await axios.delete(`${API_URL}users/deletePayment/${id}`);
     const pay = await fetchPayment(tripId);
-        console.log(pay, "response");
         if (pay !== null) {
           Swal.fire({
             title: "Calculating...",

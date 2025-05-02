@@ -33,15 +33,13 @@ function CustomTable({ dataa, columnss, button, path, size, hideFilter }) {
     useFilters,
     useSortBy,
     usePagination
-  );  
+  );
 
-  console.log("Pagination state:", { pageIndex, pageCount });
 
   return (
     <div
-      className={`w-fit flex-col mx-auto justify-center text-center ${
-        size ? size : "text-sm"
-      }`}
+      className={`w-fit flex-col mx-auto justify-center text-center ${size ? size : "text-sm"
+        }`}
     >
 
       <div className="w-[1/4] flex flex-col items-end  mx-auto">
@@ -49,9 +47,8 @@ function CustomTable({ dataa, columnss, button, path, size, hideFilter }) {
           onClick={() => {
             navigate(path);
           }}
-          className={`bg-slate-800 ${
-            button ? "" : "hidden"
-          } text-white p-2 rounded-lg mx-2 hover:bg-slate-300`}
+          className={`bg-slate-800 ${button ? "" : "hidden"
+            } text-white p-2 rounded-lg mx-2 hover:bg-slate-300`}
         >
           {"+"}
         </button>
@@ -70,14 +67,15 @@ function CustomTable({ dataa, columnss, button, path, size, hideFilter }) {
                     {...column.getHeaderProps(column.getSortByToggleProps())}
                   >
                     {!hideFilter && (<div className="mb-2">
-                    <input
-                     className="text-black p-1 w-3/4 font-normal rounded-lg"
-                      value={column.filterValue}
-                      onChange={e => {column.setFilter(e.target.value)
-                      console.log(column.filterValue)}}  // Update filter value
-                      placeholder={`Search ${column.id}`}
-                    />
-                  </div>)}
+                      <input
+                        className="text-black p-1 w-3/4 font-normal rounded-lg"
+                        value={column.filterValue}
+                        onChange={e => {
+                          column.setFilter(e.target.value)
+                        }}  // Update filter value
+                        placeholder={`Search ${column.id}`}
+                      />
+                    </div>)}
                     {column.render("Header")}
                     {column.isSorted && (
                       <span>{column.isSortedDesc ? " 🔼 " : " 🔽 "}</span>

@@ -53,9 +53,7 @@ function Login() {
           credentials: "include",
         },
       });
-      console.log(response, "response");
       if (response) {
-        console.log(response.data, "response");
         const user = response.data.user;
         const token = response.data.token;
         if (response.data.STATUS === "SUCCESS") {

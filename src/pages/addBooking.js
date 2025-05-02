@@ -26,8 +26,7 @@ const AddBooking = () => {
   const [salesSpoc, setSalesSpoc] = useState([]);
   const [agent, setAgent] = useState([]);
   const location = useLocation();
-  const trip = location.state;
-  console.log(trip, "trip");
+  const trip = location.state; 
   const auth = useSelector((state) => state.auth);
   const user = auth.user;
   const navigate = useNavigate();
@@ -127,7 +126,6 @@ const AddBooking = () => {
     if (files.length > 0) {
       Array.from(files).forEach((file) => {
         const fileURL = URL.createObjectURL(file);
-        console.log(file, "file");
         if (documents) {
           setDocuments((prevDoc) => [
             ...prevDoc,

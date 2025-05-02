@@ -54,8 +54,7 @@ function UserForm() {
       setValue("status", data.status);
     }
   }, [data, setValue]);
-
-  console.log("errors", errors);
+ 
 
   const onSubmitForm = async (Formdata) => {
     // Handle form submission logic here
@@ -70,7 +69,6 @@ function UserForm() {
           },
         }
       );
-      console.log(response.data, "response");
       if (response.data.STATUS === "FAIL") {
         Swal.fire({
           icon: "error",
@@ -79,8 +77,7 @@ function UserForm() {
           showConfirmButton: true,
         });
       } else {
-        Swal.fire(`User ${id ? "updated" : "created"} successfully`);
-        console.log("Form Data Submitted:", data);
+        Swal.fire(`User ${id ? "updated" : "created"} successfully`); 
         navigate("/user");
       }
     } catch (error) {
