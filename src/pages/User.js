@@ -127,7 +127,7 @@ function User() {
   });
 
   return (
-    <div className="flex w-full h-screen p-4 justify-between">
+    <div className="flex w-full h-screen p-4 justify-between  bg-gradient-to-b from-slate-100 to-slate-300 rounded-b-lg shadow-inner">
       {/* <Header /> */}
       <div className="relative w-full top-0 right-0">
         <BackToHome />

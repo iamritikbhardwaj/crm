@@ -35,6 +35,7 @@ import {
 import { useSelector } from "react-redux";
 import IssuesAccordian from "../components/Accordians/IssuesAccordian";
 import PaymentAccordian from "../components/Accordians/PaymentAccordian";
+import { FaCertificate, FaDochub, FaExchangeAlt, FaExclamationCircle, FaFile, FaFileExcel, FaMoneyBill, FaWpforms } from "react-icons/fa";
 
 export default function VeiwAllBooking() {
   const location = useLocation();
@@ -294,7 +295,7 @@ export default function VeiwAllBooking() {
     try {
       // Check if pax is a string, if so parse it
       const paxData = typeof pax === "string" ? JSON.parse(pax) : pax;
-      
+
       // Now safely access the properties
       return `${paxData?.A || 0} A / ${paxData?.C || 0} C / ${paxData?.Ca || 0} Ca`;
     } catch (err) {
@@ -347,25 +348,29 @@ export default function VeiwAllBooking() {
   };
 
   return (
-    <div className="p-4">
+    <div className="p-4 h-screen w-full overflow-hidden bg-slate-800">
       <BackToHome path={"/schedule"} />
-      <div className="max-w-7xl 89 mx-auto p-4 md:p-6 bg-white shadow-lg rounded-lg mt-8">
-        <h1 className="text-2xl font-bold text-center mb-6">
+      <div className="max-w-7xl max-h-[90vh] overflow-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden bg-slate-700 89 mx-auto p-4 md:p-6 shadow-lg rounded-lg mt-8">
+        <h1 className="text-2xl font-bold text-center text-white mb-6">
           View Confirmed Booking
         </h1>
 
         {/* Booking Details */}
         <div className="mb-6">
-          <h2 className="text-lg font-semibold bg-gray-200 p-2 rounded flex justify-between">
-            Booking Details
-            <button onClick={() => setActive(active === 0 ? null : 0)}>
-              <IoIosArrowDropdownCircle />
-            </button>
-          </h2>
+        <div className='bg-gradient-to-r from-yellow-100 to-yellow-300 text-black p-3 rounded-lg flex justify-between items-center shadow-md'>
+        <h2 className="text-lg font-bold text-black flex items-center gap-2">
+          <FaWpforms />
+          Booking Details
+        </h2>
+        <button
+          className="text-black hover:text-yellow-300 transition-colors duration-300"
+          onClick={() => setActive(active === 0 ? null : 0)}>
+          <IoIosArrowDropdownCircle size={24} />
+        </button>
+      </div>
           <div
-            className={`${
-              active === 0 ? "block" : "hidden"
-            } grid grid-cols-2 gap-4 p-4`}
+            className={`${active === 0 ? "block" : "hidden"
+              }  bg-gradient-to-b from-slate-200 to-slate-400 rounded-b-lg shadow-inner grid grid-cols-2 gap-4 p-4`}
           >
             {[
               ["Destination", item?.destination],
@@ -380,31 +385,30 @@ export default function VeiwAllBooking() {
               [
                 "Arrival Date",
                 item?.arrivalDate.slice(0, 10).split("-")[2] +
-                  " " +
-                  getTravelMonthRange(item?.arrivalDate),
+                " " +
+                getTravelMonthRange(item?.arrivalDate),
               ],
               [
                 "Departure Date",
                 item?.departureDate.slice(0, 10).split("-")[2] +
-                  " " +
-                  getTravelMonthRange(item?.departureDate),
+                " " +
+                getTravelMonthRange(item?.departureDate),
               ],
               [
                 "Booking Date",
                 item?.bookingDate.slice(0, 10).split("-")[2] +
-                  " " +
-                  getTravelMonthRange(item?.bookingDate),
+                " " +
+                getTravelMonthRange(item?.bookingDate),
               ],
               [
                 "WhatsApp Number",
                 <button key={item?.tripId}>
                   {item?.countryCode} {item?.whatsappNumber}{" "}
                   <MdEdit
-                    className={` ${
-                      user.profile === "Sales" || user.profile === "Finance"
-                        ? "hidden"
-                        : "flex"
-                    } ml-2`}
+                    className={` ${user.profile === "Sales" || user.profile === "Finance"
+                      ? "hidden"
+                      : "flex"
+                      } ml-2`}
                     onClick={() => setWhatsForm(!whatsForm)}
                   />
                 </button>,
@@ -428,7 +432,7 @@ export default function VeiwAllBooking() {
               [
                 "Trip Status",
                 <select
-                key={item?.tripId}
+                  key={item?.tripId}
                   value={item?.status}
                   onChange={updateStatus}
                   disabled={
@@ -457,13 +461,18 @@ export default function VeiwAllBooking() {
 
         {/* Document Upload */}
         <div className="mb-6">
-          <h2 className="text-lg font-semibold bg-gray-200 p-2 rounded flex justify-between">
-            Document Upload
-            <button onClick={() => setActive(active === 1 ? null : 1)}>
-              <IoIosArrowDropdownCircle />
-            </button>
-          </h2>
-          <div className={`p-4 ${active === 1 ? "block" : "hidden"}`}>
+        <div className='bg-gradient-to-r from-yellow-100 to-yellow-300 text-black p-3 rounded-lg flex justify-between items-center shadow-md'>
+        <h2 className="text-lg font-bold text-black flex items-center gap-2">
+          <FaFile />
+          Documents Upload
+        </h2>
+        <button
+          className="text-black hover:text-yellow-300 transition-colors duration-300"
+          onClick={() => setActive(active === 1 ? null : 1)}>
+          <IoIosArrowDropdownCircle size={24} />
+        </button>
+      </div>
+          <div className={`p-4 ${active === 1 ? "block" : "hidden"} bg-gradient-to-b from-slate-200 to-slate-400 rounded-b-lg shadow-inner`}>
             <div className="flex justify-end">
               <button
                 onClick={updateDocs}
@@ -480,11 +489,10 @@ export default function VeiwAllBooking() {
             <div className="flex">
               {/* Document Upload List */}
               <div
-                className={`w-1/2 ${
-                  user.profile !== "Admin" &&
+                className={`w-1/2 ${user.profile !== "Admin" &&
                   user.name !== item?.opsSpoc &&
                   "hidden"
-                } border-r border-gray-300 px-2 space-y-2`}
+                  } border-r border-gray-300 px-2 space-y-2`}
               >
                 <FileUpload
                   label={"Air Ticket"}
@@ -525,30 +533,30 @@ export default function VeiwAllBooking() {
                 <ul>
                   {doc
                     ? doc.map(
-                        (file, index) =>
-                          String(file).includes(
-                            "xls",
-                            "xlsx",
-                            "doc",
-                            "docx"
-                          ) || (
-                            <li className="space-x-2" key={index}>
-                              <a
-                                href={file.url || file}
-                                // target="_blank"
-                                // rel="noopener noreferrer"
-                              >
-                                {file?.file?.name || splitIt(file)}
-                              </a>
-                              <button
-                                className={`text-red-400 rounded-lg cursor-pointer hover:text-red-700`}
-                                onClick={() => removeDoc(index)}
-                              >
-                                Remove
-                              </button>
-                            </li>
-                          )
-                      )
+                      (file, index) =>
+                        String(file).includes(
+                          "xls",
+                          "xlsx",
+                          "doc",
+                          "docx"
+                        ) || (
+                          <li className="space-x-2" key={index}>
+                            <a
+                              href={file.url || file}
+                            // target="_blank"
+                            // rel="noopener noreferrer"
+                            >
+                              {file?.file?.name || splitIt(file)}
+                            </a>
+                            <button
+                              className={`text-red-700 rounded-lg cursor-pointer hover:text-red-900`}
+                              onClick={() => removeDoc(index)}
+                            >
+                              Remove
+                            </button>
+                          </li>
+                        )
+                    )
                     : "No documents uploaded"}
                 </ul>
               </div>
@@ -558,13 +566,18 @@ export default function VeiwAllBooking() {
 
         {/* Commercials */}
         <div className="mb-6">
-          <h2 className="text-lg font-semibold bg-gray-200 p-2 rounded flex justify-between">
-            Commercials
-            <button onClick={() => setActive(active === 2 ? null : 2)}>
-              <IoIosArrowDropdownCircle />
-            </button>
-          </h2>
-          <div className={`p-4 ${active === 2 ? "block" : "hidden"}`}>
+        <div className='bg-gradient-to-r from-yellow-100 to-yellow-300 text-black p-3 rounded-lg flex justify-between items-center shadow-md'>
+        <h2 className="text-lg font-bold text-black flex items-center gap-2">
+          <FaMoneyBill />
+          Commercials
+        </h2>
+        <button
+          className="text-black hover:text-yellow-300 transition-colors duration-300"
+          onClick={() => setActive(active === 2 ? null : 2)}>
+          <IoIosArrowDropdownCircle size={24} />
+        </button>
+      </div>
+          <div className={`p-4 ${active === 2 ? "block" : "hidden"} bg-gradient-to-b from-slate-200 to-slate-400 rounded-b-lg shadow-inner`}>
             <div className="flex justify-between">
               <p className="font-semibold">
                 Order Value (USD):{" "}
@@ -588,13 +601,12 @@ export default function VeiwAllBooking() {
                 Save Changes
               </button>
               <p
-                className={`font-semibold ${
-                  user.profile !== "Admin" &&
+                className={`font-semibold ${user.profile !== "Admin" &&
                   user.name !== item?.opsSpoc &&
                   user.profile !== "Finance"
-                    ? "hidden"
-                    : ""
-                }`}
+                  ? "hidden"
+                  : ""
+                  }`}
               >
                 Transfer Price(USD): {transferPrice}
               </p>
@@ -677,7 +689,7 @@ export default function VeiwAllBooking() {
                           user.name !== item?.opsSpoc &&
                           user.profile !== "Finance"
                         }
-                        className="text-red-600"
+                        className="text-red-700"
                       >
                         <MdDelete />
                       </button>
@@ -702,13 +714,12 @@ export default function VeiwAllBooking() {
 
             {/* Booking Reconciliation Table */}
             <div
-              className={`mb-4 ${
-                user.profile !== "Admin" &&
+              className={`mb-4 ${user.profile !== "Admin" &&
                 user.name !== item?.opsSpoc &&
                 user.profile !== "Finance"
-                  ? "hidden"
-                  : ""
-              }`}
+                ? "hidden"
+                : ""
+                }`}
             >
               <h3 className="font-semibold mb-2">Booking Reconciliation</h3>
               {/* Edit Form */}
@@ -760,8 +771,8 @@ export default function VeiwAllBooking() {
                         onClick={async () => {
                           if (
                             parseFloat(data?.online) +
-                              parseFloat(data?.offline) +
-                              parseFloat(data?.land) !==
+                            parseFloat(data?.offline) +
+                            parseFloat(data?.land) !==
                             parseFloat(item.orderValue)
                           ) {
                             Swal.fire(
@@ -798,7 +809,7 @@ export default function VeiwAllBooking() {
                           user.name !== item?.opsSpoc &&
                           user.profile !== "Finance"
                         }
-                        className="text-red-600"
+                        className="text-red-700"
                       >
                         <MdDelete />
                       </button>
@@ -823,21 +834,25 @@ export default function VeiwAllBooking() {
 
         {/* Freeze Quotation */}
         <div
-          className={`mb-6 ${
-            user.profile !== "Admin" &&
+          className={`mb-6 ${user.profile !== "Admin" &&
             user.name !== item?.opsSpoc &&
             user.profile !== "Finance"
-              ? "hidden"
-              : ""
-          }`}
+            ? "hidden"
+            : ""
+            }`}
         >
-          <h2 className="text-lg font-semibold bg-gray-200 p-2 rounded flex justify-between">
-            Freeze Quotation
-            <button onClick={() => setActive(active === 3 ? null : 3)}>
-              <IoIosArrowDropdownCircle />
-            </button>
-          </h2>
-          <div className={`p-4 ${active === 3 ? "flex-col" : "hidden"} h-fit`}>
+          <div className='bg-gradient-to-r from-yellow-100 to-yellow-300 text-black p-3 rounded-lg flex justify-between items-center shadow-md'>
+                  <h2 className="text-lg font-bold text-black flex items-center gap-2">
+                    <FaFileExcel />
+                    Freeze Quotation
+                  </h2>
+                  <button
+                    className="text-black hover:text-yellow-300 transition-colors duration-300"
+                    onClick={() => setActive(active === 3 ? null : 3)}>
+                    <IoIosArrowDropdownCircle size={24} />
+                  </button>
+                </div>
+          <div className={`p-4 ${active === 3 ? "flex-col" : "hidden"} h-fit bg-gradient-to-b from-slate-200 to-slate-400 rounded-b-lg shadow-inner`}>
             <div className="flex justify-between">
               <button
                 onClick={updateDocs}
@@ -874,11 +889,10 @@ export default function VeiwAllBooking() {
                   user.name !== item?.opsSpoc &&
                   user.profile !== "Finance"
                 }
-                className={`${
-                  item?.transferPrice === transferPrice
-                    ? "bg-blue-500"
-                    : "bg-red-500"
-                } rounded-lg px-2 m-2 text-white py-1`}
+                className={`${item?.transferPrice === transferPrice
+                  ? "bg-blue-500"
+                  : "bg-red-500"
+                  } rounded-lg px-2 m-2 text-white py-1`}
               >
                 Save Transfer Price
               </button>
@@ -888,11 +902,10 @@ export default function VeiwAllBooking() {
             </div>
             <div className="flex gap-4">
               <div
-                className={`w-1/2 ${
-                  user.profile !== "Admin" && user.name !== item?.opsSpoc
-                    ? "hidden"
-                    : ""
-                }`}
+                className={`w-1/2 ${user.profile !== "Admin" && user.name !== item?.opsSpoc
+                  ? "hidden"
+                  : ""
+                  }`}
               >
                 <FileUpload
                   label={"Sales Sheet"}
@@ -908,28 +921,28 @@ export default function VeiwAllBooking() {
                 <ul>
                   {doc
                     ? doc.map(
-                        (file, index) =>
-                          String(file).includes("xls") && (
-                            <li className="space-x-2" key={index}>
-                              <a
-                                onClick={handleFreezeQuotationClick}
-                                href={file}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                              >
-                                {new String(file).includes("http" || "https")
-                                  ? splitIt(file)
-                                  : file?.file?.name}
-                              </a>
-                              <button
-                                className="text-red-400 rounded-lg cursor-pointer hover:text-red-700"
-                                onClick={() => removeDoc(index)}
-                              >
-                                Remove
-                              </button>
-                            </li>
-                          )
-                      )
+                      (file, index) =>
+                        String(file).includes("xls") && (
+                          <li className="space-x-2" key={index}>
+                            <a
+                              onClick={handleFreezeQuotationClick}
+                              href={file}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              {new String(file).includes("http" || "https")
+                                ? splitIt(file)
+                                : file?.file?.name}
+                            </a>
+                            <button
+                              className="text-red-700 rounded-lg cursor-pointer hover:text-red-900"
+                              onClick={() => removeDoc(index)}
+                            >
+                              Remove
+                            </button>
+                          </li>
+                        )
+                    )
                     : "No documents uploaded"}
                 </ul>
               </div>
@@ -939,21 +952,25 @@ export default function VeiwAllBooking() {
 
         {/* vendor details */}
         <div
-          className={`mb-6 ${
-            user.profile !== "Admin" &&
+          className={`mb-6 ${user.profile !== "Admin" &&
             user.name !== item?.opsSpoc &&
             user.profile !== "Finance"
-              ? "hidden"
-              : ""
-          }`}
+            ? "hidden"
+            : ""
+            }`}
         >
-          <h2 className="text-lg font-semibold bg-gray-200 p-2 rounded flex justify-between">
-            Supplier Details
-            <button onClick={() => setActive(active === 4 ? null : 4)}>
-              <IoIosArrowDropdownCircle />
-            </button>
-          </h2>
-          <div className={`p-4 ${active === 4 ? "block" : "hidden"}`}>
+          <div className='bg-gradient-to-r from-yellow-100 to-yellow-300 text-black p-3 rounded-lg flex justify-between items-center shadow-md'>
+                  <h2 className="text-lg font-bold text-black flex items-center gap-2">
+                    <FaExchangeAlt />
+                    Supplier Payments
+                  </h2>
+                  <button
+                    className="text-black hover:text-yellow-300 transition-colors duration-300"
+                    onClick={() => setActive(active === 4 ? null : 4)}>
+                    <IoIosArrowDropdownCircle size={24} />
+                  </button>
+                </div>
+          <div className={`p-4 ${active === 4 ? "block" : "hidden"} bg-gradient-to-b from-slate-200 to-slate-400 rounded-b-lg shadow-inner`}>
             <VendorForm
               setInputData={setInputData}
               tripId={tripId}
@@ -1015,7 +1032,7 @@ export default function VeiwAllBooking() {
                         user.name !== item?.opsSpoc &&
                         user.profile !== "Finance"
                       }
-                      className="text-red-600"
+                      className="text-red-700"
                     >
                       <MdDelete />
                     </button>
@@ -1037,62 +1054,67 @@ export default function VeiwAllBooking() {
         </div>
         {/* Voucher details */}
         <div className="mb-6">
-        <h2 className="text-lg font-semibold bg-gray-200 p-2 rounded flex justify-between">
-          Voucher Details
-          <button
-          onClick={() => setActive(active === 5 ? null : 5)}><IoIosArrowDropdownCircle /></button>
-        </h2>
-        <div className={`p-4 ${active === 5 ? "flex" : "hidden"} min-h-36`}>
-          <div
-            className={`w-1/2 ${
-              user.profile !== "Admin" && user.name !== item?.opsSpoc
-            } my-auto px-2 h-full border-r-[1px] space-y-2 border-slate-400`}
-          >
-            <FileUpload
-              label={"Hotel Voucher"}
-              id={"hotelvoucher"}
-              onChange={addDoc}
-              onRemove={removeDoc}
-              toAccept="application/pdf, image/*,.docs,.docx,.doc,application/vnd.ms-excel"
-              files={doc}
-              catagory={"hotelvoucher"}
-            />
-            <FileUpload
-              label={"Activities Voucher"}
-              id={"activitiesvoucher"}
-              onChange={addDoc}
-              onRemove={removeDoc}
-              toAccept="application/pdf, image/*,.docs,.docx,.doc,application/vnd.ms-excel"
-              files={doc}
-              catagory={"activitiesvoucher"}
-            />
-            <FileUpload
-              label={"Transfer Voucher"}
-              id={"miscvoucher"}
-              onChange={addDoc}
-              onRemove={removeDoc}
-              toAccept="application/pdf, image/*,.docs,.docx,.doc,application/vnd.ms-excel"
-              files={doc}
-              catagory={"miscvoucher"}
-            />
+          <div className='bg-gradient-to-r from-yellow-100 to-yellow-300 text-black p-3 rounded-lg flex justify-between items-center shadow-md'>
+            <h2 className="text-lg font-bold text-black flex items-center gap-2">
+              <FaCertificate />
+              Voucher Details
+            </h2>
+            <button
+              className="text-black hover:text-yellow-300 transition-colors duration-300"
+              onClick={() => setActive(active === 5 ? null : 5)}>
+              <IoIosArrowDropdownCircle size={24} />
+            </button>
           </div>
-          <div className="w-1/2">
-            <div className="flex justify-end">
-              <button
-                onClick={voucherUpdate}
-                disabled={
-                  user.profile !== "Admin" &&
-                  user.name !== item?.opsSpoc &&
-                  user.profile !== "Finance"
-                }
-                className="bg-blue-500 rounded-lg px-2 m-2 text-white py-1"
-              >
-                Save documents
-              </button>
+          <div className={`p-4 ${active === 5 ? "flex" : "hidden"} min-h-36 bg-gradient-to-b from-slate-200 to-slate-400 rounded-b-lg shadow-inner`}>
+            <div
+              className={`w-1/2 ${user.profile !== "Admin" && user.name !== item?.opsSpoc
+                } my-auto px-2 h-full border-r-[1px] space-y-2 border-slate-400`}
+            >
+              <FileUpload
+                label={"Hotel Voucher"}
+                id={"hotelvoucher"}
+                onChange={addDoc}
+                onRemove={removeDoc}
+                toAccept="application/pdf, image/*,.docs,.docx,.doc,application/vnd.ms-excel"
+                files={doc}
+                catagory={"hotelvoucher"}
+              />
+              <FileUpload
+                label={"Activities Voucher"}
+                id={"activitiesvoucher"}
+                onChange={addDoc}
+                onRemove={removeDoc}
+                toAccept="application/pdf, image/*,.docs,.docx,.doc,application/vnd.ms-excel"
+                files={doc}
+                catagory={"activitiesvoucher"}
+              />
+              <FileUpload
+                label={"Transfer Voucher"}
+                id={"miscvoucher"}
+                onChange={addDoc}
+                onRemove={removeDoc}
+                toAccept="application/pdf, image/*,.docs,.docx,.doc,application/vnd.ms-excel"
+                files={doc}
+                catagory={"miscvoucher"}
+              />
             </div>
-            <ul>
-              {doc
-                ? doc.map(
+            <div className="w-1/2">
+              <div className="flex justify-end">
+                <button
+                  onClick={voucherUpdate}
+                  disabled={
+                    user.profile !== "Admin" &&
+                    user.name !== item?.opsSpoc &&
+                    user.profile !== "Finance"
+                  }
+                  className="bg-blue-500 rounded-lg px-2 m-2 text-white py-1"
+                >
+                  Save documents
+                </button>
+              </div>
+              <ul>
+                {doc
+                  ? doc.map(
                     (file, index) =>
                       String(file).includes("voucher", "doc", "docx") && (
                         <li className="space-x-2" key={index}>
@@ -1106,7 +1128,7 @@ export default function VeiwAllBooking() {
                               : file?.file?.name}
                           </a>
                           <button
-                            className="text-red-400 rounded-lg cursor-pointer hover:text-red-700"
+                            className="text-red-700 rounded-lg cursor-pointer hover:text-red-900"
                             onClick={() => removeDoc(index)}
                           >
                             Remove
@@ -1114,15 +1136,15 @@ export default function VeiwAllBooking() {
                         </li>
                       )
                   )
-                : "No documents uploaded"}
-            </ul>
+                  : "No documents uploaded"}
+              </ul>
+            </div>
           </div>
         </div>
-        </div>
         {/* Issues details */}
-        <IssuesAccordian active={active} setActive={setActive} tripId={tripId}/>
+        <IssuesAccordian active={active} setActive={setActive} tripId={tripId} />
         {/* Payment details */}
-        <PaymentAccordian active={active} setActive={setActive} tripId={tripId}/>
+        <PaymentAccordian active={active} setActive={setActive} tripId={tripId} agent={item?.agent} />
       </div>
     </div>
   );

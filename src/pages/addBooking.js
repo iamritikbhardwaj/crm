@@ -249,7 +249,7 @@ const AddBooking = () => {
   // Handle form submission
 
   return (
-    <div className="container mx-auto p-6 bg-gray-100">
+    <div className="container mx-auto p-6 bg-gradient-to-b from-slate-100 to-slate-300 rounded-b-lg shadow-inner">
       <BackToHome path="/booking" />
       <h1 className="text-3xl font-bold text-center mb-6">
        {trip !== null ? "Edit Booking" : "Create New Booking"}

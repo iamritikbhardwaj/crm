@@ -80,10 +80,10 @@ function Login() {
   };
 
   return (
-    <div className="flex justify-center text-center m-20">
+    <div className="w-fit h-fit overflow-hidden flex justify-center text-center m-20 ">
       <form
         onSubmit={handleSubmit(loginSubmit)}
-        className="flex-col flex text-center"
+        className="grid grid-cols-1 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
       >
         <TextField
           variant="outlined"

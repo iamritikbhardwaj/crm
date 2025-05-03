@@ -5,6 +5,7 @@ import { MdDelete, MdEdit } from "react-icons/md";
 import IssueForm from "../Form/issueForm";
 import { fetchIssues } from "../apiCalls/fetchData";
 import { deleteIssue } from "../apiCalls/deleteData";
+import { FaExclamationCircle } from "react-icons/fa";
 
 function IssuesAccordian({ active, setActive, tripId }) {
   const [issues, setIssues] = React.useState(
@@ -101,16 +102,19 @@ function IssuesAccordian({ active, setActive, tripId }) {
 
   return (
     <div className="mb-6 relative">
-    <div className="bg-gray-200 p-2 rounded flex justify-between">
-    <h2 className="text-lg font-semibold">
-        Issues Overview
+      <div className='bg-gradient-to-r from-yellow-100 to-yellow-300 text-black p-3 rounded-lg flex justify-between items-center shadow-md'>
+        <h2 className="text-lg font-bold text-black flex items-center gap-2">
+          <FaExclamationCircle />
+          Issues Overview
         </h2>
         <button
-          onClick={() => setActive(active === 7 ? null : 7)}><IoIosArrowDropdownCircle />
+          className="text-black hover:text-yellow-300 transition-colors duration-300"
+          onClick={() => setActive(active === 7 ? null : 7)}>
+          <IoIosArrowDropdownCircle size={24} />
         </button>
-    </div>
-      
-      <div className={`p-4 ${active === 7 ? "block" : "hidden"}`}>
+      </div>
+
+      <div className={`p-4 ${active === 7 ? "block" : "hidden"} bg-gradient-to-b from-slate-200 to-slate-400 rounded-b-lg shadow-inner`}>
         <IssueForm hidden={showForm} tripId={tripId} refetch={refetch} />
         <div className="overflow-x-auto h-48">
           <CustomTable columnss={columns} dataa={issues} hideFilter={true} />

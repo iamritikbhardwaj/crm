@@ -137,7 +137,7 @@ const NewBooking = () => {
   }, [navigate]);
 
   return (
-    <div className="box-border border-4 p-4 overflow-auto">
+    <div className="box-border border-4 p-4 overflow-auto w-full h-screen bg-gradient-to-b from-slate-100 to-slate-300 rounded-b-lg shadow-inner">
       <BackToHome />
       <CustomTable
         columnss={col}

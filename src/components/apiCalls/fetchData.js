@@ -216,3 +216,17 @@ export const fetchIssues = async (tripId) => {
     })
   }
 }
+
+export const fetchPayLinks = async (tripId) => {
+  const response = await axios.get(`${API_URL}users/getAllPaymentLinks?tripId=${tripId}`)
+  if(response.status === 200) {
+    return response.data.OUTPUT
+  } else{
+    Swal.fire({
+      title: "Opps!",
+      text: response.data.MESSAGE,
+      icon: "error",
+      showConfirmButton: true,
+    })
+  }
+}

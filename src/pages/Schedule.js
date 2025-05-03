@@ -83,8 +83,8 @@ const AllBookings = () => {
               apayment: (
                 <div
                   className={`font-bold ${parseFloat(item.orderValue) === parseFloat(item?.payment)
-                      ? "text-green-500"
-                      : "text-red-500"
+                      ? "text-green-700"
+                      : "text-red-700"
                     }`}
                 >
                   {item?.payment + " USD"}
@@ -189,8 +189,8 @@ const AllBookings = () => {
                   <div
                     className={`font-bold ${parseFloat(item.orderValue) ===
                         parseFloat(item?.payment)
-                        ? "text-green-500"
-                        : "text-red-500"
+                        ? "text-green-700"
+                        : "text-red-700"
                       }`}
                   >
                     {item?.payment + " USD"}
@@ -276,7 +276,7 @@ const AllBookings = () => {
   ];
 
   return (
-    <div className="flex-col justify-center mt-6 mx-auto p-4">
+    <div className="flex-col justify-center mt-6 mx-auto p-4 overflow-auto scrollbar-hide h-screen w-full bg-gradient-to-b from-slate-100 to-slate-300 rounded-b-lg shadow-inner">
       <div className="flex justify-center gap-4 mb-6">
         <div>
           <label htmlFor="fromDate" className="block mb-1">

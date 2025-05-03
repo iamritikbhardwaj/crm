@@ -255,7 +255,7 @@ function Setting() {
 
   return (
     <>
-      <div className="flex justify-around p-4 w-full h-full items-center overflow-y-auto content-center">
+      <div className="flex justify-around p-4 w-full h-screen items-center overflow-y-auto content-center  bg-gradient-to-b from-slate-100 to-slate-300 rounded-b-lg shadow-inner">
         {/* Back to Home Button */}
         <div className="absolute top-2 left-2">
           <BackToHome path={"/"} />

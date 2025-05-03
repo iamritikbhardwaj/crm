@@ -13,10 +13,10 @@ function App() {
   }, [isAuthenticated]);
 
     return (
-      <>
+      <div className="h-screen w-full  bg-gradient-to-b from-slate-100 to-slate-300 shadow-inner">
         {isAuthenticated ? <Header /> : <Login />}
         <Outlet />
-      </>
+      </div>
     );
 }
 

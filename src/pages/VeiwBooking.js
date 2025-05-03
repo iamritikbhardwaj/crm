@@ -188,23 +188,25 @@ export default function VeiwBooking() {
   };
 
   return (
-    <div className="p-4">
-      <BackToHome path="/booking" />
-      <div className="max-w-4xl mx-auto p-4 md:p-6 bg-white shadow-lg rounded-lg mt-8">
-        <h1 className="text-2xl font-bold text-center mb-6">View Booking</h1>
+    <div className="p-4 bg-slate-800">
+      <BackToHome path={"/booking"} />
+      <div className="max-w-7xl bg-slate-700 89 mx-auto p-4 md:p-6 shadow-lg rounded-lg mt-8">
+        <h1 className="text-2xl font-bold text-center text-yellow-100 mb-6">View Booking</h1>
 
         {/* Booking Details */}
         <div className="mb-6">
-          <h2 className="text-lg font-semibold bg-gray-200 p-2 rounded flex justify-between">
-            Booking Details
-            <span onClick={() => setActive(active === 0 ? null : 0)}>
-              <IoIosArrowDropdownCircle />
-            </span>
-          </h2>
+          <div className='bg-gradient-to-r from-yellow-100 to-yellow-300 text-black p-3 rounded-lg flex justify-between items-center shadow-md'>
+            <h2 className="text-lg font-bold text-black">
+              Booking Details
+            </h2>
+            <button
+              onClick={() => setActive(active === 0 ? null : 0)}>
+              <IoIosArrowDropdownCircle size={24} />
+            </button>
+          </div>
           <div
-            className={`${
-              active === 0 ? "block" : "hidden"
-            } grid grid-cols-2 gap-4 p-4`}
+            className={`${active === 0 ? "block" : "hidden"
+              } bg-gradient-to-b from-slate-200 to-slate-400 rounded-b-lg shadow-inner grid grid-cols-2 gap-4 p-4`}
           >
             {[
               ["Destination", data.destination],
@@ -214,12 +216,12 @@ export default function VeiwBooking() {
               [
                 "Number of Pax",
                 data?.pax.A +
-                  " A " +
-                  " / " +
-                  data?.pax.C +
-                  " C " +
-                  "- " +
-                  (data?.pax?.Ca === undefined ? "" : data?.pax.Ca),
+                " A " +
+                " / " +
+                data?.pax.C +
+                " C " +
+                "- " +
+                (data?.pax?.Ca === undefined ? "" : data?.pax.Ca),
               ],
               [
                 "Travel Month",
@@ -228,20 +230,20 @@ export default function VeiwBooking() {
               [
                 "Arrival Date",
                 data?.arrivalDate.slice(0, 10).split("-")[2] +
-                  " " +
-                  getTravelMonthRange(data?.arrivalDate),
+                " " +
+                getTravelMonthRange(data?.arrivalDate),
               ],
               [
                 "Departure Date",
                 data?.departureDate.slice(0, 10).split("-")[2] +
-                  " " +
-                  getTravelMonthRange(data?.departureDate),
+                " " +
+                getTravelMonthRange(data?.departureDate),
               ],
               [
                 "Booking Date",
                 data?.bookingDate.slice(0, 10).split("-")[2] +
-                  " " +
-                  getTravelMonthRange(data?.bookingDate),
+                " " +
+                getTravelMonthRange(data?.bookingDate),
               ],
               ["WhatsApp Number", data.countryCode + " " + data.whatsappNumber],
               [
@@ -273,13 +275,15 @@ export default function VeiwBooking() {
 
         {/* Document Upload */}
         <div className="mb-6">
-          <h2 className="text-lg font-semibold bg-gray-200 p-2 rounded flex justify-between">
-            Document Upload
-            <span onClick={() => setActive(active === 1 ? null : 1)}>
-              <IoIosArrowDropdownCircle />
-            </span>
-          </h2>
-          <div className={`p-4 ${active === 1 ? "block" : "hidden"}`}>
+          <div className='bg-gradient-to-r from-yellow-100 to-yellow-300 text-black p-3 rounded-lg flex justify-between items-center shadow-md'>
+            <h2 className="text-lg font-bold text-black flex items-center justify-between gap-2">
+              Document Upload
+            </h2>
+            <button onClick={() => setActive(active === 1 ? null : 1)}>
+              <IoIosArrowDropdownCircle size={24} />
+            </button>
+          </div>
+          <div className={`p-4 ${active === 1 ? "block" : "hidden"} bg-gradient-to-b from-slate-200 to-slate-400 rounded-b-lg shadow-inner`}>
             <div className="flex">
               {/* Document Upload List */}
               <div className="w-1/2 border-r border-gray-300 px-2 space-y-2">
@@ -322,29 +326,29 @@ export default function VeiwBooking() {
                 <ul>
                   {doc
                     ? doc.map(
-                        (file, index) =>
-                          !new String(file).includes("freezeQuotation") && (
-                            <li className="space-x-2" key={index}>
-                              <a
-                                href={
-                                  file.hasOwnProperty("file") ? file.url : file
-                                }
-                                target="_blank"
-                                rel="noopener noreferrer"
-                              >
-                                {file.hasOwnProperty("file")
-                                  ? file.file.name
-                                  : splitIt(file)}
-                              </a>
-                              <button
-                                className="text-red-400 rounded-lg cursor-pointer hover:text-red-700"
-                                onClick={() => removeDoc(index)}
-                              >
-                                Remove
-                              </button>
-                            </li>
-                          )
-                      )
+                      (file, index) =>
+                        !new String(file).includes("freezeQuotation") && (
+                          <li className="space-x-2" key={index}>
+                            <a
+                              href={
+                                file.hasOwnProperty("file") ? file.url : file
+                              }
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              {file.hasOwnProperty("file")
+                                ? file.file.name
+                                : splitIt(file)}
+                            </a>
+                            <button
+                              className="text-red-400 rounded-lg cursor-pointer hover:text-red-700"
+                              onClick={() => removeDoc(index)}
+                            >
+                              Remove
+                            </button>
+                          </li>
+                        )
+                    )
                     : "No documents uploaded"}
                 </ul>
               </div>
@@ -354,13 +358,15 @@ export default function VeiwBooking() {
 
         {/* Commercials */}
         <div className="mb-6">
-          <h2 className="text-lg font-semibold bg-gray-200 p-2 rounded flex justify-between">
-            Commercials
-            <span onClick={() => setActive(active === 2 ? null : 2)}>
-              <IoIosArrowDropdownCircle />
-            </span>
-          </h2>
-          <div className={`p-4 ${active === 2 ? "block" : "hidden"}`}>
+          <div className='bg-gradient-to-r from-yellow-100 to-yellow-300 text-black p-3 rounded-lg flex justify-between items-center shadow-md'>
+            <h2 className="text-lg font-bold text-black">
+              Commercials
+            </h2>
+            <button onClick={() => setActive(active === 2 ? null : 2)}>
+              <IoIosArrowDropdownCircle size={24} />
+            </button>
+          </div>
+          <div className={`p-4 ${active === 2 ? "block" : "hidden"} bg-gradient-to-b from-slate-200 to-slate-400 rounded-b-lg shadow-inner`}>
             <label className="font-semibold">Order Value (USD):</label>
             <input
               type="number"
@@ -376,13 +382,15 @@ export default function VeiwBooking() {
 
         {/* Freeze Quotation */}
         <div className="mb-6">
-          <h2 className="text-lg font-semibold bg-gray-200 p-2 rounded flex justify-between">
-            Freeze Quotation
-            <span onClick={() => setActive(active === 3 ? null : 3)}>
-              <IoIosArrowDropdownCircle />
-            </span>
-          </h2>
-          <div className={`p-4 ${active === 3 ? "flex" : "hidden"}`}>
+          <div className='bg-gradient-to-r from-yellow-100 to-yellow-300 text-black p-3 rounded-lg flex justify-between items-center shadow-md'>
+            <h2 className="text-lg font-bold text-black">
+              Freeze Quotation
+            </h2>
+            <button onClick={() => setActive(active === 3 ? null : 3)}>
+              <IoIosArrowDropdownCircle size={24} />
+            </button>
+          </div>
+          <div className={`p-4 ${active === 3 ? "flex" : "hidden"} bg-gradient-to-b from-slate-200 to-slate-400 rounded-b-lg shadow-inner`}>
             <div className="w-1/2 border-r px-4 border-gray-300">
               <FileUpload
                 label={"Sales Sheet"}
@@ -398,30 +406,30 @@ export default function VeiwBooking() {
               <ul>
                 {doc
                   ? doc.map(
-                      (file, index) =>
-                        (!new String(file).includes("doc") ||
-                          file?.catagory === "freezeQuotation") && (
-                          <li className="space-x-2" key={index}>
-                            <a
-                              href={
-                                file.hasOwnProperty("url") ? file.url : file
-                              }
-                              target="_blank"
-                              rel="noopener noreferrer"
-                            >
-                              {file.hasOwnProperty("file")
-                                ? file.file.name
-                                : splitIt(file)}
-                            </a>
-                            <button
-                              className="text-red-400 cursor-pointer hover:text-red-700"
-                              onClick={() => removeDoc(index)}
-                            >
-                              Remove
-                            </button>
-                          </li>
-                        )
-                    )
+                    (file, index) =>
+                      (!new String(file).includes("doc") ||
+                        file?.catagory === "freezeQuotation") && (
+                        <li className="space-x-2" key={index}>
+                          <a
+                            href={
+                              file.hasOwnProperty("url") ? file.url : file
+                            }
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            {file.hasOwnProperty("file")
+                              ? file.file.name
+                              : splitIt(file)}
+                          </a>
+                          <button
+                            className="text-red-400 cursor-pointer hover:text-red-700"
+                            onClick={() => removeDoc(index)}
+                          >
+                            Remove
+                          </button>
+                        </li>
+                      )
+                  )
                   : "No documents uploaded"}
               </ul>
             </div>

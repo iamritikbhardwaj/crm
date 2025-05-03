@@ -24,3 +24,21 @@ export const createIssue = async ( issue, tripId) => {
     });
   }
 };
+
+export const createPayLink = async (data, tripId) => {
+  const response = await axios.post(
+    `${API_URL}users/createPaymentLink?tripId=${tripId}`,
+    data,
+    {
+      withCredentials: true,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
+  if (response.status === 200) {
+    return response.data.OUTPUT;
+  } else {
+    alert(response.data.Message);
+  }
+};
