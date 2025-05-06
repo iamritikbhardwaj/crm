@@ -286,7 +286,10 @@ function PaymentAccordian({ active, setActive, agent, tripId }) {
                                             rel='noopener noreferrer'
                                             className='bg-white py-2 px-4 flex justify-around rounded-md text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 transition-colors duration-300 shadow-sm border border-indigo-100 flex-grow'
                                         >
-                                            Payment Link {link.link + " " + link.amount + " " + link.currency + " Validity: " + new Date(Date(link.created_at) + 10 * 24 * 60 * 60 * 1000).toLocaleDateString() + " Xerate: " + link.xerate}
+                                            <p>Payment Link {link.link} </p>
+                                            <p>amount {((link.amount * link.xerate) + (link.amount * link.xerate) * (link.commision / 100)).toFixed(2)}</p>
+                                            <p>currency: {link.currency}</p>
+                                            <p>Xerate: {link.xerate}</p>
                                         </a>
                                     </div>
                                 ))}

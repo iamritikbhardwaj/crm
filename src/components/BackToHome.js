@@ -7,7 +7,7 @@ function BackToHome({path}) {
     const navigate = useNavigate();
   return (
     <div>
-       <button onClick={() => navigate(path || "/")}><IoMdArrowRoundBack /></button> 
+       <button onClick={() => navigate(path || "/")}><IoMdArrowRoundBack className='text-red-600' size={30}/></button> 
     </div>
   )
 }
