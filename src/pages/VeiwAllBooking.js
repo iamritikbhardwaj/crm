@@ -357,17 +357,17 @@ export default function VeiwAllBooking() {
 
         {/* Booking Details */}
         <div className="mb-6">
-        <div className='bg-gradient-to-r from-yellow-100 to-yellow-300 text-black p-3 rounded-lg flex justify-between items-center shadow-md'>
-        <h2 className="text-lg font-bold text-black flex items-center gap-2">
-          <FaWpforms />
-          Booking Details
-        </h2>
-        <button
-          className="text-black hover:text-yellow-300 transition-colors duration-300"
-          onClick={() => setActive(active === 0 ? null : 0)}>
-          <IoIosArrowDropdownCircle size={24} />
-        </button>
-      </div>
+          <div className='bg-gradient-to-r from-yellow-100 to-yellow-300 text-black p-3 rounded-lg flex justify-between items-center shadow-md'>
+            <h2 className="text-lg font-bold text-black flex items-center gap-2">
+              <FaWpforms />
+              Booking Details
+            </h2>
+            <button
+              className="text-black hover:text-yellow-300 transition-colors duration-300"
+              onClick={() => setActive(active === 0 ? null : 0)}>
+              <IoIosArrowDropdownCircle size={24} />
+            </button>
+          </div>
           <div
             className={`${active === 0 ? "block" : "hidden"
               }  bg-gradient-to-b from-slate-200 to-slate-400 rounded-b-lg shadow-inner grid grid-cols-2 gap-4 p-4`}
@@ -461,17 +461,17 @@ export default function VeiwAllBooking() {
 
         {/* Document Upload */}
         <div className="mb-6">
-        <div className='bg-gradient-to-r from-yellow-100 to-yellow-300 text-black p-3 rounded-lg flex justify-between items-center shadow-md'>
-        <h2 className="text-lg font-bold text-black flex items-center gap-2">
-          <FaFile />
-          Documents Upload
-        </h2>
-        <button
-          className="text-black hover:text-yellow-300 transition-colors duration-300"
-          onClick={() => setActive(active === 1 ? null : 1)}>
-          <IoIosArrowDropdownCircle size={24} />
-        </button>
-      </div>
+          <div className='bg-gradient-to-r from-yellow-100 to-yellow-300 text-black p-3 rounded-lg flex justify-between items-center shadow-md'>
+            <h2 className="text-lg font-bold text-black flex items-center gap-2">
+              <FaFile />
+              Documents Upload
+            </h2>
+            <button
+              className="text-black hover:text-yellow-300 transition-colors duration-300"
+              onClick={() => setActive(active === 1 ? null : 1)}>
+              <IoIosArrowDropdownCircle size={24} />
+            </button>
+          </div>
           <div className={`p-4 ${active === 1 ? "block" : "hidden"} bg-gradient-to-b from-slate-200 to-slate-400 rounded-b-lg shadow-inner`}>
             <div className="flex justify-end">
               <button
@@ -566,17 +566,17 @@ export default function VeiwAllBooking() {
 
         {/* Commercials */}
         <div className="mb-6">
-        <div className='bg-gradient-to-r from-yellow-100 to-yellow-300 text-black p-3 rounded-lg flex justify-between items-center shadow-md'>
-        <h2 className="text-lg font-bold text-black flex items-center gap-2">
-          <FaMoneyBill />
-          Commercials
-        </h2>
-        <button
-          className="text-black hover:text-yellow-300 transition-colors duration-300"
-          onClick={() => setActive(active === 2 ? null : 2)}>
-          <IoIosArrowDropdownCircle size={24} />
-        </button>
-      </div>
+          <div className='bg-gradient-to-r from-yellow-100 to-yellow-300 text-black p-3 rounded-lg flex justify-between items-center shadow-md'>
+            <h2 className="text-lg font-bold text-black flex items-center gap-2">
+              <FaMoneyBill />
+              Commercials
+            </h2>
+            <button
+              className="text-black hover:text-yellow-300 transition-colors duration-300"
+              onClick={() => setActive(active === 2 ? null : 2)}>
+              <IoIosArrowDropdownCircle size={24} />
+            </button>
+          </div>
           <div className={`p-4 ${active === 2 ? "block" : "hidden"} bg-gradient-to-b from-slate-200 to-slate-400 rounded-b-lg shadow-inner`}>
             <div className="flex justify-between">
               <p className="font-semibold">
@@ -842,16 +842,16 @@ export default function VeiwAllBooking() {
             }`}
         >
           <div className='bg-gradient-to-r from-yellow-100 to-yellow-300 text-black p-3 rounded-lg flex justify-between items-center shadow-md'>
-                  <h2 className="text-lg font-bold text-black flex items-center gap-2">
-                    <FaFileExcel />
-                    Freeze Quotation
-                  </h2>
-                  <button
-                    className="text-black hover:text-yellow-300 transition-colors duration-300"
-                    onClick={() => setActive(active === 3 ? null : 3)}>
-                    <IoIosArrowDropdownCircle size={24} />
-                  </button>
-                </div>
+            <h2 className="text-lg font-bold text-black flex items-center gap-2">
+              <FaFileExcel />
+              Freeze Quotation
+            </h2>
+            <button
+              className="text-black hover:text-yellow-300 transition-colors duration-300"
+              onClick={() => setActive(active === 3 ? null : 3)}>
+              <IoIosArrowDropdownCircle size={24} />
+            </button>
+          </div>
           <div className={`p-4 ${active === 3 ? "flex-col" : "hidden"} h-fit bg-gradient-to-b from-slate-200 to-slate-400 rounded-b-lg shadow-inner`}>
             <div className="flex justify-between">
               <button
@@ -960,16 +960,16 @@ export default function VeiwAllBooking() {
             }`}
         >
           <div className='bg-gradient-to-r from-yellow-100 to-yellow-300 text-black p-3 rounded-lg flex justify-between items-center shadow-md'>
-                  <h2 className="text-lg font-bold text-black flex items-center gap-2">
-                    <FaExchangeAlt />
-                    Supplier Payments
-                  </h2>
-                  <button
-                    className="text-black hover:text-yellow-300 transition-colors duration-300"
-                    onClick={() => setActive(active === 4 ? null : 4)}>
-                    <IoIosArrowDropdownCircle size={24} />
-                  </button>
-                </div>
+            <h2 className="text-lg font-bold text-black flex items-center gap-2">
+              <FaExchangeAlt />
+              Supplier Payments
+            </h2>
+            <button
+              className="text-black hover:text-yellow-300 transition-colors duration-300"
+              onClick={() => setActive(active === 4 ? null : 4)}>
+              <IoIosArrowDropdownCircle size={24} />
+            </button>
+          </div>
           <div className={`p-4 ${active === 4 ? "block" : "hidden"} bg-gradient-to-b from-slate-200 to-slate-400 rounded-b-lg shadow-inner`}>
             <VendorForm
               setInputData={setInputData}
@@ -1142,9 +1142,15 @@ export default function VeiwAllBooking() {
           </div>
         </div>
         {/* Issues details */}
-        <IssuesAccordian active={active} setActive={setActive} tripId={tripId} />
+        <div className={user.profile === "Admin" ? "" : "hidden"}>
+          <IssuesAccordian active={active} setActive={setActive} tripId={tripId} />
+        </div>
+
         {/* Payment details */}
-        <PaymentAccordian active={active} setActive={setActive} tripId={tripId} agent={item?.agent} />
+        <div className={user.profile === "Finance" || user.profile === "Admin" ? "" : "hidden"}>
+          <PaymentAccordian active={active} disabled={user.profile === "Admin" || user.profile === "Finance"} setActive={setActive} tripId={tripId} agent={item?.agent} />
+        </div>
+
       </div>
     </div>
   );

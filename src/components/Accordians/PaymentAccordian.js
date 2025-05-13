@@ -12,7 +12,7 @@ import { fetchAgents, fetchPayLinks } from '../apiCalls/fetchData'
 import { createPayLink } from '../apiCalls/createData'
 
 
-function PaymentAccordian({ active, setActive, agent, tripId }) {
+function PaymentAccordian({ active, setActive, agent, tripId, disabled }) {
     const [stripe, setStripe] = useState(null);
     const [flyremit, setFlyremit] = useState(null);
     const [commision, setCommision] = useState(0);
@@ -128,11 +128,11 @@ function PaymentAccordian({ active, setActive, agent, tripId }) {
     }
 
     return (
-        <div className="mb-6 relative">
+        <div className={`mb-6 relative ${disabled ? "hidden" : ""}`}>
             <div className='bg-gradient-to-r from-yellow-100 to-yellow-300 text-black p-3 rounded-lg flex justify-between items-center shadow-md'>
                 <h2 className="text-lg font-bold text-black flex items-center gap-2">
                     <FaCreditCard />
-                    Payment Linkss
+                    Payment Links
                 </h2>
                 <button
                     onClick={() => setActive(active === 6 ? null : 6)}
