@@ -276,8 +276,8 @@ const AllBookings = () => {
   ];
 
   return (
-    <div className="flex-col justify-center mt-6 mx-auto p-4 overflow-auto scrollbar-hide h-screen w-full bg-gradient-to-b from-slate-100 to-slate-300 rounded-b-lg shadow-inner">
-      <div className="flex justify-center gap-4 mb-6">
+    <div className="flex-col justify-center overflow-none mt-6 mx-auto p-4 h-screen w-fit bg-gradient-to-b from-slate-100 to-slate-300 rounded-b-lg shadow-inner">
+      <div className="flex justify-center w-full gap-4 mb-6">
         <div>
           <label htmlFor="fromDate" className="block mb-1">
             From Date

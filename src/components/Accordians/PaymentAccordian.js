@@ -128,13 +128,14 @@ function PaymentAccordian({ active, setActive, agent, tripId, disabled }) {
     }
 
     return (
-        <div className={`mb-6 relative ${disabled ? "hidden" : ""}`}>
+        <div className={`mb-6 relative`}>
             <div className='bg-gradient-to-r from-yellow-100 to-yellow-300 text-black p-3 rounded-lg flex justify-between items-center shadow-md'>
                 <h2 className="text-lg font-bold text-black flex items-center gap-2">
                     <FaCreditCard />
                     Payment Links
                 </h2>
                 <button
+                    disabled={disabled}
                     onClick={() => setActive(active === 6 ? null : 6)}
                     className="text-black hover:text-yellow-300 transition-colors duration-300"
                 >

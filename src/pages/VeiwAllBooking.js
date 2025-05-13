@@ -63,7 +63,7 @@ export default function VeiwAllBooking() {
   const [selectedExcel, setSelectedExcel] = useState([]);
   const auth = useSelector((state) => state.auth);
   const user = auth.user;
-
+  console.log(user, "user");
   const refetch = async () => {
     const itemData = await fetchTrips(tripId);
     setItem(itemData);
@@ -1142,15 +1142,16 @@ export default function VeiwAllBooking() {
           </div>
         </div>
         {/* Issues details */}
-        <div className={user.profile === "Admin" ? "" : "hidden"}>
-          <IssuesAccordian active={active} setActive={setActive} tripId={tripId} />
+        <div className={user.profile !== "Admin" ? "hidden" : ""}>
+        <IssuesAccordian active={active} setActive={setActive} tripId={tripId} />
         </div>
-
         {/* Payment details */}
-        <div className={user.profile === "Finance" || user.profile === "Admin" ? "" : "hidden"}>
-          <PaymentAccordian active={active} disabled={user.profile === "Admin" || user.profile === "Finance"} setActive={setActive} tripId={tripId} agent={item?.agent} />
-        </div>
-
+        <PaymentAccordian 
+        active={active} 
+        disabled={user.profile !== "Admin" || user.profile !== "Finance"} 
+        setActive={setActive} 
+        tripId={tripId} 
+        agent={item?.agent} />
       </div>
     </div>
   );
