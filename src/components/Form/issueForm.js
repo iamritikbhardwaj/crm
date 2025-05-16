@@ -56,7 +56,7 @@ function IssueForm({ hidden, tripId, refetch }) {
       } p-2 bg-white rounded shadow absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2`}
     >
       <div className="flex justify-end">
-        <MdCancel onClick={() => setOpen(false)} />
+        <MdCancel onClick={() => setOpen(!open)} />
       </div>
       <div className={` p-4`}>
         <form

@@ -79,7 +79,7 @@ function IssuesAccordian({ active, setActive, tripId }) {
         " ",
       description: row.description,
       resolution: row.resolution,
-      responsible: row.resolution,
+      responsible: row.responsible,
       action: (
         <div className="flex justify-around">
           <MdEdit className="text-blue-500" />
@@ -104,7 +104,7 @@ function IssuesAccordian({ active, setActive, tripId }) {
     <div className="mb-6 relative">
       <div className='bg-gradient-to-r from-yellow-100 to-yellow-300 text-black p-3 rounded-lg flex justify-between items-center shadow-md'>
         <h2 className="text-lg font-bold text-black flex items-center gap-2">
-          <FaExclamationCircle />
+         <FaExclamationCircle />
           Issues Overview
         </h2>
         <button

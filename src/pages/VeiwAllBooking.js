@@ -1148,7 +1148,7 @@ export default function VeiwAllBooking() {
         {/* Payment details */}
         <PaymentAccordian 
         active={active} 
-        disabled={user.profile !== "Admin" || user.profile !== "Finance"} 
+        disabled={user.profile !== ("Admin" || "Finance")} 
         setActive={setActive} 
         tripId={tripId} 
         agent={item?.agent} />
