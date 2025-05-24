@@ -291,6 +291,7 @@ function PaymentAccordian({ active, setActive, agent, tripId, disabled }) {
                                             <p>amount {((link.amount * link.xerate) + (link.amount * link.xerate) * (link.commision / 100)).toFixed(2)}</p>
                                             <p>currency: {link.currency}</p>
                                             <p>Xerate: {link.xerate}</p>
+                                            <p>USD: {link.amount}</p>
                                         </a>
                                     </div>
                                 ))}

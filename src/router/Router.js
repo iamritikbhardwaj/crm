@@ -18,6 +18,7 @@ const VeiwAllBooking = lazy(() => import("../pages/VeiwAllBooking"));
 const ExcelToTable = lazy(() => import("../components/customTable/ExcelToTable"))
 const NotFound = lazy(() => import("../errorPages/NotFound.jsx"));
 const DocForm = lazy(() => import("../components/Form/docForm"));
+const JsonDataProcessor = lazy(() => import("../pages/json-to-dataframe"));
 
 // ProtectedRoute component
 const ProtectedRoute = ({ element }) => {
@@ -104,6 +105,10 @@ const router = createBrowserRouter([
     {
         path: "/login",
         element: <Login />,
+    },
+    {
+        path: "/json-to-dataframe",
+        element: <JsonDataProcessor />,
     },
     {
         path: "*",
