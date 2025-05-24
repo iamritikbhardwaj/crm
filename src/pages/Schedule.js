@@ -2,23 +2,19 @@ import React, { use, useEffect, useState } from "react";
 import BackToHome from "../components/BackToHome";
 import {
   CustomTable,
-  DefaultColumnFilter,
 } from "../components/customTable/CustomTable";
-import { useNavigate } from "react-router-dom";
 import { GrFormView } from "react-icons/gr";
 import { getTravelMonthRange } from "./Booking";
 import {
   fetchFilteredTrips,
   fetchTrips,
 } from "../components/apiCalls/fetchData";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import JsonToExcel from "../components/ExcelJson/JsonToExcel.js";
 
 // this includes dashboard for all the trips which has been created after accepting the booking
 const AllBookings = () => {
   const [bookings, setBookings] = useState([]);
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
   const auth = useSelector((state) => state.auth);
   const user = auth.user; // this user is used to specify roles based on user profile
 
@@ -83,8 +79,8 @@ const AllBookings = () => {
               apayment: (
                 <div
                   className={`font-bold ${parseFloat(item.orderValue) === parseFloat(item?.payment)
-                      ? "text-green-700"
-                      : "text-red-700"
+                    ? "text-green-700"
+                    : "text-red-700"
                     }`}
                 >
                   {item?.payment + " USD"}
@@ -107,9 +103,7 @@ const AllBookings = () => {
                 <button
                   className="text-3xl"
                   onClick={() => {
-                    navigate(`/viewAllBooking`, {
-                      state: { tripId: item.tripId },
-                    });
+                    goToBooking(item.tripId);
                   }}
                 >
                   <GrFormView />
@@ -118,8 +112,8 @@ const AllBookings = () => {
               paymentstat: (
                 <button
                   className={`${item.paymentStatus === "FULL-PAID"
-                      ? "bg-green-400"
-                      : "bg-red-400"
+                    ? "bg-green-400"
+                    : "bg-red-400"
                     } p-2 rounded-lg`}
                 ></button>
               ),
@@ -135,8 +129,8 @@ const AllBookings = () => {
               opsstatus: (
                 <button
                   className={`${item.opsStatus === "COMPLETED"
-                      ? "bg-green-400"
-                      : "bg-red-400"
+                    ? "bg-green-400"
+                    : "bg-red-400"
                     } p-2 rounded-lg`}
                 ></button>
               ),
@@ -145,6 +139,12 @@ const AllBookings = () => {
         .filter((stuff) => stuff !== true)
       : [];
     setBookings(bookings);
+  };
+
+  const goToBooking = (tripId) => {
+    const params = new URLSearchParams({ tripId: tripId });
+    const url = `/viewAllBooking?${params.toString()}`;
+    window.open(url, '_blank');
   };
 
   useEffect(() => {
@@ -188,9 +188,9 @@ const AllBookings = () => {
                 apayment: (
                   <div
                     className={`font-bold ${parseFloat(item.orderValue) ===
-                        parseFloat(item?.payment)
-                        ? "text-green-700"
-                        : "text-red-700"
+                      parseFloat(item?.payment)
+                      ? "text-green-700"
+                      : "text-red-700"
                       }`}
                   >
                     {item?.payment + " USD"}
@@ -213,7 +213,7 @@ const AllBookings = () => {
                   <button
                     className="text-3xl"
                     onClick={() =>
-                      navigate("/viewAllBooking", { state: item })
+                      goToBooking(item.tripId)
                     }
                   >
                     <GrFormView />
@@ -222,8 +222,8 @@ const AllBookings = () => {
                 paymentstat: (
                   <button
                     className={`${item.paymentStatus === "FULL-PAID"
-                        ? "bg-green-400"
-                        : "bg-red-400"
+                      ? "bg-green-400"
+                      : "bg-red-400"
                       } p-2 rounded-lg`}
                   ></button>
                 ),
@@ -240,8 +240,8 @@ const AllBookings = () => {
                 opsstatus: (
                   <button
                     className={`${item.opsStatus === "COMPLETED"
-                        ? "bg-green-400"
-                        : "bg-red-400"
+                      ? "bg-green-400"
+                      : "bg-red-400"
                       } p-2 rounded-lg`}
                   ></button>
                 ),

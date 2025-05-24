@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { IoIosArrowDropdownCircle } from "react-icons/io";
 import BackToHome from "../components/BackToHome";
 import { CustomTable } from "../components/customTable/CustomTable";
-import { useLocation } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import { getTravelMonthRange } from "./Booking";
 import FileUpload from "../components/Input/FileUpload";
 import ReconForm from "../components/Form/ReconForm";
@@ -39,8 +39,11 @@ import { FaCertificate, FaDochub, FaExchangeAlt, FaExclamationCircle, FaFile, Fa
 
 export default function VeiwAllBooking() {
   const location = useLocation();
-  const trip = location.state;
-  const tripId = trip.tripId;
+  const queryParams = new URLSearchParams(location.search);
+  const tripId = queryParams.get("tripId");
+  const tranStatus = queryParams.get("tranStatus") || null;
+  const tranId = queryParams.get("tranId") || null;
+  console.log(tranStatus, tranId);
   const [item, setItem] = useState();
   const [active, setActive] = useState(0); // Section toggle
   const [doc, setDoc] = useState(item?.documents);
@@ -159,6 +162,14 @@ export default function VeiwAllBooking() {
   };
 
   useEffect(() => {
+    if (tranId !== null) {
+      Swal.fire({
+        title: `Transaction ${tranStatus}`,
+        text: `Transaction Id: ${tranId}`,
+        icon: tranStatus.toLowerCase() === "success" ? "success" : "error",
+        confirmButtonText: "Ok",
+      })
+    }
     try {
       if (Date.now() > item?.arrivalDate && Date.now() < item?.departureDate) {
         setInputData({ ...inputData, status: "ON-TOUR" });

@@ -255,7 +255,7 @@ function PaymentAccordian({ active, setActive, agent, tripId, disabled }) {
                         </div>
                         {errors.xerate && <p className="text-red-600 col-span-1 text-sm ml-2">* {errors.xerate.message}</p>}
 
-                        <div className="col-span-2 bg-gradient-to-r from-indigo-100 to-purple-100 p-3 rounded-xl flex items-center mt-2">
+                        <div className="col-span-1 bg-gradient-to-r from-indigo-100 to-purple-100 p-3 rounded-xl flex items-center mt-2">
                             <div className="text-indigo-800 font-semibold">
                                 Commission Rate: <span className="text-purple-700">{commision}%</span>
                             </div>
