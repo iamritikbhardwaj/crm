@@ -1162,7 +1162,7 @@ export default function VeiwAllBooking() {
         disabled={user.profile !== "Finance"} 
         setActive={setActive} 
         tripId={tripId} 
-        agent={item?.agent} />
+        />
       </div>
     </div>
   );

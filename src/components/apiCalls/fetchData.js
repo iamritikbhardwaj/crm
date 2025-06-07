@@ -77,6 +77,7 @@ export const fetchAgents = async () => {
   }
 };
 
+
 export const fetchBookings = async () => {
   const response = await axios.get(`${API_URL}users/getAllBookings`, {
     withCredentials: true,

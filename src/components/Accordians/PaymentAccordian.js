@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { IoIosArrowDropdownCircle } from 'react-icons/io'
 import { BiDollarCircle, BiMailSend } from 'react-icons/bi'
 import { FaCreditCard, FaMoneyBillWave } from 'react-icons/fa'
@@ -6,18 +6,18 @@ import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Controller, useForm } from 'react-hook-form'
 import Swal from 'sweetalert2'
-import axios from 'axios'
-import { API_URL } from '../../AppConstant'
 import { fetchAgents, fetchPayLinks } from '../apiCalls/fetchData'
 import { createPayLink } from '../apiCalls/createData'
 
 
-function PaymentAccordian({ active, setActive, agent, tripId, disabled }) {
+function PaymentAccordian({ active, setActive, tripId, disabled }) {
     const [stripe, setStripe] = useState(null);
     const [flyremit, setFlyremit] = useState(null);
     const [commision, setCommision] = useState(0);
     const [links, setLinks] = useState([]);
     const [isXeRateDisabled, setIsXeRateDisabled] = useState(false);
+    const [agents, setAgents] = useState([]);
+    const [agent_id, setAgent_id] = useState('some_id');
 
     const paymentSchema = z.object({
         agent_name: z.string().min(1, { message: "Name is required" }),
@@ -40,23 +40,31 @@ function PaymentAccordian({ active, setActive, agent, tripId, disabled }) {
         }
     });
 
+    const fetchAllagents = async () => {
+        const response = await fetchAgents();
+        setAgents(response);
+        console.log(agents);
+        return response;
+    }
+
+
     // Watch the currency field to automatically set xerate when USD is selected
     const selectedCurrency = watch('currency');
 
     useEffect(() => {
         setStripe(document.querySelector('#stripe'));
         setFlyremit(document.querySelector('#flyremit'));
+        fetchAllagents();
         (async () => {
             const linksData = await fetchPayLinks(tripId)
-            console.log(linksData)
+            console.log(linksData, "linksData")
             setLinks(linksData)
         })()
     }, []);
 
     useEffect(() => {
         setValue('commision', commision);
-        setValue('agent_name', agent);
-    }, [commision, setValue, agent]);
+    }, [commision, setValue]);
 
     // Add effect to set xerate to 1 when currency is USD
     useEffect(() => {
@@ -87,17 +95,24 @@ function PaymentAccordian({ active, setActive, agent, tripId, disabled }) {
         }).then(async (result) => {
             if (result.isConfirmed) {
                 try {
-                    const response = await createPayLink(data, tripId);
+                    const response = await createPayLink(data, tripId, agent_id);
                     console.log(response);
-                    setLinks([...links, response]);
-                    setCommision(0);
-                    Swal.fire({
-                        title: 'Success!',
-                        text: 'Payment links created successfully',
-                        icon: 'success',
-                        confirmButtonColor: '#10b981',
-                        timer: 2000
-                    });
+                    if (String(await response.OUTPUT).includes('https')) {
+                        window.open(response.OUTPUT, '_blank');
+                    } else {
+                        setLinks([...links, response]);
+                        setCommision(0);
+                        Swal.fire({
+                            title: 'Success!',
+                            text: 'Payment links created successfully',
+                            icon: 'success',
+                            confirmButtonColor: '#10b981',
+                            timer: 2000
+                        }).then((result) => {
+                            console.log(response)
+                            result.isConfirmed && response.includes('https') && window.open(String(response), '_blank');
+                        })
+                    }
 
                 } catch (error) {
                     Swal.fire({
@@ -166,13 +181,35 @@ function PaymentAccordian({ active, setActive, agent, tripId, disabled }) {
 
                     <div className={`form my-4 font-medium ${commision === 0 ? 'hidden' : 'grid'} grid-cols-2 gap-4 w-full h-fit rounded-xl px-8 py-6 text-black items-center justify-around bg-gradient-to-br from-emerald-100 via-teal-50 to-cyan-100 shadow-lg border border-emerald-200`}>
                         <div className="col-span-2 relative">
-                            <input
+                            <Controller
+                                name="agent_name"
+                                control={control}
+                                className='w-full p-4 bg-white/80 border border-emerald-200 rounded-xl shadow-inner appearance-none cursor-pointer focus:ring-2 focus:ring-emerald-300 focus:border-transparent outline-none transition-all'
+                                placeholder='Agent name'
+                                render={({ field }) => (
+                                    <select
+                                        {...field}
+                                        onChange={(e) => field.onChange(e.target.value)}
+                                        value={field.value}
+                                        className='w-full p-4 bg-white/80 border border-emerald-200 rounded-xl shadow-inner appearance-none cursor-pointer focus:ring-2 focus:ring-emerald-300 focus:border-transparent outline-none transition-all'
+                                        placeholder='Agent name'
+                                    >
+                                        <option value="">Select Agent</option>
+                                        {agents.map((agent) => (
+                                            <option key={agent.agent_id} onChange={() => setAgent_id(agent.agent_id)} value={String(agent.agent_id + " " + agent.name)}>
+                                                {agent.name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                )}
+                            />
+                            {/* <input
                                 type="text"
                                 value={agent || ''}
                                 disabled
                                 placeholder='Agent name'
                                 className='w-full p-4 bg-white/80 border border-emerald-200 rounded-xl shadow-inner'
-                            />
+                            /> */}
                             <input
                                 type="hidden"
                                 {...register('agent_name')}

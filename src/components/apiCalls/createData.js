@@ -25,9 +25,9 @@ export const createIssue = async ( issue, tripId) => {
   }
 };
 
-export const createPayLink = async (data, tripId) => {
+export const createPayLink = async (data, tripId, agent_id) => {
   const response = await axios.post(
-    `${API_URL}users/createPaymentLink?tripId=${tripId}`,
+    `${API_URL}users/createPaymentLink?tripId=${tripId}&agentId=${agent_id}`,
     data,
     {
       withCredentials: true,
