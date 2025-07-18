@@ -97,22 +97,19 @@ function PaymentAccordian({ active, setActive, tripId, disabled }) {
                 try {
                     const response = await createPayLink(data, tripId, agent_id);
                     console.log(response);
-                    if (String(await response.OUTPUT).includes('https')) {
-                        window.open(response.OUTPUT, '_blank');
-                    } else {
-                        setLinks([...links, response]);
-                        setCommision(0);
-                        Swal.fire({
-                            title: 'Success!',
-                            text: 'Payment links created successfully',
-                            icon: 'success',
-                            confirmButtonColor: '#10b981',
-                            timer: 2000
-                        }).then((result) => {
-                            console.log(response)
-                            result.isConfirmed && response.includes('https') && window.open(String(response), '_blank');
-                        })
-                    }
+                    window.open(await response.link, '_blank');
+                    setLinks([...links, response]);
+                    setCommision(0);
+                    Swal.fire({
+                        title: 'Success!',
+                        text: 'Payment links created successfully',
+                        icon: 'success',
+                        confirmButtonColor: '#10b981',
+                        timer: 2000
+                    }).then((result) => {
+                        console.log(response)
+                        result.isConfirmed && response.includes('https') && window.open(String(response), '_blank');
+                    })
 
                 } catch (error) {
                     Swal.fire({
@@ -325,7 +322,7 @@ function PaymentAccordian({ active, setActive, tripId, disabled }) {
                                             className='bg-white py-2 px-4 flex justify-around rounded-md text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 transition-colors duration-300 shadow-sm border border-indigo-100 flex-grow'
                                         >
                                             <p>Payment Link {link.link} </p>
-                                            <p>amount {((link.amount * link.xerate) + (link.amount * link.xerate) * (link.commision / 100)).toFixed(2)}</p>
+                                            <p>amount {parseInt((link.amount * link.xerate) + (link.amount * link.xerate) * (link.commision / 100)) + 1}</p>
                                             <p>currency: {link.currency}</p>
                                             <p>Xerate: {link.xerate}</p>
                                             <p>USD: {link.amount}</p>
