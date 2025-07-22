@@ -845,11 +845,9 @@ export default function VeiwAllBooking() {
 
         {/* Freeze Quotation */}
         <div
-          className={`mb-6 ${user.profile !== "Admin" &&
-            user.name !== item?.opsSpoc &&
-            user.profile !== "Finance"
-            ? "hidden"
-            : ""
+          className={`mb-6 ${user.profile !== "Sales"
+            ? ""
+            : "hidden"
             }`}
         >
           <div className='bg-gradient-to-r from-yellow-100 to-yellow-300 text-black p-3 rounded-lg flex justify-between items-center shadow-md'>
